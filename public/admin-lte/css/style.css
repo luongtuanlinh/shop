@@ -1,0 +1,284 @@
+
+.select2-container--default .select2-selection--single {
+    background-color: #fff;
+    border: 1px solid #d2d6de !important;
+    border-radius: 0 !important;
+    height: 100% !important;
+}
+
+.bootstrap-tagsinput {
+    width: 100% !important;
+}
+/**********************************
+Name: cmxform Styles
+***********************************/
+form.cmxform {
+    width: 370px;
+    font-size: 1.0em;
+    color: #333;
+}
+
+form.cmxform legend {
+    padding-left: 0;
+}
+
+form.cmxform legend, form.cmxform label {
+    color: #333;
+}
+
+form.cmxform fieldset {
+    border: none;
+    border-top: 1px solid #C9DCA6;
+    background: url(../images/cmxform-fieldset.gif) left bottom repeat-x;
+    background-color: #F8FDEF;
+}
+
+form.cmxform fieldset fieldset {
+    background: none;
+}
+
+form.cmxform fieldset p, form.cmxform fieldset fieldset {
+    padding: 5px 10px 7px;
+    background: url(../images/cmxform-divider.gif) left bottom repeat-x;
+}
+
+form.cmxform label.error, label.error {
+    /* remove the next line when you have trouble in IE6 with labels in list */
+    color: red;
+    font-style: italic
+}
+div.error { display: none; }
+input {	border: 1px solid black; }
+input.checkbox { border: none }
+input:focus { border: 1px dotted black; }
+input.error { border: 1px dotted red; }
+form.cmxform .gray * { color: gray; }
+/**********************************
+Use: cmxform template
+***********************************/
+form.cmxform fieldset {
+    margin-bottom: 10px;
+}
+
+form.cmxform legend {
+    padding: 0 2px;
+    font-weight: bold;
+    _margin: 0 -7px; /* IE Win */
+}
+
+form.cmxform label {
+    display: inline-block;
+    line-height: 1.8;
+    vertical-align: top;
+    cursor: hand;
+}
+
+form.cmxform fieldset p {
+    list-style: none;
+    padding: 5px;
+    margin: 0;
+}
+
+form.cmxform fieldset fieldset {
+    border: none;
+    margin: 3px 0 0;
+}
+
+form.cmxform fieldset fieldset legend {
+    padding: 0 0 5px;
+    font-weight: normal;
+}
+
+form.cmxform fieldset fieldset label {
+    display: block;
+    width: auto;
+}
+
+form.cmxform label { width: 100px; } /* Width of labels */
+form.cmxform fieldset fieldset label { margin-left: 103px; } /* Width plus 3 (html space) */
+form.cmxform label.error {
+    margin-left: 103px;
+    width: 220px;
+}
+
+form.cmxform input.submit {
+    margin-left: 103px;
+}
+
+.break-word { word-break: break-word;}
+.contract-file-icon { font-size: 36px;}
+
+#typeContentOther textarea {
+    max-width: 300px;
+    min-width: 200px;
+}
+.user-panel>.image>img{
+    height: 40px;
+}
+.status{
+    position: relative;
+    height: 120px;
+    z-index: 11;
+    margin-bottom: 30px;
+}
+.progress{
+    font-size: 14px;
+    font-weight: bold;
+    background: none;
+    position: absolute;
+    top: 0%;
+    left: 5%;
+    color: #1CB0AE;
+}
+.line{
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    background: #D9D9D9;
+    height: 5px;
+    z-index: 10;
+}
+.circle{
+    position: absolute;
+    z-index: 1050;
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    border: 5px solid #D9D9D9;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    top: 30%;
+}
+.circle .fa{
+    color: #fff;
+}
+.circle .fa-close{
+    display: none;
+}
+.done .circle{
+    background: #fff;
+    border-color: #1CB0AE;
+}
+.done .circle .fa-spin{
+    display: none;
+}
+.done .circle .fa-close{
+    display: none;
+}
+.done .circle .fa-check{
+    color: #1CB0AE;
+}
+.done .line{
+    background: #1CB0AE;
+}
+.cancel .line{
+    background: #dd4b39;
+}
+.cancel .circle{
+    background: #fff;
+    border-color: #dd4b39;
+}
+.cancel .circle .fa-spin{
+    display: none;
+}
+.cancel .circle .fa-check{
+    display: none;
+}
+.cancel .circle .fa-close{
+    display: contents;
+    color: #dd4b39;
+}
+.sticky + .content {
+    padding-top: 30px;
+}
+.spin .circle{
+    background: #1CB0AE;
+}
+.spin .circle .fa-check{
+    display: none;
+}
+.spin .circle .fa-close{
+    display: none;
+}
+.wait .circle{
+    background: #EFEFEF;
+}
+.wait .circle .fa-spin, .wait .circle .fa-check .fa-close{
+    display: none;
+}
+#justSolve{
+    position: absolute;
+    top: 80%;
+}
+#justSolve input{
+    background: #1CB0AE;
+    color: #fff;
+}
+.quanity{
+    width: 40px;
+}
+#process-bar{
+    position: relative;
+    margin: 0px;
+}
+select {
+    display: inline-block;
+    padding: 10px;
+    width: 120px;
+    max-width: 100%; height: auto !important;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    background: url("https://maxcdn.icons8.com/Android_L/PNG/512/Arrows/sort_down-512.png")
+    right center no-repeat;
+    background-size: 30px 30px;
+    color: #444444;
+    font-size: 16px;
+    line-height: 16px !important; appearance: none; /* this is must */
+    -webkit-appearance: none; -moz-appearance: none;
+}
+select option {
+    margin: 40px;
+    padding: 4px;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+#order-total h4,#note h4{
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+#note span{
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+#note textarea{
+    width: 100%;
+}
+#note table{
+    text-align: center;
+    margin: 10px;
+}
+#order-total table{
+    width: 100%;
+}
+.name-date{
+    margin-bottom: 10px;
+}
+.comment{
+    background-color: #DFF9E0;
+    margin-bottom: 20px;
+}
+.admin{
+    font-weight: bold;
+}
+.avatar-comment img{
+    margin-top: 20%;
+    margin-left: 10%;
+    border-radius: 50%;
+    width: 40px;
+}
+.status-history{
+    margin-top: 10px;
+}
+
+/*\*//*/ form.cmxform legend { display: inline-block; } /* IE Mac legend fix */
