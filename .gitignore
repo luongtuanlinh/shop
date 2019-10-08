@@ -10,3 +10,8 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .idea
+/Modules/Core
+Modules/Guest/Config/.gitkeep
+Modules/Guest/Console/.gitkeep
+Modules/Guest/Database/Migrations/.gitkeep
+Modules/Guest/Database/Seeders/.gitkeep
