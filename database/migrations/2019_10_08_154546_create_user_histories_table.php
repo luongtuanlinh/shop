@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateQuestionsTable extends Migration
+class CreateUserHistoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateQuestionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('questions', function (Blueprint $table) {
+        Schema::create('user_histories', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('content');
-            $table->integer('level')->comment('Muc do kho de cua cau hoi, VD 1, 2, 3'); // 
+            $table->integer('user_id');
+            $table->integer('product_id');
+            $table->integer('price');
+            $table->dateTime('deleted_at')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -29,6 +30,6 @@ class CreateQuestionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('questions');
+        Schema::dropIfExists('user_histories');
     }
 }
