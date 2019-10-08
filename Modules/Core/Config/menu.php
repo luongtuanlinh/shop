@@ -11,7 +11,7 @@ return [
         'order'      => 7,
         'sub'        => [
             [
-                'route'      => 'core.user.index',
+                'route'      => 'core.user.create',
                 'permission' => [8,9,10,11],
                 'class'      => '',
                 'icon'       => 'fa fa-user',
