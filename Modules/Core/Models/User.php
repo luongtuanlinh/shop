@@ -13,6 +13,9 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Carbon\Carbon;
 use Laravel\Passport\HasApiTokens;
+use Modules\Core\Models\Shop\Cart;
+use Modules\Core\Models\Shop\Order;
+use Modules\Core\Models\Shop\Product;
 
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract
 {
@@ -136,5 +139,25 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
             return "";
         }
         return env('APP_URL') . "/img/user/{$avatar}";
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class,'admin_id','id');
+    }
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function histories()
+    {
+        return $this->belongsToMany(Product::class,'user_histories','user_id','product_id')->withPivot(['price','updated_at']);
     }
 }
