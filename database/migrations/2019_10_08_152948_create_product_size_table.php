@@ -13,7 +13,7 @@ class CreateProductSizeTable extends Migration
      */
     public function up()
     {
-        Schema::create('product_size', function (Blueprint $table) {
+        Schema::create('product_sizes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('product_id');
             $table->integer('size_id');
