@@ -17,7 +17,7 @@ class CreateSizesTable extends Migration
             $table->bigIncrements('id');
             $table->string('size_name');
             $table->string('introduction')->nullable();
-            $table->dateTime('deleted_at');
+            $table->dateTime('deleted_at')->nullable();
             $table->timestamps();
         });
     }
