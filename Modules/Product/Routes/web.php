@@ -15,7 +15,7 @@ Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
 {
     Route::group(['middleware' => ['auth', 'verify.role']], function () {
 
-        Route::get('/', 'DashboardController@index')->name('admin_home');
+        // Route::get('/', 'ProductController@index')->name('admin_home');
 
         Route::resource('product', 'ProductController', ['as' => 'product']);
 
