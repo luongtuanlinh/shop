@@ -59,7 +59,7 @@
     </div>
 
     <div id="back-to-top">
-        <a href="/shop/#top" aria-label="Go to top"><i class="ui-arrow-up"></i></a>
+        <a href="#top" aria-label="Go to top"><i class="ui-arrow-up"></i></a>
     </div>
 
 </main> <!-- end main-wrapper -->
