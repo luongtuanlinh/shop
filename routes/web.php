@@ -11,10 +11,10 @@
 |
 */
 
-Route::get('/', 'PagesController@index');
-Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
-//Route::get('/home', 'HomeController@index')->name('home');
-
-Route::get('/error', function(){
-    return abort(404);
-});
+//Route::get('/', 'PagesController@index');
+//Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+////Route::get('/home', 'HomeController@index')->name('home');
+//
+//Route::get('/error', function(){
+//    return abort(404);
+//});
