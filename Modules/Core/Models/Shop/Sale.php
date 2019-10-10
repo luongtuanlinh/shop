@@ -8,11 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
-    public function product()
+    public function products()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsToMany(Product::class,'product_sale','sale_id','product_id')->withPivot(['discount']);
     }
-
-
-
 }
