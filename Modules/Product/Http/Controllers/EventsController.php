@@ -5,9 +5,8 @@ namespace Modules\Product\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Modules\Product\Entities\Sale;
 
-class SaleController extends Controller
+class EventsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,11 +14,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $sales = Sale::withTrashed()->paginate();
-        
-        return view('product::sales/index', [
-            "sales" => $sales,
-        ]);
+        return view('product::index');
     }
 
     /**

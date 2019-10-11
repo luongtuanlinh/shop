@@ -39,6 +39,16 @@ return [
                 'text'       => 'product::menu.sales',
                 'order'      => 3,
                 'sub'        => []
+            ],
+            [
+                'route'      => 'product.event.index',
+                'permission' => [],
+                'class'      => '',
+                'icon'       => 'fa fa-level-down',
+                'name'       => 'groups',
+                'text'       => 'product::menu.events',
+                'order'      => 3,
+                'sub'        => []
             ]
         ]
     ],
