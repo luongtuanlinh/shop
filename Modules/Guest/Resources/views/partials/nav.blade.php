@@ -1,6 +1,6 @@
 <!-- Navigation -->
 <header class="nav">
-
+    <a href="#top" hidden>Top</a>
     <div class="nav__holder nav--sticky">
         <div class="container relative">
 
@@ -24,13 +24,13 @@
                 <div class="top-bar__right">
 
                     <!-- Sign In -->
-                    <a href="login.html" class="top-bar__item top-bar__sign-in" id="top-bar__sign-in"><i class="ui-user"></i>Đăng nhập</a>
+                    <a href="{{route('guest.login')}}" class="top-bar__item top-bar__sign-in" id="top-bar__sign-in"><i class="ui-user"></i>Đăng nhập</a>
                     <div class="top-bar__border-bar"></div>
 
                     <!-- Search -->
                     <div class="top-bar__item nav__search">
                         <form method="get" class="nav__search-form">
-                            <input type="search" class="nav__search-input" placeholder="Tìm kiếm">
+                            <input type="search" class="nav__search-input" placeholder="Tìm kiếm" name="keyword">
                             <button type="submit" class="nav__search-submit">
                                 <i class="ui-search"></i>
                             </button>
@@ -128,9 +128,9 @@
                         </li>
 
                         <li class="nav__dropdown">
-                            <a href="blog-standard.html">Tin tức</a>
+                            <a href="{{route('guest.news')}}">Tin tức</a>
                             <ul class="nav__dropdown-menu">
-                                <li><a href="blog-standard.html">Tin tức</a></li>
+                                <li><a href="{{route('guest.news')}}">Tin tức</a></li>
                                 <li><a href="catalog.html">Khuyến mãi</a></li>
                             </ul>
                         </li>

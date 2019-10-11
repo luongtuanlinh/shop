@@ -32,4 +32,29 @@ class HomeController extends Controller
     {
         return view('guest::pages.saleoff');
     }
+
+    public function news()
+    {
+        return view('guest::pages.news');
+    }
+
+    public function transportPolicy()
+    {
+        return view('guest::pages.transport-policy');
+    }
+
+    public function paymentPolicy()
+    {
+        return view('guest::pages.payment-policy');
+    }
+
+    public function securityPolicy()
+    {
+        return view('guest::pages.security-policy');
+    }
+
+    public function login()
+    {
+        return view('guest::pages.login');
+    }
 }

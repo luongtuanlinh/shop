@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/saleoff",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Saleoff\\Providers\\SaleoffServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Saleoff\\": ""
+        }
+    }
+}
