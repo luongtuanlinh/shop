@@ -28,9 +28,9 @@
                     <div class="widget widget_nav_menu">
                         <h4 class="widget-title white">Chính sách</h4>
                         <ul>
-                            <li><a href="chinhsachvanchuyen.html">Chính sách vận chuyển</a></li>
-                            <li><a href="chinhsachthanhtoan.html">Chính sách thanh toán</a></li>
-                            <li><a href="chinhsachbaomat.html">Chính sách bảo mật</a></li>
+                            <li><a href="{{route('guest.transport')}}">Chính sách vận chuyển</a></li>
+                            <li><a href="{{route('guest.payment')}}">Chính sách thanh toán</a></li>
+                            <li><a href="{{route('guest.security')}}">Chính sách bảo mật</a></li>
                         </ul>
                     </div>
                 </div>
