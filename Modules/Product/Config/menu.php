@@ -3,7 +3,7 @@
 return [
     'products' => [
         'route'      => 'product.product.index',
-        'permission' => [8,9,10,11],
+        'permission' => [],
         'class'      => '',
         'icon'       => 'fa fa-briefcase',
         'name'       => 'products',
@@ -12,7 +12,7 @@ return [
         'sub'        => [
             [
                 'route'      => 'product.product.index',
-                'permission' => [8,9,10,11],
+                'permission' => [],
                 'class'      => '',
                 'icon'       => 'fa fa-briefcase',
                 'name'       => 'products',
@@ -22,7 +22,7 @@ return [
             ],
             [
                 'route'      => 'product.category.index',
-                'permission' => [12,13,14,15],
+                'permission' => [],
                 'class'      => '',
                 'icon'       => 'fa fa-th-list',
                 'name'       => 'roles',
@@ -32,7 +32,7 @@ return [
             ],
             [
                 'route'      => 'product.sale.index',
-                'permission' => [16,17,18,19],
+                'permission' => [],
                 'class'      => '',
                 'icon'       => 'fa fa-level-down',
                 'name'       => 'groups',

@@ -53,7 +53,7 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        return view('product::edit');
+        return view('product::products/edit');
     }
 
     /**

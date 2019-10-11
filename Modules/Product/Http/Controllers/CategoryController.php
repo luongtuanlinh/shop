@@ -5,16 +5,24 @@ namespace Modules\Product\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\Product\Entities\Category;
 
 class CategoryController extends Controller
 {
+    protected $category;
+
+    public function __construct(Category $category){
+        $this->category = $category;
+    }
     /**
      * Display a listing of the resource.
      * @return Response
      */
     public function index()
     {
-        return view('product::categories/index');
+
+        $categories = $this->category->getCategory();
+        return view('product::categories/index', compact('categories'));
     }
 
     /**
@@ -75,5 +83,51 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function addCategory(Request $request) {
+        $cate_name = $request->cate_name;
+        $parent_id = $request->parent_id ? $request->parent_id : 0;
+        
+        if ( !$cate_name || $cate_name == null ) {
+            return redirect()->back()->withFlashWarning('Tên danh mục không được phép để trống');
+        }
+        $time = date('Y-m-d H:i:s');
+        $data = [
+            'cate_name'   => $cate_name,
+            'parent_id'   => $parent_id,
+            'created_at'  => $time
+        ];
+
+        $create_category = $this->category->insertCate($data);
+
+        if ($create_category) {
+            return redirect()->back()->withFlashSuccess('Chỉnh sửa danh mục thành công');
+        } else {
+            return redirect()->back()->withFlashDanger('Đã có lỗi xảy ra, hãy thử lại sau!');
+        }
+
+    }
+
+    public function editCategory(Request $request) {
+        $cate_id = $request->cate_id;
+        $cate_name = $request->cate_name;
+        
+        if ( !$cate_name || $cate_name == null ) {
+            return redirect()->back()->withFlashWarning('Tên danh mục không được phép để trống');
+        }
+        $time = date('Y-m-d H:i:s');
+        $data = [
+            'cate_name'   => $cate_name,
+            'updated_at'  => $time
+        ];
+
+        $update_category = $this->category->updateCate($cate_id, $data);
+
+        if ($update_category) {
+            return redirect()->back()->withFlashSuccess('Chỉnh sửa danh mục thành công');
+        } else {
+            return redirect()->back()->withFlashDanger('Đã có lỗi xảy ra, hãy thử lại sau!');
+        }
     }
 }

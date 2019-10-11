@@ -19,9 +19,15 @@ Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
 
         Route::resource('product', 'ProductController', ['as' => 'product']);
 
+
         Route::resource('sale', 'SaleController', ['as' => 'product']);
 
+
         Route::resource('category', 'CategoryController', ['as' => 'product']);
+
+        Route::post('/category/add', 'CategoryController@addCategory')->name('product.category.addcate');
+
+        Route::post('/category/edit', 'CategoryController@editCategory')->name('product.category.editcate');
 
     });
 });
