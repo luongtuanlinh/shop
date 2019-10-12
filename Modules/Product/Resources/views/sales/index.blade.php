@@ -1,5 +1,8 @@
 @extends('layouts.admin_default')
 @section('title', trans('product::sale.title'))
+@section ('before-styles-end')
+    <link rel="stylesheet" href="{{ asset('css/product.css') }}"> 
+@stop
 @section('content')
 <section class="content-header">
     <h1>{{trans('product::sale.title')}}</h1>
@@ -27,8 +30,6 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td></td>
-                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>

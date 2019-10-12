@@ -120,3 +120,19 @@
 .parent-1 .a_part_view {
     background: #f7f7f7 !important;
 }
+.event-cover {
+    overflow: hidden;
+    flex: 50%;
+}
+.event-cover .cover {
+    width: 224px;
+    height: 145px;
+    transition: all .2s ease-in-out;
+}
+.box-event {
+  
+}
+.event-content {
+    flex: 45%;
+    padding: 0 0px 0 20px;
+}

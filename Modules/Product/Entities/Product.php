@@ -23,4 +23,17 @@ class Product extends Model
     public function sizes() {
         return $this->belongsToMany(Size::class, 'product_size');
     }
+
+    public function getAllProduct(){
+        return Product::paginate(20);
+    }
+
+    public function insertProduct($data){
+        return $this->insert($data);
+    }
+
+    public function updateProduct($id, $data){
+        return $this->where('id', $id)
+                    ->update($data);
+    }
 }

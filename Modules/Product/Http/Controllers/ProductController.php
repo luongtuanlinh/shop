@@ -5,16 +5,23 @@ namespace Modules\Product\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\Product\Entities\Product;
 
 class ProductController extends Controller
 {
+    protected $product;
+
+    public function __construct(Product $product){
+        $this->product = $product;
+    }
     /**
      * Display a listing of the resource.
      * @return Response
      */
     public function index()
     {
-        return view('product::products/index');
+        $products = $this->product->getAllProduct();
+        return view('product::products/index', compact('products'));
     }
 
     /**
@@ -23,7 +30,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('product::create');
+        return view('product::products/create');
     }
 
     /**

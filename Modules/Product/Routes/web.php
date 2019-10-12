@@ -29,5 +29,7 @@ Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
 
         Route::post('/category/edit', 'CategoryController@editCategory')->name('product.category.editcate');
 
+        Route::resource('event', 'EventsController', ['as' => 'product']);
+
     });
 });

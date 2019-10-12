@@ -5,6 +5,7 @@ namespace Modules\Product\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\Product\Entities\Event;
 
 class EventsController extends Controller
 {
@@ -14,7 +15,8 @@ class EventsController extends Controller
      */
     public function index()
     {
-        return view('product::index');
+        $events = Event::get();
+        return view('product::events/index', compact('events'));
     }
 
     /**

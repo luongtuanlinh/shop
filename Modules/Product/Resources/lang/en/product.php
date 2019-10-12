@@ -4,4 +4,5 @@ return [
     'list_product' => 'Danh sách sản phẩm',
     'add' => 'Thêm mới',
     'edit' => 'Chỉnh sửa',
+    'title_add' => 'Thêm mới sản phẩm',
 ];

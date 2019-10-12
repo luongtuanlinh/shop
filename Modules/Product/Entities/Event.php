@@ -4,8 +4,8 @@ namespace Modules\Product\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Sale extends Model
+class Event extends Model
 {
     protected $fillable = [];
-    protected $table = "product_sale";
+    protected $table = "sales";
 }

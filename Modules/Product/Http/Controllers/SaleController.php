@@ -15,7 +15,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $sales = Sale::withTrashed()->paginate();
+        $sales = Sale::all();
         
         return view('product::sales/index', [
             "sales" => $sales,

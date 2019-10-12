@@ -20,7 +20,6 @@ class CategoryController extends Controller
      */
     public function index()
     {
-
         $categories = $this->category->getCategory();
         return view('product::categories/index', compact('categories'));
     }
