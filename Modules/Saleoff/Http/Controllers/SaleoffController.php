@@ -2,10 +2,12 @@
 
 namespace Modules\Saleoff\Http\Controllers;
 
+use App\Models\Shop\Product;
+use App\Models\Shop\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Modules\Core\Models\Shop\Sale;
+
 
 class SaleoffController extends Controller
 {
@@ -25,7 +27,17 @@ class SaleoffController extends Controller
      */
     public function create()
     {
-        return view('saleoff::create');
+        $products = Product::all();
+
+        $products = $products->map(function ($product) {
+            return collect([
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'code' => $product->code,
+            ]);
+        }); //
+        return view('saleoff::create',compact('products'));
     }
 
     /**
@@ -35,7 +47,16 @@ class SaleoffController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $sale = new Sale();
+        $sale['event_name'] = $request['event_name'];
+        $sale['introduction'] = $request['introduction'];
+        $sale['start_time'] = substr($request['period'],0,10);
+        $sale['end_time'] = substr($request['period'],13,10);
+        $sale->save();
+        for ($i =0;$i<count($request['saleProductIds']); $i++){
+            $sale->products()->attach($request['saleProductIds'][$i],['discount' => $request['percentageDiscounts'][$i]]);
+        }
+        return response()->json(['message' => 'ok']);
     }
 
     /**
@@ -74,8 +95,11 @@ class SaleoffController extends Controller
      * @param int $id
      * @return Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $sale = Sale::findOrFail($request->id);
+        $sale->products()->detach();
+        $sale->delete();
+        return redirect()->back();
     }
 }

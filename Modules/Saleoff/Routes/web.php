@@ -14,6 +14,10 @@
 Route::prefix('/admin')->name('admin.')->group(function(){
    Route::prefix('/saleoff')->name('saleoff.')->group(function(){
        Route::get('/','SaleoffController@index')->name('index');
+       Route::get('/create','SaleoffController@create')->name('create');
+       Route::post('/store','SaleoffController@store')->name('store');
+       Route::delete('/destroy','SaleoffController@destroy')->name('destroy');
+
    });
 });
 
