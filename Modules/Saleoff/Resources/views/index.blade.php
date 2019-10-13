@@ -93,12 +93,12 @@
 
                                     {{--                                    <a class="btn btn-info btn-sm" href="{{route('admin.children1s.edit',['children1' => $post->slug])}}">--}}
                                     <a class="btn btn-info btn-sm"
-                                       href="#">
+                                       href="{{route('admin.saleoff.edit',['id'=> $sale->id])}}">
                                         <i class="fas fa-pencil-alt">
                                         </i>
                                         Sửa
                                     </a>
-                                    <a class="btn btn-info btn-sm" href="#" onclick="event.preventDefault(); document.getElementById('{{"delete-".$sale->id}}').submit();">
+                                    <a class="btn btn-danger btn-sm" href="#" onclick="event.preventDefault(); if( confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) document.getElementById('{{"delete-".$sale->id}}').submit();">
                                         <i class="fas fa-trash-alt">
                                         </i>
                                         Xóa
@@ -112,7 +112,7 @@
                                     <!-- Modal -->
                                     <div class="modal fade" id="{{'sale-' . $sale->id}}" tabindex="-1" role="dialog"
                                          aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
+                                        <div class="modal-dialog modal-lg" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title"
@@ -125,7 +125,8 @@
                                                 <div class="modal-body">
                                                     <p>{{$sale->introduction}}</p>
                                                     <p style="float: left">Danh sách các sản phẩm được giảm giá</p>
-                                                    <table class="table table-head-fixed">
+                                                    <br>
+                                                    <table class="table table-head-fixed" name="product-table">
                                                         <thead>
                                                         <tr>
                                                             <th>#</th>
@@ -168,5 +169,7 @@
     </div>
 @endsection
 @push('js')
-
+    <script>
+        $('[name=product-table]').DataTable();
+    </script>
 @endpush

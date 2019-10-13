@@ -32,4 +32,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Order::class,'order_product','product_id','order_id');
     }
+
+    public function colors()
+    {
+        return $this->belongsToMany(Color::class,'color_product','product_id','color_id')->withPivot(['amount']);
+    }
 }

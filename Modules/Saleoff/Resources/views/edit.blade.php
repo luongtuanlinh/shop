@@ -9,7 +9,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Thêm 1 sự kiện mới</h1>
+                        <h1>Sửa thông tin sự kiện sale</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -45,17 +45,19 @@
                         <div class="card-body pad">
                             <div class="mb-3">
                                 <form method="post" enctype="multipart/form-data"
-                                      action="{{route('admin.saleoff.store')}}" id="sale-form">
+                                      action="{{route('admin.saleoff.update',['id' => $sale->id])}}" id="sale-form">
                                     {{csrf_field()}}
+                                    {{method_field('PUT')}}
                                     <div class="form-group">
                                         <label for="event_name">Tên sự kiện</label>
                                         <input type="text" name="event_name" id="event_name" class="form-control"
-                                               placeholder="Nhập tên sự kiện">
+                                               placeholder="Nhập tên sự kiện" value="{{$sale->event_name}}">
                                     </div>
                                     <div class="form-group">
                                         <label for="introduction">Lời giới thiệu ngắn</label>
                                         <input type="text" name="introduction" id="introduction" class="form-control"
-                                               placeholder="Lời giới thiệu ngắn về sự kiện">
+                                               placeholder="Lời giới thiệu ngắn về sự kiện"
+                                               value="{{$sale->introduction}}">
                                     </div>
                                     <div class="form-group">
                                         <label>Khoảng thời gian diễn ra sự kiện:</label>
@@ -134,6 +136,7 @@
                                                                                            class="form-control"
                                                                                            :id="product.id"
                                                                                            :disabled="!isSaleArr.includes(product.id)"
+                                                                                           :value="discounts[product.id]"
                                                                                            type="number" max="99"
                                                                                     >
                                                                                 </td>
@@ -176,6 +179,9 @@
 @push('js')
     <script>
         $('#period').daterangepicker({
+            timePicker: true,
+            startDate: "{{$sale->start_time}}",
+            endDate: "{{$sale->end_time}}",
             locale: {
                 format: 'YYYY-MM-DD',
             }
@@ -187,12 +193,10 @@
             el: "#product_list",
             data: {
                 products: {!! json_encode($products) !!},
-                isSaleArr: [],
+                isSaleArr: {!! json_encode($saleProductIds) !!},
+                discounts : {!! json_encode($discounts) !!}
             },
-            methods: {
-                createSale: function () {
-                },
-            },
+            methods: {},
             mounted: function () {
                 setTimeout(() => {
                     $('#product-table').DataTable();
@@ -212,9 +216,9 @@
                 introduction: $('#introduction').val(),
                 period: $('#period').val(),
                 saleProductIds: saleProductIds,
-                percentageDiscounts : percentageDiscounts,
+                percentageDiscounts: percentageDiscounts,
             };
-            axios.post("{{route('admin.saleoff.store')}}",
+            axios.put("{{route('admin.saleoff.update',['id' => $sale->id])}}",
                 params
             ).then(function (res) {
                 alert('thanh cong');

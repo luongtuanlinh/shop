@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/css/alertify.min.css"/>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/css/themes/default.min.css"/>
     <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin-lte3/plugins/datatables-bs4/css/dataTables.bootstrap4.css">
     <style>
         .summernote {
             width: 100%;
@@ -108,6 +109,8 @@
 <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/alertify.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="/admin-lte3/plugins/datatables/jquery.dataTables.js"></script>
+<script src="/admin-lte3/plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
 <script>
     $(document).ready(function () {
         $('.summernote').summernote({
