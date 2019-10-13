@@ -162,9 +162,9 @@ class SaleoffController extends Controller
             }
         }
         $products = $query->paginate(15);
-        return response()->json([
-            'product' => $products,
-        ]);
+//        return response()->json([
+//            'product' => $products,
+//        ]);
         return view('saleoff::api.index',compact('products'));
     }
 
