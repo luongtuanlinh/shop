@@ -10,8 +10,9 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1>Danh sách các sự kiện</h1>
-                        <a role="button" href="#" class="btn btn-success"><i
-                                    class="fas fa-plus"></i>Thêm sự kiện sale mới</a>
+                        <a role="button" href="{{route('admin.saleoff.create')}}" class="btn btn-success">
+                            <i class="fas fa-plus"></i>Thêm sự kiện sale mới
+                        </a>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -50,14 +51,14 @@
                             <th style="width: 20%">
                                 Tên
                             </th>
-                            <th style="width: 10%">
+                            <th style="width: 20%">
                                 Thời gian
                             </th>
                             <th style="width: 20%">
                                 Lời giới thiệu
                             </th>
                             <th style="width: 10%">Sản phẩm</th>
-                            <th style="width: 39%" class="text-center">
+                            <th style="width: 29%" class="text-center">
                                 Thao tác
                             </th>
                         </tr>
@@ -74,62 +75,81 @@
                                     </a>
                                     <br>
                                     <small>
-                                        Cập nhật vào: {{$sale->updated_at}}
+                                        Tạo lúc: {{$sale->created_at}}
                                     </small>
                                 </td>
-                                <td >
-                                    <div class="content-hidden">
-
-                                        {{$sale->introduction}}
+                                <td>
+                                    <div>
+                                        Từ {{substr($sale->start_time,0,10)}} <br>tới {{ substr($sale->end_time,0,10) }}
                                     </div>
                                 </td>
-                                <td class="4">
-                                    <img src="{{$sale->cover_img}}" width="120px">
+                                <td>
+                                    {{$sale->introduction}}
                                 </td>
                                 <td>
-                                    Thêm cái modal hoặc href để thêm sửa sản phẩm
+                                    <a href="#" data-toggle="modal" data-target="#{{'sale-' . $sale->id}}">Xem</a>
                                 </td>
                                 <td class="project-state">
-                                    <a class="btn btn-primary btn-sm" data-toggle="modal"
-                                       data-target="#{{'sale-' . $sale->id}}" href="#">
-                                        <i class="fas fa-folder">
-                                        </i>
-                                        Xem
-                                    </a>
+
                                     {{--                                    <a class="btn btn-info btn-sm" href="{{route('admin.children1s.edit',['children1' => $post->slug])}}">--}}
                                     <a class="btn btn-info btn-sm"
-                                       href="#">
+                                       href="{{route('admin.saleoff.edit',['id'=> $sale->id])}}">
                                         <i class="fas fa-pencil-alt">
                                         </i>
                                         Sửa
                                     </a>
-                                    <a class="btn btn-info btn-sm" href="#">
+                                    <a class="btn btn-danger btn-sm" href="#" onclick="event.preventDefault(); if( confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) document.getElementById('{{"delete-".$sale->id}}').submit();">
                                         <i class="fas fa-trash-alt">
                                         </i>
                                         Xóa
                                     </a>
-                                    {{--                                    <form id={{'delete-'.$post->slug}} action="{{ route('admin.children1s.destroy',['children1' => $post->slug]) }}" method="POST" style="display: none;">--}}
+                                    <form id={{'delete-'.$sale->id}} action="{{route('admin.saleoff.destroy')}}"
+                                            method="POST" style="display: none;">
+                                        <input value="{{$sale->id}}" name="id">
+                                        {{ csrf_field() }}
+                                        {{method_field('delete')}}
+                                    </form>
                                     <!-- Modal -->
                                     <div class="modal fade" id="{{'sale-' . $sale->id}}" tabindex="-1" role="dialog"
                                          aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
+                                        <div class="modal-dialog modal-lg" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title"
-                                                        id="exampleModalLongTitle">{{$sale->introduction}}</h5>
+                                                        id="exampleModalLongTitle">{{$sale->event_name}}</h5>
                                                     <button type="button" class="close" data-dismiss="modal"
                                                             aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <img src="#" width="200px">
-                                                    <p>{!!$sale->introduction!!}</p>
+                                                    <p>{{$sale->introduction}}</p>
+                                                    <p style="float: left">Danh sách các sản phẩm được giảm giá</p>
+                                                    <br>
+                                                    <table class="table table-head-fixed" name="product-table">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Tên sản phẩm</th>
+                                                            <th>Mã sản phẩm</th>
+                                                            <th>Giá gốc</th>
+                                                            <th>Giảm</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        @foreach($sale->products as $index => $product)
+                                                            <tr>
+                                                                <td>{{$index+1}}</td>
+                                                                <td>{{$product->name}}</td>
+                                                                <td>{{$product->code}}</td>
+                                                                <td>{{$product->price}}</td>
+                                                                <td>{{$product->pivot->discount}} %</td>
+                                                            </tr>
+                                                        @endforeach
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <a class="btn btn-info btn-sm">
-                                                        <i class="fas fa-pencil-alt"></i>Sửa
-                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -149,5 +169,7 @@
     </div>
 @endsection
 @push('js')
-
+    <script>
+        $('[name=product-table]').DataTable();
+    </script>
 @endpush
