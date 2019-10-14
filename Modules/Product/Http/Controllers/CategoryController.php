@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\Product\Entities\Category;
+use DB;
+use Validator;
 
 class CategoryController extends Controller
 {
@@ -40,7 +42,32 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $cate_name = $request->cate_name;
+        $parent_id = $request->parent_id ? $request->parent_id : 0;
+
+        // $validatorArray = [
+        //     'cate_name' => 'required',
+        // ];
+
+        // $validator = Validator::make($request->all(), $validatorArray);
+        // if ($validator->fails()) {
+        //     $message = $validator->errors();
+        //     return Redirect::back()->withInput()->withErrors([$message->first()])->with(['modal_error' => $message->first()]);
+        // }
+       
+        $time = date('Y-m-d H:i:s');
+        $data = [
+            'cate_name'     => $cate_name,
+            'parent_id'     => $parent_id,
+            'created_at'    => $time
+        ];
+        $create_category = $this->category->insertCate($data);
+
+        if ($create_category) {
+            return redirect()->back()->withFlashSuccess( @trans('product::notify.add_cate_success') );
+        } else {
+            return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
+        }
     }
 
     /**
@@ -81,31 +108,6 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
-    }
-
-    public function addCategory(Request $request) {
-        $cate_name = $request->cate_name;
-        $parent_id = $request->parent_id ? $request->parent_id : 0;
-        
-        if ( !$cate_name || $cate_name == null ) {
-            return redirect()->back()->withFlashWarning('Tên danh mục không được phép để trống');
-        }
-        $time = date('Y-m-d H:i:s');
-        $data = [
-            'cate_name'   => $cate_name,
-            'parent_id'   => $parent_id,
-            'created_at'  => $time
-        ];
-
-        $create_category = $this->category->insertCate($data);
-
-        if ($create_category) {
-            return redirect()->back()->withFlashSuccess('Chỉnh sửa danh mục thành công');
-        } else {
-            return redirect()->back()->withFlashDanger('Đã có lỗi xảy ra, hãy thử lại sau!');
-        }
-
     }
 
     public function editCategory(Request $request) {
@@ -124,9 +126,40 @@ class CategoryController extends Controller
         $update_category = $this->category->updateCate($cate_id, $data);
 
         if ($update_category) {
-            return redirect()->back()->withFlashSuccess('Chỉnh sửa danh mục thành công');
+            return redirect()->back()->withFlashSuccess( @trans('product::notify.edit_cate_success') );
         } else {
-            return redirect()->back()->withFlashDanger('Đã có lỗi xảy ra, hãy thử lại sau!');
+            return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
+        }
+    }
+
+    public function deleteCategory(Request $request) {
+        $cate_id = $request->cate_id;
+        
+        if ( !$cate_id || $cate_id == null ) {
+            return redirect()->back()->withFlashWarning( @trans('product::notify.has_err') );
+        }
+
+        $time = date('Y-m-d H:i:s');
+
+        //check count of product in this category, if count >1 -> errr
+
+        $delete_category = DB::transaction(function () use($cate_id, $time) {
+            $data = [
+                'status'   => -1,
+                'deleted_at'  => $time
+            ];
+
+            Category::where('id', $cate_id)
+                    ->update($data);
+
+            Category::where('parent_id', $cate_id)
+                    ->update($data);
+            });
+
+        if (empty($delete)) {
+            return redirect()->back()->withFlashSuccess( @trans('product::notify.delete_cate_success') );
+        } else {
+            return redirect()->back()->withFlashDanger (@trans('product::notify.has_err') );
         }
     }
 }

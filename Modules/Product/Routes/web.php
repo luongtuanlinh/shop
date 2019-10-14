@@ -19,17 +19,15 @@ Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
 
         Route::resource('product', 'ProductController', ['as' => 'product']);
 
-
-        Route::resource('sale', 'SaleController', ['as' => 'product']);
-
+        Route::post('/product/delete', 'ProductController@deleteProduct')->name('product.product.deleteProduct');
 
         Route::resource('category', 'CategoryController', ['as' => 'product']);
 
-        Route::post('/category/add', 'CategoryController@addCategory')->name('product.category.addcate');
-
         Route::post('/category/edit', 'CategoryController@editCategory')->name('product.category.editcate');
 
-        Route::resource('event', 'EventsController', ['as' => 'product']);
+        Route::post('/category/delete', 'CategoryController@deleteCategory')->name('product.category.deleteCate');
+
+        Route::resource('size', 'SizeController', ['as' => 'product']);
 
     });
 });

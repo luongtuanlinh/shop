@@ -20,12 +20,35 @@ class Product extends Model
         'category_id',
     ];
 
-    public function sizes() {
-        return $this->belongsToMany(Size::class, 'product_size');
+    public function sales()
+    {
+        return $this->belongsToMany(Sale::class,'product_sale','product_id','sale_id')->withPivot(['discount']);
+    }
+    public function admin()
+    {
+        return $this->belongsTo(User::class,'id','admin_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class,'category_id','id');
+    }
+
+    public function sizes()
+    {
+        return $this->belongsToMany(Size::class,'product_size','product_id','size_id')->withPivot(['count','updated_at']);
+    }
+
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class,'order_product','product_id','order_id');
     }
 
     public function getAllProduct(){
-        return Product::paginate(20);
+        $data = Product::with('category')
+                        ->where('status', '<>' , -1)
+                        ->paginate(20);
+        return $data;
     }
 
     public function insertProduct($data){
@@ -36,4 +59,9 @@ class Product extends Model
         return $this->where('id', $id)
                     ->update($data);
     }
+
+    public function getProductById($id){
+        return $this->where("id", $id)->first();
+    }
+  
 }

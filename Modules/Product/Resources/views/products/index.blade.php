@@ -3,6 +3,16 @@
 @section ('before-styles-end')
     <link rel="stylesheet" href="{{ asset('css/product.css') }}"> 
 @stop
+@section ('scripts')
+    <script>
+        $(function(){
+            $('.delete-product').click(function(){
+                var product_id = $(this).data("id");
+                $('#product_id').val(product_id);
+            });
+        });
+    </script>
+@stop
 @section('content')
 <section class="content-header">
     <h1>{{trans('product::product.title')}}</h1>
@@ -25,7 +35,8 @@
                                 <th>Mã sản phẩm</th>
                                 <th>Tên sản phẩm</th>
                                 <th>Giá</th>
-                                <th>Thể loại</th>
+                                <th>Loại sản phẩm</th>
+                                <th>Số lượng</th>
                                 <th>Ảnh</th>
                                 <th>Chất liệu</th>
                                 <th>Mô tả</th>
@@ -39,14 +50,21 @@
                                 <td>{{ $item->id }}</td>
                                 <td>{{ $item->name }}</td>
                                 <td>{{ $item->price }}</td>
-                                <td>{{ $item->category_id }}</td>
-                                <td>{{ $item->cover_path }}</td>
+                                <td>{{ $item->category->cate_name }}</td>
+                                <td>{{ $item->count }}</td>
+                                <td>
+                                    @if($item->cover_path != null)
+                                    @foreach ($item->cover_path as $path)
+                                        <img class="image-product" src="{{ ($path != null) ? url($path) : '' }}">
+                                    @endforeach
+                                    @endif
+                                </td>
                                 <td>{{ $item->material }}</td>
                                 <td>{{ $item->description }}</td>
                                 <td>Trung Quốc</td>
                                 <td>
                                     <a type="button" href="{{ route('product.product.edit', $item->id) }}" class="btn btn-primary btn-sm">Sửa</a>
-                                    <a type="button" class="btn btn-danger btn-sm">Xóa</a>
+                                    <a type="button" class="btn btn-danger btn-sm delete-product" data-toggle="modal" data-target="#modal-delete-product" data-id="{{ $item->id }}">Xóa</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -59,4 +77,25 @@
         <!-- /.col -->
     </div>
 </section>
+
+<div id="modal-delete-product" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body box-add-cate">
+                <form action="{{ route('product.product.deleteProduct') }}" method="POST" name="form-delete-product">
+                    <input type="hidden" name="_token" value="{{csrf_token()}}" />
+                    <input type="hidden" name="id" id="product_id" />
+                    <div class="title-modal">Xóa sản phẩm</div>
+                    <div class="modal-box">
+                        <p class="delete-confirm">Bạn có chắc chắn muốn xóa sản phẩm này?</p> 
+                        <div class="box-btn">
+                            <button class="btn btn-primary btn-sm" type="submit">Đồng ý</button>
+                            <button class="btn btn-danger btn-sm" data-dismiss="modal">Hủy</button>
+                        </div>      
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

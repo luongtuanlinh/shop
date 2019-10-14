@@ -5,9 +5,8 @@ namespace Modules\Product\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Modules\Product\Entities\Event;
 
-class EventsController extends Controller
+class SizeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +14,7 @@ class EventsController extends Controller
      */
     public function index()
     {
-        $events = Event::get();
-        return view('product::events/index', compact('events'));
+        return view('product::sizes/index');
     }
 
     /**
