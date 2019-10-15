@@ -4,6 +4,7 @@ namespace Modules\Product\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Session;
 
 class Product extends Model
 {
@@ -62,6 +63,23 @@ class Product extends Model
 
     public function getProductById($id){
         return $this->where("id", $id)->first();
+    }
+
+    public static function genColumnHtml($data){
+        $message = "'Bạn có chắc chắn muốn xóa sản phẩm này?'";
+        $collum = "";
+        if(!empty($data)){
+            $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';
+            $collum .= '<a href="'. route('product.product.deleteProduct', $data->id) .'" onclick="return confirm('.$message.')" class="btn btn-xs btn-danger"><i class="fa fa-trash">Xoá</i></a>';
+
+            // if(Session::get('edit')) {
+            //     $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';
+            // }
+            // if(Session::get('destroy')){
+            //     $collum .= '<a href="'. route('product.product.deleteProduct', $data->id) .'" onclick="return confirm('.$message.')" class="btn btn-xs btn-danger"><i class="fa fa-trash">Xoá</i></a>';
+            // }
+        }
+        return $collum;
     }
   
 }

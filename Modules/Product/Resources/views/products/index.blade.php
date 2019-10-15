@@ -3,16 +3,6 @@
 @section ('before-styles-end')
     <link rel="stylesheet" href="{{ asset('css/product.css') }}"> 
 @stop
-@section ('scripts')
-    <script>
-        $(function(){
-            $('.delete-product').click(function(){
-                var product_id = $(this).data("id");
-                $('#product_id').val(product_id);
-            });
-        });
-    </script>
-@stop
 @section('content')
 <section class="content-header">
     <h1>{{trans('product::product.title')}}</h1>
@@ -29,7 +19,7 @@
                     <a class="btn btn-primary btn-sm add-cate" href="{{ route('product.product.create') }}">Thêm sản phẩm mới</a>
                 </div>
                 <div class="body table-responsive">
-                    <table class="table table-hover table-bordered txt-center">
+                    <table id="table-product" class="table table-hover table-bordered txt-center">
                         <thead>
                             <tr class="bg-cyan">
                                 <th>Mã sản phẩm</th>
@@ -45,57 +35,67 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($products as $item)
-                            <tr>
-                                <td>{{ $item->id }}</td>
-                                <td>{{ $item->name }}</td>
-                                <td>{{ $item->price }}</td>
-                                <td>{{ $item->category->cate_name }}</td>
-                                <td>{{ $item->count }}</td>
-                                <td>
-                                    @if($item->cover_path != null)
-                                    @foreach ($item->cover_path as $path)
-                                        <img class="image-product" src="{{ ($path != null) ? url($path) : '' }}">
-                                    @endforeach
-                                    @endif
-                                </td>
-                                <td>{{ $item->material }}</td>
-                                <td>{{ $item->description }}</td>
-                                <td>Trung Quốc</td>
-                                <td>
-                                    <a type="button" href="{{ route('product.product.edit', $item->id) }}" class="btn btn-primary btn-sm">Sửa</a>
-                                    <a type="button" class="btn btn-danger btn-sm delete-product" data-toggle="modal" data-target="#modal-delete-product" data-id="{{ $item->id }}">Xóa</a>
-                                </td>
-                            </tr>
-                            @endforeach
                         </tbody>
                     </table>
-                    {{ $products->links() }}
+                </div>
+                <div class="overlay hide">
+                    <i class="fa fa-refresh fa-spin"></i>
                 </div>
             </div>
         </div>
-        <!-- /.col -->
     </div>
 </section>
 
-<div id="modal-delete-product" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body box-add-cate">
-                <form action="{{ route('product.product.deleteProduct') }}" method="POST" name="form-delete-product">
-                    <input type="hidden" name="_token" value="{{csrf_token()}}" />
-                    <input type="hidden" name="id" id="product_id" />
-                    <div class="title-modal">Xóa sản phẩm</div>
-                    <div class="modal-box">
-                        <p class="delete-confirm">Bạn có chắc chắn muốn xóa sản phẩm này?</p> 
-                        <div class="box-btn">
-                            <button class="btn btn-primary btn-sm" type="submit">Đồng ý</button>
-                            <button class="btn btn-danger btn-sm" data-dismiss="modal">Hủy</button>
-                        </div>      
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+@endsection
+@section('scripts')
+    <script src="{{ asset('admin-lte/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('admin-lte/plugins/datatables/dataTables.bootstrap.js') }}"></script>
+    <script src="{{ asset('js/theory_group.js') }}"></script>
+    <script>
+
+        $(function() {
+            table=$('#table-product').DataTable({
+                processing: true,
+                serverSide: true,
+                bAutoWidth: false,
+                searching: false,
+                ajax: {
+                    url: '{{ route("product.product.get") }}',
+                    type: 'get',
+                    data: function(d) {
+                        {{--d.csrf = '{{csrf_field()}}';--}}
+                    }
+                },
+                columns: [
+                    {data: 'id', sortable: true},
+                    {data: 'name', orderable: false},
+                    {data: 'price', sortable: true},
+                    {data: 'cate_name', orderable: false},
+                    {data: 'count', sortable: true},
+                    {data: 'cover_path', orderable: false},
+                    {data: 'material', orderable: false},
+                    {data: 'description', orderable: false},
+                    {data: 'source', orderable: false},
+                    {data: 'actions', orderable: false}
+                ],
+                "order": [[ 0, "desc" ]],
+                "language": {
+                    "lengthMenu": "Hiển thị _MENU_ bản ghi trên một trang",
+                    "zeroRecords": "Không tìm bản ghi phù hợp",
+                    "info": "Đang hiển thị trang _PAGE_ of _PAGES_",
+                    "infoEmpty": "Không có dữ liệu",
+                    "infoFiltered": "(lọc từ tổng số _MAX_ bản ghi)",
+                    "info": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_ kết quả",
+                    "paginate": {
+                        "previous":   "«",
+                        "next":       "»"
+                    },
+                    "sProcessing": '<i class="fa fa-spinner fa-pulse fa-fw"></i> Loading'
+                },
+                "columnDefs": [
+                ]
+            });
+        });
+
+    </script>
 @endsection

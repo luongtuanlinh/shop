@@ -10,12 +10,13 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/product/get', 'ProductController@get')->name('product.product.get');
+
+Route::get('/size/get', 'SizeController@get')->name('product.size.get');
 
 Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
 {
     Route::group(['middleware' => ['auth', 'verify.role']], function () {
-
-        // Route::get('/', 'ProductController@index')->name('admin_home');
 
         Route::resource('product', 'ProductController', ['as' => 'product']);
 
@@ -28,6 +29,8 @@ Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
         Route::post('/category/delete', 'CategoryController@deleteCategory')->name('product.category.deleteCate');
 
         Route::resource('size', 'SizeController', ['as' => 'product']);
+
+        Route::get('/size/getGoogle', 'SizeController@getDataFromSheet')->name('product.size.getGoogle');
 
     });
 });

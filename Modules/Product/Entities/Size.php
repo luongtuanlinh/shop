@@ -12,7 +12,7 @@ class Size extends Model
         'size_name',
         'introduction',
     ];
-    protected $table = "sizes";
+    protected $table = "product_size";
 
     public function products() {
         return $this->belongsToMany(Product::class, 'product_size');

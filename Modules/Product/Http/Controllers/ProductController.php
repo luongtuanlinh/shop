@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\Category;
+use Yajra\Datatables\Datatables;
 use Intervention\Image\Facades\Image as Image;
 use Auth;
 use Validator;
@@ -26,14 +27,15 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = $this->product->getAllProduct();
+        return view('product::products/index');
+        // $products = $this->product->getAllProduct();
         
-        foreach ($products as $key => $value) {
-            if ($value->cover_path != null) {
-                $products[$key]->cover_path = json_decode($value->cover_path);
-            }
-        }
-        return view('product::products/index', compact('products'));
+        // foreach ($products as $key => $value) {
+        //     if ($value->cover_path != null) {
+        //         $products[$key]->cover_path = json_decode($value->cover_path);
+        //     }
+        // }
+        // return view('product::products/index', compact('products'));
     }
 
     /**
@@ -134,7 +136,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        return view('product::show');
+        return view('product::products/index');
     }
 
     /**
@@ -258,5 +260,38 @@ class ProductController extends Controller
         } else {
             return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
         }
+    }
+
+    public function get(Request $request)
+    {
+        $query = Product::with('category')->whereNull('deleted_at');
+
+        return Datatables::of($query)
+                ->escapeColumns([])
+                ->addColumn('actions', function ($product) {
+                    $html = Product::genColumnHtml($product);
+                    return $html;
+                })
+                ->addColumn('cate_name', function ($product) {
+
+                    return $product->category->cate_name;
+                })
+                ->addColumn('source', function ($product) {
+
+                    return 'Trung quốc';
+                })
+                ->addColumn('cover_path', function ($product) {
+                    if ($product->cover_path != null) {
+                        $data = json_decode($product->cover_path);
+                        $html = '';
+                        foreach ($data as $key => $path) {
+                            $html .= '<img class="image-product" src="'.( ($path != null) ? url($path) : "") .'">';
+                        }
+                        return $html;
+                    }else{
+                        return '';
+                    }
+                })
+                ->make(true);
     }
 }

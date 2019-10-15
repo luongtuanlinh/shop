@@ -45,15 +45,15 @@ class CategoryController extends Controller
         $cate_name = $request->cate_name;
         $parent_id = $request->parent_id ? $request->parent_id : 0;
 
-        // $validatorArray = [
-        //     'cate_name' => 'required',
-        // ];
+        $validatorArray = [
+            'cate_name' => 'required',
+        ];
 
-        // $validator = Validator::make($request->all(), $validatorArray);
-        // if ($validator->fails()) {
-        //     $message = $validator->errors();
-        //     return Redirect::back()->withInput()->withErrors([$message->first()])->with(['modal_error' => $message->first()]);
-        // }
+        $validator = Validator::make($request->all(), $validatorArray);
+        if ($validator->fails()) {
+            $message = $validator->errors();
+            return Redirect::back()->withInput()->withErrors([$message->first()])->with(['modal_error' => $message->first()]);
+        }
        
         $time = date('Y-m-d H:i:s');
         $data = [
