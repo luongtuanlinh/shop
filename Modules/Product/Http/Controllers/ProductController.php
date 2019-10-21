@@ -27,7 +27,13 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return view('product::products/index');
+        $selectedCategories = array();
+        $categories = Category::all();
+
+        foreach($categories as $category) {
+            $selectedCategories[$category->id] = $category->cate_name;
+        }
+        return view('product::products/index', compact('selectedCategories'));
         // $products = $this->product->getAllProduct();
         
         // foreach ($products as $key => $value) {

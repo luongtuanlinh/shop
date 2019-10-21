@@ -25,6 +25,12 @@
                 var cate_id = $(this).data("id");
                 $('#categpry_id').val(cate_id);
             });
+
+            $('.parent-0').on('click', function() {
+                var cate_id = $(this).data("id");
+                $('.item-' + cate_id).toggle();
+                $(this).toggleClass('box-close');
+            });
         });
     </script>
 @stop
@@ -55,7 +61,7 @@
                         <ol class="content_list my_sortable" id="list-data-course" >
                             @foreach($categories as $cates) 
                             @foreach($cates as $cate)                     
-                            <li class="content_item parent-{{ $cate->parent_id ? 1 : 0 }}">
+                            <li class="content_item parent-{{ $cate->parent_id ? 1 : 0 }} item-{{ $cate->parent_id }}" data-id="{{ $cate->id }}">
                                 <div class="a_part_view opened">
                                     <div class="row row-data-part">
                                         <div class="col-md-8 title_view">
@@ -74,9 +80,11 @@
                                                 <span class="icon_buton btn_remove delete-cate" data-toggle="modal" data-target="#modal-delete-category" data-id="{{ $cate->id }}">
                                                     <i class="fa fa-trash" title="Xóa"></i>
                                                 </span>
+                                                @if( $cate->parent_id == 0 )
                                                 <span class="icon_buton btn_toggle_content">
                                                     <i class="fa fa-th-list" title="Chi tiết"></i>
                                                 </span>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

@@ -24,7 +24,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">           
             <div class="box box-primary" style="padding: 10px 5px;">
                 <div class="box-action">
-                    <a class="btn btn-primary btn-sm add-cate" href="{{ route('product.size.create') }}">Thêm size cho</a>
+                    <a class="btn btn-primary btn-sm add-cate" href="{{ route('product.size.create') }}">Thêm size cho sản phẩm</a>
                     <a class="btn btn-primary btn-sm add-cate" href="{{ route('product.size.getGoogle') }}">Thêm từ google sheet</a>
                 </div>
                 <div class="body table-responsive">

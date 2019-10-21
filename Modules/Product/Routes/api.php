@@ -13,6 +13,17 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/product', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:api')->get('/product', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::group(['namespace' => 'Api'], function () {
+
+    Route::group(['prefix' => 'product'], function () {
+
+        Route::get('/{id}', 'ProductController@getDetaiProduct');
+
+        Route::get('/category/{id}', 'ProductController@getProductByCategory');
+    });
 });
+

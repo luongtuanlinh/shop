@@ -140,3 +140,9 @@
     margin: 20px;
     font-size: 1.2em;
 }
+.box-close {
+    border-bottom: 2px solid;
+}
+.filter-cate {
+    width: 150px;
+}

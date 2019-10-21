@@ -16,6 +16,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">           
             <div class="box box-primary" style="padding: 10px 5px;">
                 <div class="box-action">
+                    {!! Form::select('category_id', $selectedCategories, old('category_id'), ['class'=>'form-control filter-cate select2']) !!}
                     <a class="btn btn-primary btn-sm add-cate" href="{{ route('product.product.create') }}">Thêm sản phẩm mới</a>
                 </div>
                 <div class="body table-responsive">
@@ -54,7 +55,7 @@
     <script>
 
         $(function() {
-            table=$('#table-product').DataTable({
+            table = $('#table-product').DataTable({
                 processing: true,
                 serverSide: true,
                 bAutoWidth: false,
@@ -94,6 +95,10 @@
                 },
                 "columnDefs": [
                 ]
+            });
+
+            $('.filter-cate').change(function() {
+                 
             });
         });
 

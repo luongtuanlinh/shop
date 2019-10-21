@@ -5,6 +5,7 @@ namespace Modules\Product\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Session;
+use DB;
 
 class Product extends Model
 {
@@ -63,6 +64,15 @@ class Product extends Model
 
     public function getProductById($id){
         return $this->where("id", $id)->first();
+    }
+
+    public function getProductByCategory($cate_id) {
+        return DB::table('products as pro')
+                 ->join('categories as cate', 'cate.id', '=', 'pro.category_id')
+                 ->where('cate.id', $cate_id)
+                 ->orWhere('cate.parent_id', $cate_id)
+                 ->where('pro.status', '!=', '-1')
+                 ->get();
     }
 
     public static function genColumnHtml($data){
