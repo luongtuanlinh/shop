@@ -27,6 +27,7 @@ class ProductController extends Controller
             if (count($listCateParent) > 0) {
                 foreach($listCateParent as $key => $value) {
                     $listData[$value->id] = Product::with('category')
+                                              ->with('sales')
                                               ->whereNull('deleted_at')
                                               ->where('status', 1)
                                               ->whereHas('category', function($q) use ($value){
@@ -36,6 +37,7 @@ class ProductController extends Controller
                                               ->get();
                 }
                 $listDataFirst = Product::with('category')
+                                    ->with('sales')
                                     ->whereNull('deleted_at')
                                     ->where('status', 2)
                                     ->get();

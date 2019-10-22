@@ -136,6 +136,11 @@
 .image-product {
     width: 90px;
 }
+.img-product {
+    width: 100%;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+}
 .delete-confirm {
     margin: 20px;
     font-size: 1.2em;
@@ -145,4 +150,23 @@
 }
 .filter-cate {
     width: 150px;
+}
+.box-product {
+    padding: 10px 15px;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+}
+.product-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #0742ac;
+}
+.trending {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 20px;
+}
+.trending span {
+    font-size: 0.7em;
 }

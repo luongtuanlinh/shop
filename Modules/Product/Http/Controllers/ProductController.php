@@ -264,11 +264,17 @@ class ProductController extends Controller
         $categories = Category::all();
         $listCateParent = Category::where('parent_id', 0)
                                     ->get();
+        $listDataFirst = Product::with('category')
+                            ->with('sales')
+                            ->whereNull('deleted_at')
+                            ->where('status', 2)
+                            ->get();
         $listData = array();
         $listCate = array();
         if (count($listCateParent) > 0) {
             foreach($listCateParent as $key => $value) {
                 $listData[$value->id] = Product::with('category')
+                                          ->with('sales')
                                           ->whereNull('deleted_at')
                                           ->where('status', 1)
                                           ->whereHas('category', function($q) use ($value){
@@ -279,18 +285,26 @@ class ProductController extends Controller
                 $listCate[$value->id] = Category::where('parent_id', $value->id)->get();
                 
             }
+            foreach ($listDataFirst as $key => $item) {
+                if ($item->cover_path != null) {
+                    $listPath = json_decode($item->cover_path);
+                    if ($listPath[0] != null) {
+                        $listDataFirst[$key]->cover_path = url($listPath[0]);
+                    }
+                }
+            }
             foreach($listData as $key => $value) {
                 foreach ($value as $key2 => $item) {
                     if ($item->cover_path != null) {
                         $listPath = json_decode($item->cover_path);
                         if ($listPath[0] != null) {
-                            $listData[$key]->cover_path = url($listPath[0]);
+                            $listData[$key][$key2]->cover_path = url($listPath[0]);
                         }
                     }
                 }
             }
         }
-        return view('product::products/first', compact('categories', 'listData', 'listCate'));
+        return view('product::products/first', compact('categories', 'listData', 'listCate', 'listDataFirst'));
     }
 
     public function get(Request $request) {

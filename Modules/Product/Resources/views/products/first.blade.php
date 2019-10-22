@@ -16,24 +16,39 @@
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">           
         <div class="box box-primary" style="padding: 10px 5px;">
-            @foreach($listCate as $key => $value)
-            <p>Top sản phẩm nổi bật</p>
-            @if ( count($listData[$key]) > 0)
+            <p class="trending"><span><i class="fa fa-circle" aria-hidden="true"></i></span> Sản phẩm nổi bật</p>
+            @if ( count($listDataFirst) > 0)
             <div class="row">
-                @foreach($listData[$key] as $item)
+                @foreach($listDataFirst as $item)
                 <div class="col-md-3">
-                    @if($item->cover_path != null)
-                    <img class="image-product" src="{{ $item->cover_path }}">
-                    @else
-                    <img class="image-product" src="{{ url('img/fashion.png') }}">
-                    @endif
-                    <p>{{ $item->name }}</p>
+                    <div class="box-product">
+                        <img class="img-product" src="{{ ($item->cover_path != null ) ? $item->cover_path : url('img/fashion.png') }}">
+                        <p class="product-name">{{ $item->name }}</p>
+                        <p>{{ $item->price }} vnd</p>
+                    </div>
                 </div>
                 @endforeach
             </div>
-            @else
+            @else 
             <p>Chưa có sản phẩm nổi bật</p>
             @endif
+            @foreach($listCate as $key => $value)
+                <p class="trending"><span><i class="fa fa-circle" aria-hidden="true"></i></span> Top sản phẩm {{ $key }}</p>
+                @if ( count($listData[$key]) > 0)
+                <div class="row">
+                    @foreach($listData[$key] as $item)
+                    <div class="col-md-3">
+                        <div class="box-product">
+                            <img class="img-product" src="{{ ($item->cover_path != null ) ? $item->cover_path : url('img/fashion.png') }}">
+                            <p class="product-name">{{ $item->name }}</p>
+                            <p>{{ $item->price }} vnd</p>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @else
+                <p>Chưa có sản phẩm nổi bật</p>
+                @endif
             @endforeach
         </div>
     </div>

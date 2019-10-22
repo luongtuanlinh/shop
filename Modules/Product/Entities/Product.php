@@ -63,16 +63,20 @@ class Product extends Model
     }
 
     public function getProductById($id){
-        return $this->where("id", $id)->first();
+        return $this->with('sales')
+                    ->where("id", $id)->first();
     }
 
     public function getProductByCategory($cate_id) {
-        return DB::table('products as pro')
-                 ->join('categories as cate', 'cate.id', '=', 'pro.category_id')
-                 ->where('cate.id', $cate_id)
-                 ->orWhere('cate.parent_id', $cate_id)
-                 ->where('pro.status', '!=', '-1')
-                 ->get();
+        return Product::with('category')
+                    ->with('sales')
+                    ->whereNull('deleted_at')
+                    ->where('status', '!=' , -1)
+                    ->whereHas('category', function($q) use ($cate_id){
+                        $q->where('id', $cate_id)
+                        ->orWhere('parent_id', $cate_id);
+                    })
+                    ->get();
     }
 
     public static function genColumnHtml($data){
