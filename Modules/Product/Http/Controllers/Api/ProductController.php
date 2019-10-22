@@ -20,17 +20,18 @@ class ProductController extends Controller
     }
 
     public function getProductForTopic(Request $request) {
-        try{
+        // try{
             $listCateParent = Category::where('parent_id', 0)
                                        ->get();
             $listData = array();
             if (count($listCateParent) > 0) {
                 foreach($listCateParent as $key => $value) {
-                    $listData[$key] = Product::with('category')
+                    $listData[$value->id] = Product::with('category')
                                               ->whereNull('deleted_at')
                                               ->where('status', 1)
                                               ->whereHas('category', function($q) use ($value){
-                                                    $q->where('parent_id', $value->id);
+                                                    $q->where('id', $value->id)
+                                                      ->orWhere('parent_id', $value->id);
                                                 })
                                               ->get();
                 }
@@ -53,9 +54,9 @@ class ProductController extends Controller
                 }
             }
 
-        }catch (\Exception $ex){
-            return response()->json(['status' => 403, $ex->getMessage()]);
-        }
+        // }catch (\Exception $ex){
+        //     return response()->json(['status' => 403, $ex->getMessage()]);
+        // }
     }
 
     public function getDetaiProduct(Request $request) {
@@ -103,20 +104,21 @@ class ProductController extends Controller
                 return response()->json(['success' => 500, 'Invalid category id']);
             }
             $product = $this->product->getProductByCategory($cate_id);
-            return $product;
 
             if ($product) {
-                if ($product->cover_path != null) {
-                    $product->cover_path = json_decode($product->cover_path);
-                    $arr = array();
-                    foreach ($product->cover_path as $key => $path) {
-                        if ($path) {
-                            $arr[$key] = url($path);
-                        } else {
-                            $arr[$key] = null;
+                foreach($product as $key => $item) {
+                    if ($item->cover_path != null) {
+                        $listPath = json_decode($item->cover_path);
+                        $newArr = array();
+                        foreach ($listPath as $key2 => $path) {
+                            if ($path) {
+                                $newArr[$key2] = url($path);
+                            } else {
+                                $newArr[$key2] = null;
+                            }
                         }
+                        $product[$key]->cover_path = $newArr;
                     }
-                    $product->cover_path = $arr;
                 }
                 return Response::json(['status' => 200, 'result' => $product]);
             } else {

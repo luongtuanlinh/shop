@@ -272,16 +272,25 @@ class ProductController extends Controller
                                           ->whereNull('deleted_at')
                                           ->where('status', 1)
                                           ->whereHas('category', function($q) use ($value){
-                                                $q->where('parent_id', $value->id);
+                                                $q->where('id', $value->id)
+                                                ->orWhere('parent_id', $value->id);
                                             })
                                           ->get();
                 $listCate[$value->id] = Category::where('parent_id', $value->id)->get();
                 
             }
+            foreach($listData as $key => $value) {
+                foreach ($value as $key2 => $item) {
+                    if ($item->cover_path != null) {
+                        $listPath = json_decode($item->cover_path);
+                        if ($listPath[0] != null) {
+                            $listData[$key]->cover_path = url($listPath[0]);
+                        }
+                    }
+                }
+            }
         }
-        return $listCate;
-        dd($listCate);
-        return view('product::products/first', compact('categories', 'listData'));
+        return view('product::products/first', compact('categories', 'listData', 'listCate'));
     }
 
     public function get(Request $request) {

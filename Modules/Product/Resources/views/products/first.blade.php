@@ -16,25 +16,25 @@
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">           
         <div class="box box-primary" style="padding: 10px 5px;">
+            @foreach($listCate as $key => $value)
             <p>Top sản phẩm nổi bật</p>
-            <div class="">
-
+            @if ( count($listData[$key]) > 0)
+            <div class="row">
+                @foreach($listData[$key] as $item)
+                <div class="col-md-3">
+                    @if($item->cover_path != null)
+                    <img class="image-product" src="{{ $item->cover_path }}">
+                    @else
+                    <img class="image-product" src="{{ url('img/fashion.png') }}">
+                    @endif
+                    <p>{{ $item->name }}</p>
+                </div>
+                @endforeach
             </div>
-
-            <p>Top áo nữ nổi bật</p>
-            <div class="">
-
-            </div>
-
-            <p>Top váy đầm nổi bật</p>
-            <div class="">
-
-            </div>
-
-            <p>Top nội y, đồ ngủ nổi bật</p>
-            <div class="">
-
-            </div>
+            @else
+            <p>Chưa có sản phẩm nổi bật</p>
+            @endif
+            @endforeach
         </div>
     </div>
 </div>
