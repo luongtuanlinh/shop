@@ -31,15 +31,25 @@ return [
                 'sub'        => []
             ],
             [
-                'route'      => 'product.size.index',
+                'route'      => 'product.choose',
                 'permission' => [],
                 'class'      => '',
                 'icon'       => 'fa fa-th-list',
-                'name'       => 'sizes',
-                'text'       => 'product::menu.sizes',
+                'name'       => 'chooses',
+                'text'       => 'product::menu.chooses',
                 'order'      => 2,
                 'sub'        => []
-            ]
+            ],
+            // [
+            //     'route'      => 'product.size.index',
+            //     'permission' => [],
+            //     'class'      => '',
+            //     'icon'       => 'fa fa-th-list',
+            //     'name'       => 'sizes',
+            //     'text'       => 'product::menu.sizes',
+            //     'order'      => 2,
+            //     'sub'        => []
+            // ]
         ]
     ]
     // [

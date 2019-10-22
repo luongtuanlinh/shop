@@ -21,38 +21,40 @@ class ProductController extends Controller
 
     public function getProductForTopic(Request $request) {
         try{
-            $user = User::where('phone','=',$request->phone)->first();
-            if(!empty($user)){
-                if(!Auth::attempt(['phone' => $request->phone, 'password' => $request->password, 'admin' => 0],$request->remember_me))
-                    return $this->errorResponse([],'Số điện thoại hoặc mật khẩu không đúng');
-                $user->token = $params['token'];
-                $user->save();
-                $user = $request->user();
+            $listCateParent = Category::where('parent_id', 0)
+                                       ->get();
+            $listData = array();
+            if (count($listCateParent) > 0) {
+                foreach($listCateParent as $key => $value) {
+                    $listData[$key] = Product::with('category')
+                                              ->whereNull('deleted_at')
+                                              ->where('status', 1)
+                                              ->whereHas('category', function($q) use ($value){
+                                                    $q->where('parent_id', $value->id);
+                                                })
+                                              ->get();
+                }
+                $listDataFirst = Product::with('category')
+                                    ->whereNull('deleted_at')
+                                    ->where('status', 2)
+                                    ->get();
 
-                $tokenResult = $user->createToken('Personal Access Token');
-                $token = $tokenResult->token;
-                if ($request->remember_me)
-                    $token->expires_at = Carbon::now()->addWeeks(1);
-                $token->save();
-                $agency = Agency::where('user_id', $user->id)->first();
-                $result = [
-                    'user_id' => $user->id,
-                    'agency_name' => $agency->name,
-                    'agency_child_count' => Agency::where('parent', $agency->id)->count(),
-                    'access_token' => $tokenResult->accessToken,
-                    'token_type' => 'Bearer',
-                    'expires_at' => Carbon::parse(
-                        $tokenResult->token->expires_at
-                    )->toDateTimeString()
-                ];
-                return $this->successResponse(["user" => $result],'Response Successfully');
-            }
-            else{
-                return $this->errorResponse([],'Số điện thoại không đúng ');
+                if ($listData) {
+                    return Response::json([
+                        'status' => 200,
+                        'result' => $listData,
+                        'firstList' => $listDataFirst
+                    ]);
+                } else {
+                    return Response::json([
+                        'status' => 404,
+                        'message' => 'Không tìm thấy dữ liệu'
+                    ]);
+                }
             }
 
         }catch (\Exception $ex){
-            return $this->errorResponse([],$ex->getMessage());
+            return response()->json(['status' => 403, $ex->getMessage()]);
         }
     }
 

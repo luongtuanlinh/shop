@@ -16,7 +16,12 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">           
             <div class="box box-primary" style="padding: 10px 5px;">
                 <div class="box-action">
-                    {!! Form::select('category_id', $selectedCategories, old('category_id'), ['class'=>'form-control filter-cate select2']) !!}
+                    <select class="form-control select2 filter-cate" name="cate_id" id="category">
+                        <option value="">--Loại sản phẩm--</option>
+                        @foreach($categories as $cate)
+                            <option value="{{ $cate->id }}">{{ $cate->cate_name }}</option>
+                        @endforeach
+                    </select>
                     <a class="btn btn-primary btn-sm add-cate" href="{{ route('product.product.create') }}">Thêm sản phẩm mới</a>
                 </div>
                 <div class="body table-responsive">
@@ -64,7 +69,8 @@
                     url: '{{ route("product.product.get") }}',
                     type: 'get',
                     data: function(d) {
-                        {{--d.csrf = '{{csrf_field()}}';--}}
+                        d.category_id = $('#category option:selected').val();
+                        d.csrf = '{{csrf_field()}}';
                     }
                 },
                 columns: [
@@ -98,9 +104,9 @@
             });
 
             $('.filter-cate').change(function() {
-                 
+                table.draw();
             });
         });
-
+        
     </script>
 @endsection

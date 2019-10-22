@@ -27,21 +27,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $selectedCategories = array();
         $categories = Category::all();
 
-        foreach($categories as $category) {
-            $selectedCategories[$category->id] = $category->cate_name;
-        }
-        return view('product::products/index', compact('selectedCategories'));
-        // $products = $this->product->getAllProduct();
-        
-        // foreach ($products as $key => $value) {
-        //     if ($value->cover_path != null) {
-        //         $products[$key]->cover_path = json_decode($value->cover_path);
-        //     }
-        // }
-        // return view('product::products/index', compact('products'));
+        return view('product::products/index', compact('categories'));
     }
 
     /**
@@ -194,25 +182,29 @@ class ProductController extends Controller
             return Redirect::back()->withInput()->withErrors([$message->first()])->with(['modal_error' => $message->first()]);
         }
 
-        if( count($request->cover_path) > 5 ) {
-            return redirect()->back()->withFlashWarning( @trans('product::notify.max_upload') );
-        }
-
         $old_list_image = Product::select('cover_path')->where('id', $id)->get();
         $old_list_image = $old_list_image[0];
         $old_list_image = json_decode($old_list_image->cover_path);
         $list_img = array();
 
-        for( $i = 0; $i < 5; $i++) {
-            if ( isset($request->cover_path[$i]) && $request->cover_path[$i] !== null) {
-                $filename = '/img/product/_'.substr( md5('_' . time() ), 0, 15) .$i. '.png'; 
-                $path = public_path( $filename );
-                Image::make($request->cover_path[$i])->orientate()->save($path);
-                $list_img[$i] = $filename;
-            } else {
-                $link = $old_list_image[$i];
-                $list_img[$i] = $link;
+        if ($request->cover_path) {
+            if( count($request->cover_path) > 5 ) {
+                return redirect()->back()->withFlashWarning( @trans('product::notify.max_upload') );
             }
+           
+            for( $i = 0; $i < 5; $i++) {
+                if ( isset($request->cover_path[$i]) && $request->cover_path[$i] !== null) {
+                    $filename = '/img/product/_'.substr( md5('_' . time() ), 0, 15) .$i. '.png'; 
+                    $path = public_path( $filename );
+                    Image::make($request->cover_path[$i])->orientate()->save($path);
+                    $list_img[$i] = $filename;
+                } else {
+                    $link = $old_list_image[$i];
+                    $list_img[$i] = $link;
+                }
+            }
+        } else {
+            $list_img = $old_list_image;
         }
 
         $array = [
@@ -268,11 +260,48 @@ class ProductController extends Controller
         }
     }
 
-    public function get(Request $request)
-    {
+    public function getChooseProduct(Request $request) {
+        $categories = Category::all();
+        $listCateParent = Category::where('parent_id', 0)
+                                    ->get();
+        $listData = array();
+        $listCate = array();
+        if (count($listCateParent) > 0) {
+            foreach($listCateParent as $key => $value) {
+                $listData[$value->id] = Product::with('category')
+                                          ->whereNull('deleted_at')
+                                          ->where('status', 1)
+                                          ->whereHas('category', function($q) use ($value){
+                                                $q->where('parent_id', $value->id);
+                                            })
+                                          ->get();
+                $listCate[$value->id] = Category::where('parent_id', $value->id)->get();
+                
+            }
+        }
+        return $listCate;
+        dd($listCate);
+        return view('product::products/first', compact('categories', 'listData'));
+    }
+
+    public function get(Request $request) {
         $query = Product::with('category')->whereNull('deleted_at');
 
         return Datatables::of($query)
+                ->filter(function ($query) use ($request) {
+                    foreach ($request->all() as $key => $value) {
+                        if (($value == "") || ($value == -1) || ($value == null)) {
+
+                        } else {
+                            if ($key == 'category_id') {
+                                $query->where('category_id', $value)
+                                      ->orWhereHas('category', function($q) use ($value){
+                                            $q->where('parent_id', $value);
+                                        });
+                            }
+                        }
+                    }
+                })
                 ->escapeColumns([])
                 ->addColumn('actions', function ($product) {
                     $html = Product::genColumnHtml($product);

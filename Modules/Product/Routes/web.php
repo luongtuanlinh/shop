@@ -32,5 +32,7 @@ Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
 
         Route::get('/size/getGoogle', 'SizeController@getDataFromSheet')->name('product.size.getGoogle');
 
+        Route::match(['get', 'post'], 'choose', 'ProductController@getChooseProduct')->name('product.choose');
+
     });
 });

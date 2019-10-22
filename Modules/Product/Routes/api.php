@@ -21,9 +21,12 @@ Route::group(['namespace' => 'Api'], function () {
 
     Route::group(['prefix' => 'product'], function () {
 
+        Route::get('/', 'ProductController@getProductForTopic');
+
         Route::get('/{id}', 'ProductController@getDetaiProduct');
 
         Route::get('/category/{id}', 'ProductController@getProductByCategory');
+        
     });
 });
 
