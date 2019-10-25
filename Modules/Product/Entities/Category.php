@@ -12,6 +12,7 @@ class Category extends Model
     public function getCategory(){
         $data = Category::where('status', 0)
                         ->where('parent_id', 0)
+                        ->whereNull('deleted_at')
                         ->get();
         $listCate = array();
         foreach ($data as $key => $value) {
@@ -20,6 +21,7 @@ class Category extends Model
            
             $itemData = Category::where('status', 0)
                                 ->where('parent_id', $value->id)
+                                ->whereNull('deleted_at')
                                 ->get();
             foreach ($itemData as $item) {
                 array_push($listCate[$key], $item);
