@@ -22,7 +22,7 @@ Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
 
         Route::resource('product', 'ProductController', ['as' => 'product']);
 
-        Route::post('/product/delete', 'ProductController@deleteProduct')->name('product.product.deleteProduct');
+        Route::get('/product/delete', 'ProductController@deleteProduct')->name('product.product.deleteProduct');
 
         Route::resource('category', 'CategoryController', ['as' => 'product']);
 
