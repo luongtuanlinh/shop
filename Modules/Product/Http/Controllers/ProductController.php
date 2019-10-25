@@ -27,7 +27,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::whereNull('deleted_at')->get();
 
         return view('product::products/index', compact('categories'));
     }
@@ -39,7 +39,7 @@ class ProductController extends Controller
     public function create()
     {
         $selectedCategories = array();
-        $categories = Category::all();
+        $categories = Category::whereNull('deleted_at')->get();
 
         foreach($categories as $category) {
             $selectedCategories[$category->id] = $category->cate_name;
@@ -141,7 +141,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $selectedCategories = array();
-        $categories = Category::all();
+        $categories = Category::whereNull('deleted_at')->get();
         $product = $this->product->getProductById($id);
         if ($product->cover_path != null) {
             $product->cover_path = json_decode($product->cover_path);
@@ -261,8 +261,9 @@ class ProductController extends Controller
     }
 
     public function getChooseProduct(Request $request) {
-        $categories = Category::all();
+        $categories = Category::whereNull('deleted_at')->get();
         $listCateParent = Category::where('parent_id', 0)
+                                    ->whereNull('deleted_at')
                                     ->get();
         $listDataFirst = Product::with('category')
                             ->with('sales')
@@ -282,7 +283,7 @@ class ProductController extends Controller
                                                 ->orWhere('parent_id', $value->id);
                                             })
                                           ->get();
-                $listCate[$value->id] = Category::where('parent_id', $value->id)->get();
+                $listCate[$value->id] = Category::where('parent_id', $value->id)->whereNull('deleted_at')->get();
                 
             }
             foreach ($listDataFirst as $key => $item) {
