@@ -352,4 +352,80 @@ class ProductController extends Controller
                 })
                 ->make(true);
     }
+
+    public function getDataChoose(Request $request) {
+        $query = Product::with('category')->whereNull('deleted_at');
+
+        return Datatables::of($query)
+                ->filter(function ($query) use ($request) {
+                    foreach ($request->all() as $key => $value) {
+                        if (($value == "") || ($value == -1) || ($value == null)) {
+
+                        } else {
+                            if ($key == 'category_id') {
+                                if($value != 0) {
+                                    $query->where('category_id', $value)
+                                    ->orWhereHas('category', function($q) use ($value){
+                                            $q->where('parent_id', $value);
+                                        });
+                                }
+                            }
+                        }
+                    }
+                })
+                ->escapeColumns([])
+                ->addColumn('actions', function ($product) {
+                    $html = Product::genColumnChoose($product);
+                    return $html;
+                })
+                ->addColumn('cate_name', function ($product) {
+
+                    return $product->category->cate_name;
+                })
+                ->addColumn('cover_path', function ($product) {
+                    if ($product->cover_path != null) {
+                        $data = json_decode($product->cover_path);
+                        $html = '';
+                        foreach ($data as $key => $path) {
+                            $html .= '<img class="image-product" src="'.( ($path != null) ? url($path) : "") .'">';
+                        }
+                        return $html;
+                    }else{
+                        return '';
+                    }
+                })
+                ->make(true);
+    }
+
+    public function updateChoosen(Request $request) {
+        $dataChoose = $request->dataChoose;
+        $category_id = $request->cate_id;
+        if ($category_id == 0) {
+            $count = Product::with('category')
+                            ->with('sales')
+                            ->whereNull('deleted_at')
+                            ->where('status', 2)
+                            ->count();
+            if ($count > 4 || (count($dataChoose) + $count >= 4 ) ) {
+                return redirect()->back()->withFlashDanger('Bạn chỉ được chọn tối đa 4 sản phẩm' );
+            } else {
+
+            }
+        } else {
+            $count = Product::with('category')
+                            ->with('sales')
+                            ->whereNull('deleted_at')
+                            ->where('status', 1)
+                            ->whereHas('category', function($q) use ($value){
+                                $q->where('id', $value->id)
+                                ->orWhere('parent_id', $value->id);
+                            })
+                            ->count();
+            if ($count > 4 || (count($dataChoose) + $count >= 4 ) ) {
+                return redirect()->back()->withFlashDanger('Bạn chỉ được chọn tối đa 4 sản phẩm' );
+            } else {
+                
+            }
+        }
+    }
 }

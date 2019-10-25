@@ -170,3 +170,10 @@
 .trending span {
     font-size: 0.7em;
 }
+.add-top {
+    margin-left: 20px;
+}
+.add-top, .edit-top {
+    text-decoration: underline;
+    cursor: pointer;
+}

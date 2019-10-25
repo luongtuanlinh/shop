@@ -12,6 +12,8 @@
 */
 Route::get('/product/get', 'ProductController@get')->name('product.product.get');
 
+Route::get('/product/getchoose', 'ProductController@getDataChoose')->name('product.product.getChoose');
+
 Route::get('/size/get', 'SizeController@get')->name('product.size.get');
 
 Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
@@ -33,6 +35,8 @@ Route::group(['middleware' => ['web'], 'prefix' => 'admin'], function()
         Route::get('/size/getGoogle', 'SizeController@getDataFromSheet')->name('product.size.getGoogle');
 
         Route::match(['get', 'post'], 'choose', 'ProductController@getChooseProduct')->name('product.choose');
+
+        Route::post('/product/choose', 'ProductController@updateChoosen')->name('product.product.updateChoosen');
 
     });
 });

@@ -95,5 +95,13 @@ class Product extends Model
         }
         return $collum;
     }
+
+    public static function genColumnChoose($data){
+        $collum = "";
+        if(!empty($data)){
+            $collum .= '<input type="checkbox" value=" '. $data->id. '" name="dataChoose[]">';
+        }
+        return $collum;
+    }
   
 }
