@@ -332,8 +332,11 @@ class ProductController extends Controller
                     return $html;
                 })
                 ->addColumn('cate_name', function ($product) {
-
-                    return $product->category->cate_name;
+                    if ($product->category && isset($product->category)){
+                        return $product->category->cate_name;
+                    } else {
+                        return null;
+                    }
                 })
                 ->addColumn('source', function ($product) {
 
