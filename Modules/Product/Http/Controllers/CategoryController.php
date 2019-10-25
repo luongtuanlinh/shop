@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\Product\Entities\Category;
+use Modules\Product\Entities\Product;
 use DB;
 use Validator;
 
@@ -142,7 +143,16 @@ class CategoryController extends Controller
         $time = date('Y-m-d H:i:s');
 
         //check count of product in this category, if count >1 -> errr
-
+        $countProduct = Product::whereNull('deleted_at')
+                ->whereHas('category', function($q) use ($cate_id){
+                    $q->where('id', $cate_id)
+                    ->orWhere('parent_id', $cate_id);
+                })
+                ->count();
+        if ($countProduct > 0) {
+            return redirect()->back()->withFlashWarning('Bạn không được phép xóa thư mục đang có sản phẩm');  
+        }
+        
         $delete_category = DB::transaction(function () use($cate_id, $time) {
             $data = [
                 'status'   => -1,
