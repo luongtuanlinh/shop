@@ -28,8 +28,10 @@ class ProductController extends Controller
     public function index()
     {
         $categories = Category::whereNull('deleted_at')->get();
-
-        return view('product::products/index', compact('categories'));
+        $actions = request()->route()->getAction();
+        $controller = (explode("@",$actions['controller']));
+        $controller = $controller[0];
+        return view('product::products/index', compact('categories', 'controller'));
     }
 
     /**
@@ -234,12 +236,6 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
-    }
-
-    public function deleteProduct(Request $request) {
-        $id = $request->id;
-        
         if ( !$id || $id == null ) {
             return redirect()->back()->withFlashWarning( @trans('product::notify.has_err') );
         }
@@ -259,6 +255,29 @@ class ProductController extends Controller
             return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
         }
     }
+
+    // public function deleteProduct(Request $request) {
+    //     $id = $request->id;
+        
+    //     if ( !$id || $id == null ) {
+    //         return redirect()->back()->withFlashWarning( @trans('product::notify.has_err') );
+    //     }
+
+    //     $time = date('Y-m-d H:i:s');
+
+    //     $data = [
+    //         'status'   => -1,
+    //         'deleted_at'  => $time
+    //     ];
+
+    //     $delete_product =  $this->product->updateProduct($id, $data);
+
+    //     if ($delete_product) {
+    //         return redirect()->back()->withFlashSuccess( @trans('product::notify.delete_product_success') );
+    //     } else {
+    //         return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
+    //     }
+    // }
 
     public function getChooseProduct(Request $request) {
         $categories = Category::whereNull('deleted_at')->get();
