@@ -84,7 +84,8 @@ class Product extends Model
         $collum = "";
         if(!empty($data)){
             $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';
-            $collum .= '<a href="'. route('product.product.delete', $data->id) .'" onclick="return confirm('.$message.')" class="btn btn-xs btn-danger"><i class="fa fa-trash">Xoá</i></a>';
+            $collum .= '<a href="'. route('product.product.delete', $data->id) .'" onclick="return confirm('.$message.')" class="btn btn-sm btn-danger">Xóa</a>';
+            $collum .= '<a type="button" href="' .route('product.color.get', $data->id) .'" class="btn btn-default btn-sm">Quản lý số lượng</a>';
 
             // if(Session::get('edit')) {
             //     $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';

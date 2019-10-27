@@ -117,30 +117,30 @@ class SizeController extends Controller
 
         return Datatables::of($query)
                 ->escapeColumns([])
-                // ->addColumn('actions', function ($product) {
-                //     $html = Product::genColumnHtml($product);
-                //     return $html;
-                // })
-                // ->addColumn('cate_name', function ($product) {
+                ->addColumn('actions', function ($product) {
+                    $html = Product::genColumnHtml($product);
+                    return $html;
+                })
+                ->addColumn('cate_name', function ($product) {
 
-                //     return $product->category->cate_name;
-                // })
-                // ->addColumn('source', function ($product) {
+                    return $product->category->cate_name;
+                })
+                ->addColumn('source', function ($product) {
 
-                //     return 'Trung quốc';
-                // })
-                // ->addColumn('cover_path', function ($product) {
-                //     if ($product->cover_path != null) {
-                //         $data = json_decode($product->cover_path);
-                //         $html = '';
-                //         foreach ($data as $key => $path) {
-                //             $html .= '<img class="image-product" src="'.( ($path != null) ? url($path) : "") .'">';
-                //         }
-                //         return $html;
-                //     }else{
-                //         return '';
-                //     }
-                // })
+                    return 'Trung quốc';
+                })
+                ->addColumn('cover_path', function ($product) {
+                    if ($product->cover_path != null) {
+                        $data = json_decode($product->cover_path);
+                        $html = '';
+                        foreach ($data as $key => $path) {
+                            $html .= '<img class="image-product" src="'.( ($path != null) ? url($path) : "") .'">';
+                        }
+                        return $html;
+                    }else{
+                        return '';
+                    }
+                })
                 ->make(true);
     }
 }

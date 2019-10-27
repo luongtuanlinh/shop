@@ -49,38 +49,17 @@ return [
             //     'text'       => 'product::menu.sizes',
             //     'order'      => 2,
             //     'sub'        => []
-            // ]
+            // ],
+            [
+                'route'      => 'product.color.list_color',
+                'permission' => [],
+                'class'      => '',
+                'icon'       => 'fa fa-calendar',
+                'name'       => 'groups',
+                'text'       => 'product::menu.colors',
+                'order'      => 6,
+                'sub'        => []
+            ]
         ]
     ]
-    // [
-    //     'route'      => 'product.event.index',
-    //     'permission' => [],
-    //     'class'      => '',
-    //     'icon'       => 'fa fa-calendar',
-    //     'name'       => 'groups',
-    //     'text'       => 'product::menu.events',
-    //     'order'      => 6,
-    //     'sub'        => [
-    //         [
-    //             'route'      => 'product.sale.index',
-    //             'permission' => [],
-    //             'class'      => '',
-    //             'icon'       => 'fa fa-level-down',
-    //             'name'       => 'groups',
-    //             'text'       => 'product::menu.sales',
-    //             'order'      => 3,
-    //             'sub'        => []
-    //         ],
-    //         [
-    //             'route'      => 'product.event.index',
-    //             'permission' => [],
-    //             'class'      => '',
-    //             'icon'       => 'fa fa-level-down',
-    //             'name'       => 'groups',
-    //             'text'       => 'product::menu.events',
-    //             'order'      => 6,
-    //             'sub'        => []
-    //         ]
-    //     ]
-    // ]
 ];

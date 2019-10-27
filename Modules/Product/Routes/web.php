@@ -38,4 +38,30 @@ Route::group(['middleware' => ['web', 'auth', 'verify.role'], 'prefix' => 'admin
 
         Route::post('/product/choose', 'ProductController@updateChoosen')->name('product.product.updateChoosen');
 
+        Route::group(['prefix' => 'color'], function() {
+
+                //route for product_color                
+
+                Route::get('/{id}/amount', 'ColorsController@index')->name('product.color.get');
+
+                Route::get('/get', 'ColorsController@get')->name('product.color.getData');
+
+                Route::match(['get', 'post'], '/add_amount/{id}', 'ColorsController@createAmount')->name('product.color.create_amount');
+
+                Route::match(['get', 'post'], '/edit_amount', 'ColorsController@editAmount')->name('product.color.edit_amount');
+
+                Route::get('delete_amount/{id}', 'ColorsController@deleteAmount')->name('product.color.delete_amount');
+
+                // route for color
+                Route::get('/get_color', 'ColorsController@getListColor')->name('product.color.list_color');
+
+                Route::post('/create', 'ColorsController@store')->name('product.color.create');
+
+                Route::get('edit/{id}', 'ColorsController@edit')->name('product.color.edit');
+
+                Route::post('update', 'ColorsController@update')->name('product.color.update');
+
+                Route::get('delete/{id}', 'ColorsController@destroy')->name('product.color.delete');
+        });
+
 });
