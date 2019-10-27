@@ -29,10 +29,10 @@
                                 <label>Màu(*)</label>
                                 {!! Form::select('color_id', $listColor, old('color_id'), ['class'=>'form-control select2']) !!}
                             </div>
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label>Số lượng(*)</label>
                                 <input name="count" type="number" class="form-control" value="{{ old('material') }}" required>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                     <div class="box-footer">

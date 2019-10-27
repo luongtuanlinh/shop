@@ -35,7 +35,7 @@
                                 <th>Tên sản phẩm</th>
                                 <th>Loại size</th>
                                 <th>Màu</th>
-                                <th>Số lượng</th>
+                                {{-- <th>Số lượng</th> --}}
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -78,7 +78,7 @@
                     {data: 'product_name', orderable: false},
                     {data: 'size_name', sortable: true},
                     {data: 'color_name', orderable: false},
-                    {data: 'count', sortable: true},
+                    // {data: 'count', sortable: true},
                     {data: 'actions', orderable: false}
                 ],
                 "order": [[ 0, "desc" ]],

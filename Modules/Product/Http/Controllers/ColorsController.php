@@ -149,13 +149,13 @@ class ColorsController extends Controller
         if($request->isMethod('post')){
             $size_id = $request->size_id;
             $color_id = $request->color_id;
-            $count = $request->count;
+            // $count = $request->count;
             if (!$color_id) {
                 return redirect()->back()->withFlashWarning('Bạn phải chọn màu cho sản phẩm');
             }
-            if (!$count) {
-                return redirect()->back()->withFlashWarning('Số lượng sản phẩm phải lớn hơn 0');
-            }
+            // if (!$count) {
+            //     return redirect()->back()->withFlashWarning('Số lượng sản phẩm phải lớn hơn 0');
+            // }
 
             //check exist color_id && size_id
             $checkExist = ProductColor::where('product_id', $id)
@@ -172,13 +172,13 @@ class ColorsController extends Controller
                 'product_id' => $id,
                 'size_id' => $size_id,
                 'color_id' => $color_id,
-                'count' => $count,
+                // 'count' => $count,
                 'created_at' => $created_at
             ];
     
             $created = ProductColor::insert($array);
             if ($created) {
-                $this->updateCountProduct($id);
+                // $this->updateCountProduct($id);
                 return redirect()->back()->withFlashSuccess('Thêm thành công');
             } else {
                 return redirect()->back()->withFlashDanger('Đã có lỗi xảy ra, vui lòng thử lại!');
@@ -215,8 +215,8 @@ class ColorsController extends Controller
         if($request->isMethod('post')){
             $size_id = $request->size_id;
             $color_id = $request->color_id;
-            $count = $request->count;
-            if ( ($size_id == $data->size_id) && ($color_id == $data->color_id) && ($count == $data->count)) {
+            // $count = $request->count;
+            if ( ($size_id == $data->size_id) && ($color_id == $data->color_id) ) {
                 return redirect()->back();
             } else {
                 $checkExist = ProductColor::where('product_id', $product_id)
@@ -227,17 +227,17 @@ class ColorsController extends Controller
                 if( $checkExist[0]->id != $id ) {
                     return redirect()->back()->withFlashWarning('Đã tồn tại size và màu, vui lòng chọn dữ liệu đầu vào khác!');
                 }
-                
+
                 $array = [
                     'size_id' => $size_id,
                     'color_id' => $color_id,
-                    'count' => $count,
+                    // 'count' => $count,
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
         
                 $updateData = ProductColor::where('id', $id)->update($array);
                 if ($updateData) {
-                    $this->updateCountProduct($product_id);
+                    // $this->updateCountProduct($product_id);
                     return redirect()->back()->withFlashSuccess('Chỉnh sửa thành công');
                 } else {
                     return redirect()->back()->withFlashDanger('Đã có lỗi xảy ra, vui lòng thử lại!');
@@ -270,7 +270,7 @@ class ColorsController extends Controller
         } else {
             $deleteData = ProductColor::where('id', $id)->delete();
             if ($deleteData) {
-                $this->updateCountProduct($product_id);
+                // $this->updateCountProduct($product_id);
                 return redirect()->back()->withFlashSuccess('Xóa dữ liệu thành công');
             } else {
                 return redirect()->back()->withFlashDanger('Đã có lỗi xảy ra, vui lòng thử lại!');
