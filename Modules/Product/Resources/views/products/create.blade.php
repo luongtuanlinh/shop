@@ -74,7 +74,6 @@
             {!! Form::button( trans('product::product.save'), ['class' => 'btn btn-primary pull-left', 'type' => "submit"]) !!}
         </div>
         {!! Form::close() !!}
-        </div>
     </div>
 </div>
 </section>

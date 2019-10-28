@@ -148,7 +148,7 @@
 .box-close {
     border-bottom: 2px solid;
 }
-.filter-cate {
+.filter {
     width: 150px;
 }
 .box-product {
@@ -176,4 +176,10 @@
 .add-top, .edit-top {
     text-decoration: underline;
     cursor: pointer;
+}
+.btn-default {
+    margin-top: 5px;
+}
+.btn-danger {
+    margin-left: 5px;
 }
