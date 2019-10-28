@@ -1,5 +1,8 @@
 @extends('layouts.admin_default')
 @section('title', "Đơn hàng")
+@section ('before-styles-end')
+    <link rel="stylesheet" href="{{ asset('css/product.css') }}"> 
+@stop
 @section('content')
     <style>
         .select2-container--default .select2-selection--single {
@@ -117,7 +120,7 @@
                     // {data: 'creater', name:'orders.user_id'},
                     {data: 'customer_name', name:'orders.customer_id'},
                     {data: 'customer_phone', name:'orders.customer_phone'},
-                    {data: 'total', name:'orders.total_price'},
+                    {data: 'total_price', name:'orders.total_price'},
                     {data: 'status', name:'orders.order_status'},
                     {data: 'deliver_address', name:'orders.deliver_address'},
                     {data: 'deliver_time', sortable: true,name:'orders.deliver_time'},

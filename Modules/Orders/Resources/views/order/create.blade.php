@@ -1,275 +1,225 @@
 @extends('layouts.admin_default')
 @section('title', "Tạo đơn hàng")
 @section('content')
-    <section class="content-header">
-        <h1>Tạo mới đơn hàng</h1>
-        <ol class="breadcrumb">
-            <li><a href="{{ route('admin_home') }}"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
-            <li><a href="{{ route('order.index') }}"> Đơn hàng</a></li>
-            <li class="active">Tạo đơn hàng</li>
-        </ol>
-    </section>
-    <style>
-        .select2-container--default .select2-selection--multiple{
-            width: 350px;
-        }
-        .select2-dropdown select2-dropdown--below{
-            width: 350px;
-        }
-        td .select2-container--default .select2-selection--single{
-            width: 140px;
-        }
-        td select2-dropdown select2-dropdown--below{
-            width: 140px;
-        }
-    </style>
-    <section class="content">
-        <div class="row">
-            {!! Form::open(['method' => 'POST', 'route' => ['order.store'], 'class' => 'validate','enctype'=>'multipart/form-data']) !!}
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                    @endforeach
-                </div>
-            @endif
-            <div class="col-md-12">
-                <div class="box box-info">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Thông tin đại lý</h3>
-                        <div class="box-tools pull-right">
-                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                            </button>
-                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                        </div>
-                    </div>
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                        <div class="col-md-6">
-                            <input type="hidden" value="" id="customer_id" name="customer_id">
-                            <div class="form-group">
-                                <label>Số điện thoại (*)</label>
-                                <input type="text" name="mobile" class="form-control typeahead-mobile" autocomplete="off" value="{{ old('mobile') }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Họ và tên (*)</label>
-                                <input type="text" name="name" id="customer_name" class="form-control" value="{{ old('name') }}" required>
-                            </div>
+<section class="content-header">
+    <h1>Tạo mới đơn hàng</h1>
+    <ol class="breadcrumb">
+        <li><a href="{{ route('admin_home') }}"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+        <li><a href="{{ route('order.index') }}"> Đơn hàng</a></li>
+        <li class="active">Tạo đơn hàng</li>
+    </ol>
+</section>
+<style>
+    .select2-container--default .select2-selection--multiple {
+        width: 350px;
+    }
 
-                            <div class="form-group">
-                                <label>Loại khách hàng (*)</label>
-                                <select name="type_customer" id="type" class="form-control" required>
-                                    <option value="">--Chọn loại khách hàng--</option>
-                                    <option value="1">Công ty</option>
-                                    <option value="2">Cá nhân</option>
-                                </select>
-                            </div>
-                            <div class="form-group remove-date">
-                                <label>Tỉnh</label>
-                                <select class="form-control select2" id="province" name="province_id" onchange="return filterArea($(this).val(),'district', 'province', '{{ old('district_id') }}')">
-                                    <option value="">--Tất cả--</option>
-                                    @foreach($provinces as $province)
-                                        <option value="{{ $province->id }}" <?php echo ($province->id == old('province_id'))? "selected" : "";?>>{{ $province->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group remove-date">
-                                <label>Huyện</label>
-                                <select class="form-control select2" id="district" name="district_id" onchange="return filterArea($(this).val(),'commune', 'district', '{{ old('commune_id') }}')">
-                                    <option value="">--Tất cả--</option>
-                                </select>
-                            </div>
-                            <div class="form-group remove-date">
-                                <label>Xã</label>
-                                <select class="form-control select2" id="commune" name="commune_id" onchange="return filterAddress($(this))">
-                                    <option value="">--Tất cả--</option>
-                                </select>
-                            </div>
+    .select2-dropdown select2-dropdown--below {
+        width: 350px;
+    }
 
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Địa chỉ cụ thể(*)</label>
-                                <input name="address" id="address" type="textbox" value="{{ old('address') }}" class="form-control" placeholder="Nhap dia chi cu the vao day" required>
-                            </div>
-                            <h3 class="h3">Thông tin đại lý</h3>
-                            <div class="form-group">
-                                <label>Cấp đại lý (*)</label>
-                                <select name="user_level" id="level" class="form-control select2" required  onchange="filterLevel($(this).val())">
-                                    <option value="">--Chọn cấp đại lý--</option>
-                                    <option value="0">Cấp công ty</option>
-                                    @for($i = 1 ; $i <= $maxLevel ; $i++)
-                                        <option value="{{ $i }}" <?php echo ($i == old('level')? "selected" : "")?>>Cấp {{ $i }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Đại lý (*)</label>
-                                <select name="created_user_id" id="created_user_id" required class="form-control select2">
-                                    <option value="">--Chọn đại lý--</option>
-                                </select>
-                            </div>
-                            <div class="form-group no-margin remove-date">
-                                <label>Ngày giao hàng</label>
-                                <div class='input-group date'>
-                                    <input type='text' class="form-control" id="datetimepicker1" name="deliver_time"  value="{{ Request::get('published_at') }}" onchange="return filter()" />
-                                    <label class="input-group-addon btn" for="date">
-                                        <span class="fa fa-calendar open-datetimepicker"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
+    #amount>input {
+        border: solid 1px #d0d0d0;
+        height: 32px;
+        padding-left: 10px;
+        font-style: bold;
+    }
 
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12">
+    td select2-dropdown select2-dropdown--below {
+        width: 140px;
+    }
 
-                <div class="box box-info">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Thông tin đơn hàng</h3>
-                        <div class="box-tools pull-right">
-                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                            </button>
-                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                        </div>
-                    </div>
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                        <table class="table table-info table-bordered">
-                            <thead>
-                                <th>TT</th>
-                                <th width="14%">Loại sản phẩm</th>
-                                <th width="14%">Sản phẩm</th>
-                                <th width="14%">Đơn vị</th>
-                                <th width="10%">Mã màu</th>
-                                <th>Màu</th>
-                                <th>Tồn kho</th>
-                                <th style="width: 7%">Số lượng</th>
-                                <th width="7%">% màu</th>
-                                <th style="width: 9%">TT</th>
-                                <th width="10%">Đơn giá</th>
-                                <th width="10%">Thành tiền sơn</th>
-                                <th style="width: 115px">Hành động</th>
-                            </thead>
-                            <tbody>
-                                @php
-                                    $listTypes = \Modules\Product\Entities\Product::listTypeProduct();
-                                    $listUnits = \Modules\Product\Entities\Product::listProductUnit();
-                                @endphp
-                                <tr>
-                                    <td>#1</td>
-                                    <td>
-                                        <select class="form-control select2" required name="type[]" id="type_1" onchange="filterProduct($(this).val(), '1')">
-                                            <option value="">--Chọn loại sp--</option>
-                                            @foreach($listTypes as $key => $value)
-                                                <option value="{{ $key }}" >{{ $value }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="form-control select2" required name="product_id[]" id="product_id_1" onchange="filter('1')">
-                                            <option value="">--Chọn sản phẩm--</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="form-control select2" required name="unit[]" id="unit_1" onchange="filterUnit('1')">
-                                            <option value="">--Chọn đơn vị--</option>
-                                            @foreach($listUnits as $key => $value)
-                                                <option value="{{ $key }}">{{ $value }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input class="typeahead form-control"  data-index="1" oninput="filterColor($(this))" autocomplete="off" id="colorcode_id_1" style="margin:0px auto;" name="color_id[]" type="text" disabled>
-                                    </td>
-                                    <td>
-                                        <button type="button" id="color_1" style="width: 20px; height: 20px; background-color: white"></button>
-                                    </td>
-                                    <td id="inventory_1">0</td>
-                                    <td><input type="number" min="1" value="1" name="amount[]" id="amount_1" oninput='changeAmount("1")' class="form-control"></td>
-                                    <td id="percent_1"><input type="hidden"  id="color_percent_1" name="color_percent[]" value=""><span>0%</span></td>
-                                    <td id="tt_1"><input type="hidden" id="tt_hidden_1" value=""><span>0</span></td>
-                                    <td id="price_1"><input type="hidden" id="price_hidden_1" name="sell_price[]"><span>0</span></td>
-                                    <td id="sum_price_1">0</td>
-                                    <td id="td-1">
-                                        <button type="button" class="btn btn-info btn-xs" onclick="addRow($(this))"><i class="fa fa-plus">Thêm</i></button>
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="deleteRow($(this))"><i class="fa fa-minus">Xoá</i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="2">Cộng</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td colspan="4" id="sum_total"><input type="hidden" value="" id="sum_total_hidden" name="total"><span>0</span></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">Chiết khấu</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>
-                                        <div class='input-group discount'>
-                                            <input type="number" name="discount" id="discount" oninput="sum_discount($('#sum_total_hidden').val())" class="form-control">
-                                        </div>
-
-                                    </td>
-                                    <td colspan="4" id="sum_discount">0</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">Chiết khấu thánh toán</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>
-                                        <div class='input-group tax'>
-                                            <input type="number" oninput="sum_tax($('#discount').val(), $('#sum_total_hidden').val())" name="tax" id="tax" class="form-control">
-                                        </div>
-
-                                    </td>
-                                    <td colspan="4" id="sum_tax">0</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">Thành tiền</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td colspan="4" id="sum_price">0</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                    <div class="box-footer" style="text-align: center">
-                        {!! Form::button(trans('core::user.save'), ['class' => 'btn btn-primary', 'type' => "submit"]) !!}
-                        <a href="{{ route('order.index') }}" class="btn btn-default">{{trans('core::user.cancel')}}</a>
-                    </div>
-                </div>
-            </div>
-            {!! Form::close() !!}
+    .form-group>.select2 {
+        height: 34px;
+    }
+</style>
+<section class="content">
+    <div class="row">
+        {!! Form::open(['method' => 'POST', 'route' => ['order.store'], 'class' =>
+        'validate','enctype'=>'multipart/form-data']) !!}
+        @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            @foreach ($errors->all() as $error)
+            <p>{{ $error }}</p>
+            @endforeach
         </div>
-    </section>
+        @endif
+        <div class="col-md-12">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Thông tin đại lý</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i
+                                class="fa fa-times"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="col-md-6">
+                        <input type="hidden" value="" id="customer_id" name="customer_id">
+                        <div class="form-group">
+                            <label>Tên khách hàng (*)</label>
+                            <input type="text" name="name" id="customer_name" class="form-control"
+                                value="{{ old('name') }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại (*)</label>
+                            <input type="text" name="mobile" class="form-control typeahead-mobile" autocomplete="off"
+                                value="{{ old('mobile') }}" required>
+                        </div>
+                        <div class="form-group remove-date">
+                            <label>Lưu ý</label>
+                            <textarea style="width: 100%;" name="more_info"></textarea>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group remove-date">
+                            <label>Tỉnh</label>
+                            <select class="form-control select2" id="province" name="province_id"
+                                onchange="return filterArea($(this).val(),'district', 'province', '{{ old('district_id') }}')">
+                                <option value="">--Tất cả--</option>
+                                @foreach($provinces as $province)
+                                <option value="{{ $province->id }}"
+                                    <?php echo ($province->id == old('province_id'))? "selected" : "";?>>
+                                    {{ $province->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group remove-date">
+                            <label>Huyện</label>
+                            <select class="form-control select2" id="district" name="district_id"
+                                onchange="return filterArea($(this).val(),'commune', 'district', '{{ old('commune_id') }}')">
+                                <option value="">--Tất cả--</option>
+                            </select>
+                        </div>
+                        <div class="form-group remove-date">
+                            <label>Xã</label>
+                            <select class="form-control select2" id="commune" name="commune_id"
+                                onchange="return filterAddress($(this))">
+                                <option value="">--Tất cả--</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ cụ thể(*)</label>
+                            <input name="address" id="address" type="textbox" value="{{ old('address') }}"
+                                class="form-control" placeholder="Nhap dia chi cu the vao day" required>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Thông tin đơn hàng</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i
+                                class="fa fa-times"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table class="table table-info table-bordered">
+                        <thead>
+                            <th>TT</th>
+                            <th>Loại sản phẩm</th>
+                            <th>Sản phẩm</th>
+                            <th>Kích cỡ</th>
+                            <th>Màu sắc</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                            <th>Hành động</th>
+                        </thead>
+                        <tbody id="tbody">
+                            <tr>
+                                <td>#1</td>
+                                <td>
+                                    <select class="form-control select2" required name="category[]" id="type_1"
+                                        onchange="return filterProduct($(this).val(), '1')">
+                                        <option value="">--Chọn loại sp--</option>
+                                        @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->cate_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control select2" required name="product_id[]" id="product_id_1"
+                                        onchange="return filterProductProperties('1')">
+                                        <option value="">--Chọn sản phẩm--</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control select2" required name="size[]" id="size_1">
+                                        <option value="">--Kích cỡ--</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control select2" required name="color[]" id="color_1">
+                                        <option value="">--Màu sắc--</option>
+                                    </select>
+                                </td>
+                                <td id="amount">
+                                    <input type="number" id="amount_1" value="1" min="1" name="amount[]" max="4"
+                                        required onchange="return changeAmount('1')">
+                                </td>
+                                <td id="sell_price_1">
+                                    <input type="hidden" id="price_hidden_1">
+                                    <span>0</span>
+                                </td>
+                                <td id="tt_1">
+                                    <input type="hidden" id="tt_hidden_1">
+                                    <span>0</span>
+                                </td>
+
+                                {{-- <td id="sum_price_1">0</td> --}}
+                                <td id="td-1">
+                                    <button type="button" class="btn btn-danger btn-xs" onclick="deleteRow($(this))"><i
+                                            class="fa fa-minus">Xoá</i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="9" class="text-center"><button type="button" id="add_button_1" class="btn btn-info btn-xs"
+                                    onclick="addRow()"><i class="fa fa-plus">Thêm</i></button></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Tổng tiền</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td colspan="2" id="sum_price">
+                                    <input type="hidden" name="total" id="total" value='0'?/>
+                                    <span>0</span></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="box-footer" style="text-align: center">
+                    {!! Form::button(trans('core::user.save'), ['class' => 'btn btn-primary', 'type' => "submit"]) !!}
+                    <a href="{{ route('order.index') }}" class="btn btn-default">{{trans('core::user.cancel')}}</a>
+                </div>
+            </div>
+        </div>
+        {!! Form::close() !!}
+    </div>
+</section>
 @endsection
 @section('scripts')
-    <script type="text/javascript">
-        $(function () {
+<script type="text/javascript">
+    $(function () {
             $('#datetimepicker1').datetimepicker({
                 format: "DD-MM-YYYY",
                 locale: 'vi'
@@ -295,89 +245,6 @@
             },
         });
 
-        function filterLevel(level) {
-            if(level > 0){
-                $("#created_user_id").prop('required', true);
-                $.ajax({
-                    data:{
-                        level : level
-                    },
-                    url: "{{route('agency.filter.level')}}",
-                    type: "GET",
-                    success: function (data) {
-                        $("#created_user_id").html("");
-                        $("#created_user_id").append(data.message);
-
-                    }
-                })
-            }else{
-                $("#created_user_id").prop('required', false);
-            }
-
-        }
-
-        function filterProduct(type, id) {
-            $.ajax({
-                data:{
-                    type : type
-                },
-                url: "{{route('product.filter.type')}}",
-                type: "GET",
-                success: function (data) {
-                    if(data.result == 1){
-                        $("#product_id_"+id).html("");
-                        $("#product_id_"+id).append(data.message);
-                        if(parseInt(type) == 1){
-                            $("#colorcode_id_"+id).prop("disabled", false);
-                        }
-                        else{
-                            $("#colorcode_id_"+id).val("");
-                            $("#colorcode_id_"+id).prop("disabled", true);
-                            $("#percent_"+ id +" span").html("");
-                            $("#percent_"+ id +" span").append("0%");
-                            $("#tt_"+ id +" span").append("0");
-                            $("#tt_hidden_"+id).val();
-                            tt(id);
-                            total(id);
-                        }
-                    }
-                }
-            })
-        }
-
-        function filterUnit(id) {
-            var data = $('#unit_'+ id).select2('data');
-            if($("#type_" + id).val() != "1"){
-                filterPrice(id, data[0].id);
-            }else{
-                var color_id = $("#colorcode_id").val();
-                filterPrice(id, data[0].id, color_id);
-            }
-        }
-
-        function filterPrice(id, unit, color_id = "") {
-            $.ajax({
-                data:{
-                    unit : unit,
-                    product_id: $("#product_id_"+id + " option:selected").val(),
-                    color_id: color_id
-                },
-                url: "{{route('product.filter.price')}}",
-                type: "GET",
-                success: function (data) {
-                    if(data.result == 1){
-                        $("#price_hidden_"+id).val(data.message);
-                        $("#price_"+ id + " span").html("");
-                        $("#price_"+ id + " span").append(addCommas(data.message));
-                        $("#inventory_" + id).html(data.message1);
-                        tt(id);
-                        total(id);
-                    }
-
-                }
-            })
-        }
-
         function addCommas(nStr)
         {
             nStr += '';
@@ -391,14 +258,49 @@
             return x1 + x2;
         }
 
-        function filter(id) {
-            var data_1 = $('#unit_'+ id).select2('data');
-            filterPrice(id, data_1[0].id);
+        function filterProductProperties(index) {
+            var product = $("#product_id_" + index).select2('data');
+            // console.log($("sell_price_" + index + " span").text());
+            $("#sell_price_" + index + " span").html("");
+            $("#sell_price_" + index + " span").append(addCommas(product[0].price));
+            $("#price_hidden_" + index).val(product[0].price);
+            tt(index);
+            total();
+            $.ajax({
+                data: {
+                    product_id: product[0].id,
+                },
+                url: "{{ route('order.product.filterSize') }}",
+                type: "GET",
+                success: function(data) {
+                    if (data.result == 0) {
+                        console.log(data.message);
+                    } else {
+                        $("#size_" + index).html("");
+                        $("#size_" + index).append(data.message);
+                    }
+                }
+            });
+            $.ajax({
+                data: {
+                    product_id: product[0].id,
+                },
+                url: "{{ route('order.product.filterColor') }}",
+                type: "GET",
+                success: function(data) {
+                    if (data.result == 0) {
+                        console.log(data.message);
+                    } else {
+                        $("#color_" + index).html("");
+                        $("#color_" + index).append(data.message);
+                    }
+                }
+            })
         }
 
 
         function changeAmount(id){
-            total(id);
+            tt(id);
         }
 
         /**
@@ -407,32 +309,24 @@
          */
         function tt(id) {
             var price = $("#price_hidden_"+id).val();
-            var percent = $("#percent_"+ id +" span").html().replace("%", "");
-            $("#tt_hidden_"+id).val(price * percent/100);
-            $("#tt_"+id+" span").html(addCommas(price * percent/100));
-
+            var amount = $("#amount_"+id).val();
+            $("#tt_hidden_"+id).val(price * amount);
+            $("#tt_"+id+" span").html(addCommas(price * amount));
+            total();
         }
 
-        function total(id) {
-            var price = $("#price_hidden_"+id).val();
-            var amount = $("#amount_" + id).val();
-            if(amount == ""){
-                amount = 0
-            }
-            if(price == ""){
-                price = 0;
-            }
-            var tt = $("#tt_hidden_"+id).val();
-            if(tt == ""){
-                tt = 0;
-            }
-            //update sum of item
-            $("#sum_price_"+id).html("");
-            $("#sum_price_"+id).html(addCommas((parseInt(price) + parseInt(tt)) * parseInt(amount)));
-
-            var sum_total = getSumTotal();
-            //update sum of list item
-            _sum_total(sum_total);
+        function total() {
+            var total = 0;
+            $("#tbody tr").each(function() {
+                let value = $(this).find("td").slice(7,8).find("input").val();
+                if (value == '') {
+                    value = 0;
+                }
+                total += parseInt(value);
+            });
+            $("#sum_price #total").val(total);
+            $("#sum_price span").html("");
+            $("#sum_price span").html(addCommas(total));
         }
 
         function _sum_total(sum_total) {
@@ -483,52 +377,68 @@
             $("#sum_price").html(addCommas((100 - parseInt(tax)) * (100 - parseInt(discount)) * (sum_total - parseInt(total_type_4)) / 10000 + parseInt(total_type_4)));
         }
 
-        function addRow(_this) {
-            $(_this).remove();
-            var str_row = "";
-            count = count + 1;
-            str_row += "<tr>\n" +
-                "                                    <td>#"+ count +"</td>\n" +
-                "                                    <td>\n" +
-                "                                        <select class=\"form-control select2\" name=\"type[]\" id=\"type_"+count+"\" onchange=\"filterProduct($(this).val(), '"+count+"')\">\n" +
-                "                                            <option value=\"\">--Chọn loại sp--</option>\n" +
-                "                                            @foreach($listTypes as $key => $value)\n" +
-                "                                                <option value=\"{{ $key }}\">{{ $value }}</option>\n" +
-                "                                            @endforeach\n" +
-                "                                        </select>\n" +
-                "                                    </td>\n" +
-                "                                    <td>\n" +
-                "                                        <select class=\"form-control select2\" name=\"product_id[]\" id=\"product_id_"+count+"\" onchange=\"filter('"+count+"')\">\n" +
-                "                                            <option value=\"\">--Chọn sản phẩm--</option>\n" +
-                "                                        </select>\n" +
-                "                                    </td>\n" +
-                "                                    <td>\n" +
-                "                                        <select class=\"form-control select2\" name=\"unit[]\" id=\"unit_"+count+"\" onchange=\"filterUnit('"+count+"')\">\n" +
-                "                                            <option value=\"\">--Chọn đơn vị--</option>\n" +
-                "                                            @foreach($listUnits as $key => $value)\n" +
-                "                                                <option value=\"{{ $key }}\">{{ $value }}</option>\n" +
-                "                                            @endforeach\n" +
-                "                                        </select>\n" +
-                "                                    </td>\n" +
-                "                                     <td>\n" +
-                "                                        <input class=\"typeahead form-control\" oninput=\"filterColor($(this))\" autocomplete=\"off\" data-index="+ count +" id=\"colorcode_id_"+ count +"\" style=\"margin:0px auto;\" name=\"color_id[]\" type=\"text\" disabled>\n" +
-                "                                    </td>"+
-                "                                       <td>\n" +
-                "                                        <button type=\"button\" id=\"color_"+ count +"\" style=\"width: 20px; height: 20px; background-color: white\"></button>\n" +
-                "                                    </td>"+
-                    "<td id=\"inventory_"+ count +"\">0</td>"+
-                "                                    <td><input type=\"number\" min=\"1\" value=\"1\" name=\"amount[]\" id=\"amount_"+count+"\" oninput='changeAmount(\""+count+"\")' class=\"form-control\"></td>\n" +
-                "                                    <td id=\"percent_"+count+"\"><input type=\"hidden\" id=\"color_percent_"+ count +"\" name=\"color_percent[]\" value=\"\"><span>0%</span></td>\n" +
-                "                                    <td id=\"tt_"+count+"\"><input type=\"hidden\" id=\"tt_hidden_"+count+"\" value=\"\"><span>0</span></td>\n" +
-                "                                    <td id=\"price_"+count+"\"><input type=\"hidden\" id=\"price_hidden_"+count+"\" name=\"sell_price[]\"><span>0</span></td>\n" +
-                "                                    <td id=\"sum_price_"+count+"\">0</td>\n" +
-                "                                    <td id='td-"+ count +"'><button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"addRow($(this))\"><i class=\"fa fa-plus\">Thêm</i></button>" +
-                "                                           <button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteRow($(this))\"><i class=\"fa fa-minus\">Xoá</i></button></td>\n" +
-                "                                </tr>";
-            $("tbody").append(str_row);
-            $(".select2").select2();
-            filterColor(_this);
+        function addRow() {
+            btn_loading.loading("tbody");
+            $.ajax({
+                data: {
+                    index: count,
+                },
+                url: "{{ route('order.product.addRow') }}",
+                type: "GET",
+                success: function(data) {
+                    if (data.result == 0) {
+                        console.log(data.message);
+                    } else {
+                        btn_loading.hide("tbody");
+                        // $("#color_" + index).html("");
+                        $("tbody").append(data.message);
+                        count++;
+                        $(".select2").select2();
+                        filterProduct(count);
+                    }
+                }
+            });
         }
+        // function addRow(_this) {
+        //     $(_this).remove();
+        //     var str_row = "";
+        //     count = count + 1;
+        //     str_row += "<tr>\n" +
+        //         "                                    <td>#"+ count +"</td>\n" +
+        //         "                                    <td>\n" +
+        //         "                                        <select class=\"form-control select2\" name=\"type[]\" id=\"type_"+count+"\" onchange=\"filterProduct($(this).val(), '"+count+"')\">\n" +
+        //         "                                            <option value=\"\">--Chọn loại sp--</option>\n"  +
+        //         "                                        </select>\n" +
+        //         "                                    </td>\n" +
+        //         "                                    <td>\n" +
+        //         "                                        <select class=\"form-control select2\" name=\"product_id[]\" id=\"product_id_"+count+"\" onchange=\"filter('"+count+"')\">\n" +
+        //         "                                            <option value=\"\">--Chọn sản phẩm--</option>\n" +
+        //         "                                        </select>\n" +
+        //         "                                    </td>\n" +
+        //         "                                    <td>\n" +
+        //         "                                        <select class=\"form-control select2\" name=\"unit[]\" id=\"unit_"+count+"\" onchange=\"filterUnit('"+count+"')\">\n" +
+        //         "                                            <option value=\"\">--Chọn đơn vị--</option>\n" +
+        //         "                                        </select>\n" +
+        //         "                                    </td>\n" +
+        //         "                                     <td>\n" +
+        //         "                                        <input class=\"typeahead form-control\" oninput=\"filterColor($(this))\" autocomplete=\"off\" data-index="+ count +" id=\"colorcode_id_"+ count +"\" style=\"margin:0px auto;\" name=\"color_id[]\" type=\"text\" disabled>\n" +
+        //         "                                    </td>"+
+        //         "                                       <td>\n" +
+        //         "                                        <button type=\"button\" id=\"color_"+ count +"\" style=\"width: 20px; height: 20px; background-color: white\"></button>\n" +
+        //         "                                    </td>"+
+        //             "<td id=\"inventory_"+ count +"\">0</td>"+
+        //         "                                    <td><input type=\"number\" min=\"1\" value=\"1\" name=\"amount[]\" id=\"amount_"+count+"\" oninput='changeAmount(\""+count+"\")' class=\"form-control\"></td>\n" +
+        //         "                                    <td id=\"percent_"+count+"\"><input type=\"hidden\" id=\"color_percent_"+ count +"\" name=\"color_percent[]\" value=\"\"><span>0%</span></td>\n" +
+        //         "                                    <td id=\"tt_"+count+"\"><input type=\"hidden\" id=\"tt_hidden_"+count+"\" value=\"\"><span>0</span></td>\n" +
+        //         "                                    <td id=\"price_"+count+"\"><input type=\"hidden\" id=\"price_hidden_"+count+"\" name=\"sell_price[]\"><span>0</span></td>\n" +
+        //         "                                    <td id=\"sum_price_"+count+"\">0</td>\n" +
+        //         "                                    <td id='td-"+ count +"'><button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"addRow($(this))\"><i class=\"fa fa-plus\">Thêm</i></button>" +
+        //         "                                           <button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteRow($(this))\"><i class=\"fa fa-minus\">Xoá</i></button></td>\n" +
+        //         "                                </tr>";
+        //     $("tbody").append(str_row);
+        //     $(".select2").select2();
+        //     filterColor(_this);
+        // }
 
         $('input.typeahead-mobile').typeahead({
             source:  function (query, process) {
@@ -563,34 +473,6 @@
         var province_text = "";
         var district_text = "";
         var commune_text = "";
-        function filterArea(id, type, parent_type, old_value) {
-            var text = $("#" + parent_type).find(":selected").text();
-            if (type != "district") {
-                district_text = text;
-                $("#address").val(district_text + "," + province_text);
-            } else {
-                province_text = text;
-                $("#address").val(province_text);
-            }
-            $.ajax({
-                data: {
-                    id: id,
-                    type: type,
-                    value: old_value
-                },
-                url: "{{route('agency.filter')}}",
-                type: "GET",
-                success: function (data) {
-                    if (data.result == 0) {
-
-                    } else {
-                        $("#" + type).html("");
-                        $("#" + type).append(data.message);
-                    }
-
-                }
-            })
-        }
 
         <?php if(!empty(old('province_id'))){ ?>
         filterArea('{{ old('province_id') }}', "district", "province", {{ old('district_id') }});
@@ -600,28 +482,6 @@
         <?php if(!empty(old('level'))){ ?>
         filterParent("{{ old('level') }}")
         <?php } ?>
-        function filterParent(level) {
-            level = parseInt(level);
-            if(level > 1){
-                level = level - 1;
-                $.ajax({
-                    data:{
-                        level : level
-                    },
-                    url: "{{route('agency.filter.parent')}}",
-                    type: "GET",
-                    success: function (data) {
-                        $("#parent").html("");
-                        $("#parent").append(data.message);
-
-                    }
-                })
-            }else{
-                $("#parent").find('option').remove();
-            }
-
-        }
-
         /**
          *
          * @param _this
@@ -629,24 +489,30 @@
         function filterAddress(_this) {
             var text = $(_this).find(":selected").text();
             commune_text = text
-            $("#address").val(commune_text + "," + district_text + "," + province_text);
+            $("#address").val(commune_text + ", " + district_text + ", " + province_text);
         }
 
         function deleteRow(_this) {
             if($(_this).parent().children().length == 2){
                 $(_this).parent().parent().remove();
-                count = count - 1;
                 var sum_total = getSumTotal();
                 _sum_total(sum_total);
 
-                var str =
-                    "<button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"addRow($(this))\"><i class=\"fa fa-plus\">Thêm</i></button>\n" +
-                    "                                <button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteRow($(this))\"><i class=\"fa fa-minus\">Xoá</i></button>";
+                var str ="<button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteRow($(this))\"><i class=\"fa fa-minus\">Xoá</i></button>";
                 $("#td-" + count).html("");
                 $("#td-" + count).html(str);
             }else{
                 $(_this).parent().parent().remove();
             }
+
+            count = count - 1;
+            console.log(count);
+            var i = 1;
+            $("#tbody tr").each(function() {
+                $(this).find("td").first().html("#" + i);
+                i++;
+            });
+
         }
 
         $.fn.datetimepicker.dates['es'] = {
@@ -696,32 +562,57 @@
             return sum_total;
         }
 
-        function filterColor(_this) {
-            var index = $(_this).data("index");
-            $(_this).typeahead({
-                source:  function (query, process) {
-                    return $.get('{{ route('product.color.filter') }}', { query: query }, function (data) {
-                        data = $.parseJSON(data);
-                        return process(data);
-                    });
+        var province_text = "";
+        var district_text = "";
+        var commune_text = "";
+        function filterArea(id, type, parent_type, old_value) {
+            var text = $("#" + parent_type).find(":selected").text();
+            console.log(text);
+            text = text.trim();
+            if(type != "district"){
+                district_text = text;
+                $("#address").val(district_text + ", " + province_text);
+            } else {
+                province_text = text;
+                $("#address").val(province_text);
+            }
+            $.ajax({
+                data:{
+                    id : id,
+                    type: type,
+                    value: old_value
                 },
-                displayText: function(item){
-                    // OMG ugly !!! :p
-                    if (item.hex_code == undefined) return item;
-                    return item.hex_code;
-                },
-                updater: function(item) {
-                    $("#percent_"+ index +" span").html("");
-                    $("#percent_"+ index +" span").append(item.percent + "%");
-                    $("#color_percent_" + index).val(item.percent);
-                    $("#color_"+index).css("background-color", item.real_color_code);
-                    return item.hex_code;
-                },
-                afterSelect: function (obj) {
-                    var unit = $("#unit_" + index).val();
-                    filterPrice(index, unit, obj);
+                url: "{{route('order.filter')}}",
+                type: "GET",
+                success: function (data) {
+                    if(data.result == 0){
+                        alert(data.message);
+                    }else{
+                        $("#" + type).html("");
+                        $("#" + type).append(data.message);
+                    }
                 }
-            });
+            })
         }
-    </script>
+
+        function filterProduct(category, index) {
+            $.ajax({
+                data: {
+                    category_id: category,
+                },
+                url: "{{ route('order.product.filter') }}",
+                type: "GET",
+                success: function (data) {
+                    if(data.result == 0){
+                        alert(data.message);
+                    }else{
+                        $("#product_id_" + index).select2({
+                            data: data.message,
+                        });
+                    }
+                }
+
+            })
+        }
+</script>
 @endsection

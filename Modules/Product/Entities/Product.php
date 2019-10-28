@@ -41,6 +41,11 @@ class Product extends Model
         return $this->belongsToMany(Size::class,'product_size','product_id','size_id')->withPivot(['count','updated_at']);
     }
 
+    public function colors()
+    {
+        return $this->belongsToMany(Size::class,'product_color','product_id','color')->withPivot(['count','updated_at']);
+    }
+
     public function orders()
     {
         return $this->belongsToMany(Order::class,'order_product','product_id','order_id');
