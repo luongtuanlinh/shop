@@ -9,14 +9,16 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Modules\Agency\Entities\Agency;
-use Modules\Agency\Entities\Province;
+// use Modules\Agency\Entities\Agency;
+use Modules\Orders\Entities\Province;
+use Modules\Orders\Entities\District;
+use Modules\Orders\Entities\Commune;
 use Modules\Core\Models\User;
 use Modules\Orders\Entities\Customer;
 use Modules\Orders\Entities\History;
 use Modules\Orders\Entities\OrderItems;
 use Modules\Orders\Entities\Orders;
-use Modules\Product\Entities\ColorCode;
+// use Modules\Product\Entities\ColorCode;
 use Modules\Product\Entities\ElectedWarehouse;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\Color;
@@ -29,6 +31,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Excel;
 use App\Exports\OrderExport;
+use Modules\Product\Entities\Category;
 
 class OrdersController extends Controller
 {
@@ -54,7 +57,7 @@ class OrdersController extends Controller
      */
     public function get(Request $request)
     {
-        $query = Orders::join("customers", "customers.id", "=", "orders.customer_id");
+        $query = Orders::select("orders.*", "customers.customer_name as customer_name", "customers.customer_phone as customer_phone")->join("customers", "customers.id", "=", "orders.customer_id");
         return Datatables::of($query)
             ->filter(function ($query) use ($request) {
                 foreach ($request->all() as $key => $value) {
@@ -125,18 +128,9 @@ class OrdersController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function view($id, Request $request){
-        $order = Orders::where('id', $id)->firstOrFail();
+        $order = Orders::where('id', $id)->first();
         $customer = Customer::whereId($order->customer_id)->first();
         $order->customer_name = $customer->customer_name;
-        // $allItems = OrderItems::with('color', 'product', "elected")->where('order_id',$id)->get();
-        $request->session()->put('url.intended',url()->current());
-        // $events = History::where('order_id',$id)->get();
-        // $events = $events->groupBy(function($date) {
-        //     return Carbon::parse($date->created_at)->format('d');
-        // });
-
-        // $colors = ColorCode::whereNull('deleted_at')->get();
-        //dd($allItems);
         return view('orders::order.edit',['order' => $order]);
     }
 
@@ -155,12 +149,17 @@ class OrdersController extends Controller
             return Product::whereId($item->product_id)->first()->name;
         })
         ->addColumn('image', function($item) {
-            $html = "<img src='".Product::whereId($item->product_id)->first()->cover_path."' style='width:150px; height: 150px;margin: auto;' />";
-
-            return $html;
-        })
+            if ($item->cover_path != null) {
+                $data = json_decode($item->cover_path);
+                $html = '';
+                $html .= '<img class="image-product" src="' . (($data[0] != null) ? url($data[0]) : "") . '">';
+                return $html;
+            } else {
+                return '';
+            }
+    })
         ->addColumn('color', function($item) {
-            return Color::where('code', Product::whereId($item->product_id)->first()->code)->first()->color;
+            return Color::join('color_product', 'colors.id', '=', 'color_product.color_id')->where('color_product..product_id', $item->product_id)->first()->color;
         })
         ->addColumn('size', function($item) {
             return Size::whereId($item->size_id)->first()->size_name;
@@ -199,92 +198,7 @@ class OrdersController extends Controller
         DB::beginTransaction();
         $order = Orders::with("order_item")->where('id',$params['order_id'])->first();
         try {
-            if(empty($order)){
-                return redirect()->back()->withInput()->withErrors(["Không tồn tại đơn hàng này"]);
-            }else {
-
-                if ($params['order_status'] == Orders::SHIPPED_STATUS) {
-                    if($order->is_update == Orders::NOT_UPDATED_STATUS){
-                        $total_amount = 0;
-                        foreach ($order->order_item as $item) {
-                            $obj = ElectedWarehouse::where('product_id', $item->product_id)->where('unit', $item->unit);
-                            if(!empty($item->colorcode_id)){
-                                $obj = $obj->where("color_id", $item->colorcode_id);
-                            }
-                            $obj = $obj->first();
-                            if(empty($obj) || $obj->amount == 0){
-                                return redirect()->back()->withInput()->withErrors([Orders::renderMessage($item)]);
-                            }else{
-                                if ($obj->amount < $item->amount) {
-                                    return redirect()->back()->withInput()->withErrors([Orders::renderMessage($item)]);
-                                } else {
-                                    $total_amount += $item->amount;
-                                    $obj->amount = $obj->amount - $item->amount;
-                                    $obj->save();
-                                }
-                            }
-
-                        }
-
-                        WareHouse::insertWarehouse($total_amount, $order->total, WareHouse::OUPUT_STATUS, $order->id);
-
-                        //update order status
-                        $order->is_update = 1;
-                        $order->save();
-                    }
-                }
-                else if ($params['order_status'] == Orders::CANCEL_STATUS){
-                    if($order->is_update == Orders::UPDATED_STATUS) {
-                        $total_amount = 0;
-                        foreach ($order->order_item as $item) {
-                            $obj = ElectedWarehouse::where('product_id', $item->product_id)->where('unit', $item->unit);
-                            if (!empty($item->colorcode_id)) {
-                                $obj = $obj->where("color_id", $item->colorcode_id);
-                            }
-                            $obj = $obj->first();
-                            $total_amount += $item->amount;
-                            $obj->amount += $item->amount;
-                            $obj->save();
-                        }
-                        WareHouse::insertWarehouse($total_amount, $order->total, WareHouse::ROLLBACK_STATUS, $order->id);
-                    }
-                }
-                else if ($params['order_status'] == Orders::PROCESSING_STATUS){
-                    if(count($params) > 0){
-                        $index_color = 0;
-                        //dd($params);
-                        foreach ($params["product_id"] as $key => $value){
-                            if($params["type"][$key] == 1){
-                                $colorcode = ColorCode::where("hex_code", $params["color_id"][$index_color])->whereNull('deleted_at')->first();
-                                if(empty($colorcode)){
-                                    return redirect()->back()->withInput()->withErrors(["Mã màu ". $params["color_id"][$index_color] . " chưa được nhập"]);
-                                }
-                                $index_color = $index_color + 1;
-                            }
-                        }
-                        $order->total = $params['total'];
-                        $order->discount = $params['discount'];
-                        $order->tax = $params['tax'];
-                        Orders::insertOrderitem($params);
-                    }
-                }
-                $order->status = $params['order_status'];
-                if($params['order_status'] == Orders::PENDING_STATUS){
-                    $order->total = $params['total'];
-                    $order->discount = $params['discount'];
-                    $order->tax = $params['tax'];
-                    Orders::insertOrderitem($params);
-                }
-
-                $order->save();
-                History::create([
-                    'order_id' => $order->id,
-                    'actor_id' => $params['order_status'],
-                    'description' => $params['subcrible'],
-                    'user_id'   =>  Auth::user()->id,
-                    'user_name' =>  Auth::user()->username
-                ]);
-            }
+            
             DB::commit();
             return redirect()->back()->with('messages','Đổi trạng thái đơn hàng thành công');
         } catch (\Exception $e) {
@@ -298,10 +212,12 @@ class OrdersController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function create(){
-        $maxLevel = Agency::max('level');
-        $colors = ColorCode::whereNull('deleted_at')->get();
+        // $maxLevel = Agency::max('level');
+        // $colors = ColorCode::whereNull('deleted_at')->get();
         $provinces = Province::all();
-        return view('orders::order.create', compact('maxLevel','colors', 'provinces'));
+        $categories = Category::whereNull('deleted_at')->get();
+
+        return view('orders::order.create', compact('provinces', 'categories'));
     }
 
     /**
@@ -311,12 +227,10 @@ class OrdersController extends Controller
     public function store(Request $request){
         $params = $request->all();
         $validatorArray = [
-            'user_level' => 'numeric',
             'name' => 'required',
-            'mobile' => 'required',
+            'mobile' => 'required', 
+            'more_info' => '',
             'address'  => 'required',
-            'type_customer' => 'required',
-            'deliver_time' => '',
             'province_id'   => 'required',
             'commune_id'    => 'required',
             'district_id'   => 'required',
@@ -327,59 +241,30 @@ class OrdersController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator->messages());
         }
-        if($params['user_level'] > 0){
-            $validatorArray['created_user_id'] = 'numeric|min:1';
-            $validator = Validator::make($params, $validatorArray);
-            if ($validator->fails()) {
-                return redirect()->back()->withInput()->withErrors($validator->messages());
-            }
-        }
 
         DB::beginTransaction();
         try{
             //create customer
             if(empty($params["customer_id"])){
                 $customer = [];
-                $customer['name'] = trim($params['name']);
-                $customer['mobile'] = trim($params['mobile']);
-                $customer['address'] = trim($params['address']);
+                $customer['customer_name'] = trim($params['name']);
+                $customer['customer_phone'] = trim($params['mobile']);
+                $customer['customer_address'] = trim($params['address']);
                 $customer['province_id'] = trim($params['province_id']);
                 $customer['district_id'] = trim($params['district_id']);
                 $customer['commune_id'] = trim($params['commune_id']);
-                $customer['type'] = trim($params['type_customer']);
                 $customer['created_at'] = Carbon::now();
                 $customer_id = Customer::insertGetId($customer);
             }else{
                 $customer_id = $params["customer_id"];
             }
 
-
-            //create order
-
-            $agency = Agency::where('id', $params['created_user_id'])->first();
-
             $order = [];
-            if(!empty($agency)){
-                $order["created_user_id"] = $agency->user_id;
-                $order["creater"] = $agency->name;
-                $order["user_level"] = $agency->level;
-            }else{
-                $order["creater"] = "Công ty";
-                $order["user_level"] = $params['user_level'];
-            }
-            $order["deliver_address"] = $customer['address'];
-            $order["status"] = Orders::PENDING_STATUS;
-            $order["total"] = $params['total'];
-            $order["discount"] = $params['discount'];
-            $order["tax"] = $params['tax'];
-            $order["customer_type"] = ($params['type_customer'] == "1") ? "Công ty" : "Cá nhân";
-            $order["customer_name"] = trim($params['name']);
-            $order["customer_address"] = trim($params['address']);
-            $order["customer_phone"] = trim($params['mobile']);
+            $order["deliver_address"] = $customer['customer_address'];
+            $order["order_status"] = Orders::PENDING_STATUS;
+            $order["total_price"] = $params['total'];
             $order["customer_id"] = $customer_id;
-            $order["deliver_time"] = Carbon::parse($params["deliver_time"])->format("Y-m-d H:i:s");
             $order["created_at"] = Carbon::now();
-            $order["is_update"] = 0;
             $params['order_id'] = Orders::insertGetId($order);
             //update order item
             Orders::insertOrderitem($params);
@@ -436,6 +321,51 @@ class OrdersController extends Controller
             }
 
 
+        }
+    }
+
+    /**
+     * Filter area
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function filter(Request $request){
+        $result = new KMsg();
+        if(empty($request->id) || empty($request->type)){
+            $result->message = "Something was wrong";
+            $result->result = KMsg::RESULT_ERROR;
+            return \response()->json($result);
+        }else{
+            if($request->type == "district"){
+                $html = "";
+                $districts = District::select('id', 'name')->where('province_id', $request->id)->get();
+                $html .= "<option value='' selected>-- Tất cả --</option>";
+                foreach ($districts as $district){
+                    if(!empty($request->value) && $request->value == $district->id){
+                        $html .= "<option value=". $district->id ." selected>". $district->name ."</option>";
+                    }else{
+                        $html .= "<option value=". $district->id .">". $district->name ."</option>";
+                    }
+                }
+                $result->message = $html;
+                $result->result = KMsg::RESULT_SUCCESS;
+            }
+            else if($request->type == "commune"){
+                $html = "";
+                $communes = Commune::select('id', 'name')->where('district_id', $request->id)->get();
+                $html .= "<option value='' selected>-- Tất cả --</option>";
+                foreach ($communes as $commune){
+                    if(!empty($request->value) && $request->value == $commune->id){
+                        $html .= "<option value=". $commune->id ." selected>". $commune->name ."</option>";
+                    }else{
+                        $html .= "<option value=". $commune->id .">". $commune->name ."</option>";
+                    }
+                }
+                $result->message = $html;
+                $result->result = KMsg::RESULT_SUCCESS;
+            }
+            return \response()->json($result);
         }
     }
 }
