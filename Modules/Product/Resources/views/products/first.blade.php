@@ -15,11 +15,10 @@
 <section class="content">
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">           
-        <div class="box box-primary" style="padding: 10px 5px;">
+        <div class="box box-primary" style="padding: 10px 25px;">
             <p class="trending">
                 <span><i class="fa fa-circle" aria-hidden="true"></i></span> Sản phẩm nổi bật
-                <span class="add-top" data-id="0">Thêm</span>
-                <span class="edit-top" data-id="0">Sửa</span>
+                <span class="add-top" data-id="0">Chọn</span>
             </p>
             @if ( count($listDataFirst) > 0)
             <div class="row">
@@ -39,8 +38,7 @@
             @foreach($listCate as $key => $value)
                 <p class="trending">
                     <span><i class="fa fa-circle" aria-hidden="true"></i></span> Top sản phẩm {{ $key }}
-                    <span class="add-top" data-id="{{ $key }}">Thêm</span>
-                    <span class="edit-top" data-id="{{ $key }}">Sửa</span>
+                    <span class="add-top" data-id="{{ $key }}">Chọn</span>
                 </p>
                 @if ( count($listData[$key]) > 0)
                 <div class="row">

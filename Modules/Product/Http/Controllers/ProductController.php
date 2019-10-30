@@ -256,29 +256,6 @@ class ProductController extends Controller
         }
     }
 
-    // public function deleteProduct(Request $request) {
-    //     $id = $request->id;
-        
-    //     if ( !$id || $id == null ) {
-    //         return redirect()->back()->withFlashWarning( @trans('product::notify.has_err') );
-    //     }
-
-    //     $time = date('Y-m-d H:i:s');
-
-    //     $data = [
-    //         'status'   => -1,
-    //         'deleted_at'  => $time
-    //     ];
-
-    //     $delete_product =  $this->product->updateProduct($id, $data);
-
-    //     if ($delete_product) {
-    //         return redirect()->back()->withFlashSuccess( @trans('product::notify.delete_product_success') );
-    //     } else {
-    //         return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
-    //     }
-    // }
-
     public function getChooseProduct(Request $request) {
         $categories = Category::whereNull('deleted_at')->get();
         $listCateParent = Category::where('parent_id', 0)
@@ -388,7 +365,8 @@ class ProductController extends Controller
                             if ($key == 'category_id') {
                                 if($value != 0) {
                                     $query->where('category_id', $value)
-                                    ->orWhereHas('category', function($q) use ($value){
+                                        ->where('status', '<>', 2)
+                                        ->orWhereHas('category', function($q) use ($value){
                                             $q->where('parent_id', $value);
                                         });
                                 }
@@ -423,31 +401,33 @@ class ProductController extends Controller
     public function updateChoosen(Request $request) {
         $dataChoose = $request->dataChoose;
         $category_id = $request->cate_id;
-        if ($category_id == 0) {
-            $count = Product::with('category')
-                            ->with('sales')
-                            ->whereNull('deleted_at')
-                            ->where('status', 2)
-                            ->count();
-            if ($count > 4 || (count($dataChoose) + $count >= 4 ) ) {
-                return redirect()->back()->withFlashDanger('Bạn chỉ được chọn tối đa 4 sản phẩm' );
-            } else {
-
-            }
+        $count = count($dataChoose);
+        if ($count > 4 ) {
+            return redirect()->back()->withFlashDanger('Bạn chỉ được chọn tối đa 4 sản phẩm' );
         } else {
-            $count = Product::with('category')
-                            ->with('sales')
-                            ->whereNull('deleted_at')
-                            ->where('status', 1)
-                            ->whereHas('category', function($q) use ($value){
-                                $q->where('id', $value->id)
-                                ->orWhere('parent_id', $value->id);
-                            })
-                            ->count();
-            if ($count > 4 || (count($dataChoose) + $count >= 4 ) ) {
-                return redirect()->back()->withFlashDanger('Bạn chỉ được chọn tối đa 4 sản phẩm' );
-            } else {
+            if ($category_id == 0) {
                 
+                $update_old_data = Product::where('status', 2)
+                                    ->update(['status' => '0']);
+
+                $update_new_data = Product::whereIn('id', $dataChoose)
+                                ->update(['status' => '2']);
+                return redirect()->back()->withFlashSuccess('Update danh sách thành công');
+            } else {
+                $update_old_data = Product::where('status', 1)
+                                        ->whereHas('category', function($q) use ($category_id){
+                                            $q->where('id', $category_id)
+                                            ->orWhere('parent_id', $category_id);
+                                        })
+                                        ->update(['status' => '0']);
+
+                $update_new_data = Product::whereIn('id', $dataChoose)
+                                            ->whereHas('category', function($q) use ($category_id){
+                                                $q->where('id', $category_id)
+                                                ->orWhere('parent_id', $category_id);
+                                            })
+                                            ->update(['status' => '1']);
+                return redirect()->back()->withFlashSuccess('Update danh sách thành công');
             }
         }
     }

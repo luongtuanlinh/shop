@@ -30,16 +30,16 @@ return [
                 'order'      => 2,
                 'sub'        => []
             ],
-            // [
-            //     'route'      => 'product.choose',
-            //     'permission' => [],
-            //     'class'      => '',
-            //     'icon'       => 'fa fa-th-list',
-            //     'name'       => 'chooses',
-            //     'text'       => 'product::menu.chooses',
-            //     'order'      => 2,
-            //     'sub'        => []
-            // ],
+            [
+                'route'      => 'product.choose',
+                'permission' => [],
+                'class'      => '',
+                'icon'       => 'fa fa-th-list',
+                'name'       => 'chooses',
+                'text'       => 'product::menu.chooses',
+                'order'      => 2,
+                'sub'        => []
+            ],
             // [
             //     'route'      => 'product.size.index',
             //     'permission' => [],
