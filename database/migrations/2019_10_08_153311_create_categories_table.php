@@ -17,6 +17,7 @@ class CreateCategoriesTable extends Migration
             $table->bigIncrements('id');
             $table->string('cate_name')->nullable();
             $table->integer('parent_id');
+            $table->tinyInteger('status')->default(0);
             $table->dateTime('deleted_at')->nullable();
             $table->timestamps();
         });
