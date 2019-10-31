@@ -26,7 +26,7 @@ class VerifyRoleRequests
             //dd(1);
             return $next($request);
         } else {
-            return redirect('/admin')->withErrors(['You are not permitted to access request url and do this action']);
+            return redirect('/admin')->withErrors(['Bạn không có quyền thực hiện chức năng này']);
         }
     }
 }

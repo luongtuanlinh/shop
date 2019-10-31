@@ -29,7 +29,7 @@ class RoleController extends Controller
         $actions = request()->route()->getAction();
         $controller = (explode("@",$actions['controller']));
         $controller = $controller[0];
-        //dd($controller);
+//        dd($controller);
 
         return view('core::role/index', [
             "params" => $params,
