@@ -16,7 +16,7 @@ class Orders extends Model
 
 
     protected $table = "orders";
-    protected $fillable = [];
+    //protected $fillable = [];
 
     const PENDING_STATUS = 1;
     const PROCESSING_STATUS = 2;
@@ -114,23 +114,15 @@ class Orders extends Model
         $order_items = [];
         $index_color = 0;
         foreach ($params["product_id"] as $key => $value){
+            $product = Product::whereId($value)->first();
             $item = [];
-            $product_price = ProductPrice::with("product")->where(['unit' => $params["unit"][$key], 'product_id' => $value])->first();
-            $item["order_id"] = $params['order_id'];
+            $item["order_id"] = $params["order_id"];
             $item["product_id"] = $value;
-            $item["product_name"] = $product_price->product->name;
+            $item["size_id"] = $params["size"][$key];
+            $item["color_id"] = $params["color"][$key];
             $item["amount"] = $params["amount"][$key];
-            $item["sell_price"] = $product_price->price;
-            $item["unit"] = $params["unit"][$key];
-            if($params["type"][$key] == 1){
-                $color_item = ColorCode::where("hex_code", $params["color_id"][$index_color])->whereNull('deleted_at')->first();
-                $item["colorcode_id"] = $params["color_id"][$index_color];
-                $item["color_percent"] = (double) (!empty($color_item)) ? $color_item->color_percent : 0;
-                $index_color = $index_color + 1;
-            }else{
-                $item["colorcode_id"] = null;
-                $item["color_percent"] = 0;
-            }
+            $item["sell_price"] = $product->get('price');
+            $item["list_price"] = $product->get('price'); // gia goc
             $item["created_at"] = Carbon::now();
             array_push($order_items, $item);
         }
