@@ -23,10 +23,18 @@ Route::group(['namespace' => 'Api'], function () {
 
         Route::get('/', 'ProductController@getProductForTopic');
 
+        Route::get('/all', 'ProductController@getProduct');
+
         Route::get('/{id}', 'ProductController@getDetaiProduct');
 
         Route::get('/category/{id}', 'ProductController@getProductByCategory');
         
+    });
+
+    Route::group(['prefix' => 'category'], function () {
+
+        Route::get('/', 'ProductController@getCategory');
+
     });
 });
 

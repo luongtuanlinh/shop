@@ -22,7 +22,8 @@ class ProductController extends Controller
     public function getProductForTopic(Request $request) {
         // try{
             $listCateParent = Category::where('parent_id', 0)
-                                       ->get();
+                                        ->whereNull('deleted_at')
+                                        ->get();
             $listData = array();
             if (count($listCateParent) > 0) {
                 foreach($listCateParent as $key => $value) {
@@ -83,10 +84,13 @@ class ProductController extends Controller
                     }
                     $product->cover_path = $arr;
                 }
-               
+
+                $category = $this->category->getCategoryById($product->category_id);
+                
                 return Response::json([
                     'status' => 200,
-                    'result' => $product
+                    'result' => $product,
+                    'category' => $category
                 ]);
             } else {
                 return Response::json([
@@ -106,7 +110,9 @@ class ProductController extends Controller
                 return response()->json(['success' => 500, 'Invalid category id']);
             }
             $product = $this->product->getProductByCategory($cate_id);
-
+            $listCate = Category::where('parent_id', $cate_id)
+                                ->whereNull('deleted_at')
+                                ->get();
             if ($product) {
                 foreach($product as $key => $item) {
                     if ($item->cover_path != null) {
@@ -122,12 +128,52 @@ class ProductController extends Controller
                         $product[$key]->cover_path = $newArr;
                     }
                 }
-                return Response::json(['status' => 200, 'result' => $product]);
+                return Response::json([
+                    'status' => 200, 
+                    'result' => $product,
+                    'listCate' => $listCate
+                    ]);
             } else {
                 return Response::json(['status' => 404, 'message' => 'Không tìm thấy dữ liệu']);
             }
         // } catch (\Exception $ex){
         //     return Response::json(['status' => 500, 'message' => 'Đã có lỗi xảy ra']);
+        // }
+    }
+
+    public function getCategory() {
+        $categories = $this->category->getCategoryList();
+        if ($categories) {
+            return Response::json(['status' => 200, 'result' => $categories]);
+        } else {
+            return Response::json(['status' => 404, 'message' => 'Không tìm thấy dữ liệu']);
+        }
+    }
+
+    public function getProduct(Request $request) {
+        // try{
+            $listData = Product::with('category')
+                                ->with('sales')
+                                ->whereNull('deleted_at')
+                                ->get();
+            $listCate = Category::where('parent_id', 0)
+                                ->whereNull('deleted_at')
+                                ->get();
+            if ($listData) {
+                return Response::json([
+                    'status' => 200,
+                    'result' => $listData,
+                    'listCate' => $listCate
+                ]);
+            } else {
+                return Response::json([
+                    'status' => 404,
+                    'message' => 'Không tìm thấy dữ liệu'
+                ]);
+            }
+
+        // }catch (\Exception $ex){
+        //     return response()->json(['status' => 403, $ex->getMessage()]);
         // }
     }
 }

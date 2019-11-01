@@ -43,7 +43,7 @@ class Product extends Model
 
     public function colors()
     {
-        return $this->belongsToMany(Size::class,'product_color','product_id','color')->withPivot(['count','updated_at']);
+        return $this->hasMany(ProductColor::class,'product_id','id');
     }
 
     public function orders()
@@ -69,6 +69,7 @@ class Product extends Model
 
     public function getProductById($id){
         return $this->with('sales')
+                    ->with('colors')
                     ->where("id", $id)->first();
     }
 
