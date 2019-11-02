@@ -122,7 +122,7 @@ class NewsController extends ApiController
             
             
             $result = array();
-            $query = NewsPost::select(DB::raw('id, title, slug, thumbnail, images, summary, post_type, post_view,show_title_post, data, media, created_id, published_at, created_at, (SELECT count(*) as comment_num FROM news_comments WHERE news_comments.post_id = news_posts.id LIMIT 1) as comment_num'));
+            $query = NewsPost::select(DB::raw('id, title, slug, thumbnail, images, summary, post_type, post_view, data, media, created_id, published_at, created_at'));
             
             if (!empty($params['category_id'])) {
                 $category_id = $params['category_id'];
@@ -138,6 +138,9 @@ class NewsController extends ApiController
             }
             if (!empty($params['title'])) {
                 $query = $query->where('title', 'LIKE', "%{$params['title']}%");
+            }
+            if (!empty($params['post_type'])) {
+                $query = $query->where('post_type', $params['post_type']);
             }
             $query = $query->where('status', '>=', 0)->where('post_status', '=', NewsPost::STATUS_PUBLISHED);
             $count = $query->count();
@@ -162,7 +165,11 @@ class NewsController extends ApiController
                     }
                     $result[] = $item;
                 }
-                return $this->successResponse(['posts' => $result], 'Response Successfully');
+                $pagination = [];
+                $pagination["page"] = $page;
+                $pagination["page_size"] = $pageSize;
+                $pagination["total_page"] = ceil($count/$pageSize);
+                return $this->successResponse(['posts' => $result, 'pagination' => $pagination], 'Response Successfully');
             } else {
                 return $this->errorResponse([], 'Not enough record in page ' . $page . ' with ' . $pageSize . ' records per page');
             }
@@ -223,15 +230,15 @@ class NewsController extends ApiController
     public function detailPostV2(ApiDetailNewsRequest $request)
     {
         
-        $post = NewsPost::select(['id', 'title', 'slug', 'post_view', 'post_type', 'data', 'images', 'thumbnail', 'summary', 'published_at', 'post_status', 'media', 'author','created_id', 'updated_at', 'created_at'])->find($request->post_id);
+        $post = NewsPost::select(['id', 'title', 'slug', 'post_view', 'post_type', 'data', 'images', 'thumbnail', 'summary', 'published_at', 'post_status', 'media','created_id', 'updated_at', 'created_at'])->find($request->post_id);
         
         if ($post) {
             if($post->post_status != NewsPost::STATUS_PUBLISHED){
                 return $this->errorResponse([], 'POST IS NOT PUBLISH');
             }
             //Count view
-            $user_id = User::where('access_token', $request->header('AccessToken'))->select('id')->first();
-            if (!empty($user_id)) {
+            // $user_id = User::where('access_token', $request->header('AccessToken'))->select('id')->first();
+            // if (!empty($user_id)) {
                 
                 if (!empty($post['thumbnail'])) {
                     $post['thumbnail'] = NewsPost::getDataUrl($post['thumbnail']);
@@ -245,13 +252,13 @@ class NewsController extends ApiController
                 //Post relate
                 $post['relate_post'] = NewsPost::getPostRelate($request->post_id);
                 
-                NewsPost::ascView($request->post_id, $user_id);
+                //NewsPost::ascView($request->post_id, $user_id);
                 
                 return $this->successResponse(['post' => $post]);
                 
-            } else {
-                return $this->errorResponse([], 'Access token was wrong');
-            }
+            // } else {
+            //     return $this->errorResponse([], 'Access token was wrong');
+            // }
             
         } else {
             return $this->errorResponse([], trans('news::api.post_not_found'));
