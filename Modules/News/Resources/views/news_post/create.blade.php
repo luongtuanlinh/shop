@@ -82,6 +82,7 @@
                                 <select name="post_type" class="form-control" onchange="return post.changeType(this);">
 {{--                                    <option value="pdf">PDF</option>--}}
                                     <option value="news">{{trans('news::post_create.type_news')}}</option>
+                                    <option value="sale">Khuyến mại</option>
                                     {{--<option value="image">{{trans('news::post_create.type_image')}}</option>--}}
                                     {{--<option value="video">{{trans('news::post_create.type_video')}}</option>--}}
                                 </select>

@@ -21,7 +21,7 @@ class CreateTableNewsPosts extends Migration
             $table->text('media')->nullable();
             $table->string('summary', 512)->nullable();
             $table->text('data')->nullable();
-            $table->enum('post_type', ['news', 'image', 'video'])->default('news')->nullable();
+            $table->enum('post_type', ['news', 'sale'])->default('news')->nullable();
             $table->tinyInteger('post_status')->default(0)->comment('-1: deleted; 0: draft; 1: published');
             $table->integer('post_famous')->default(0)->comment('0: normal post; 1: special post');
             $table->integer('post_view', false, true)->default(0)->nullable();

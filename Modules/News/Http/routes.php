@@ -47,9 +47,8 @@ Route::group(['middleware' => 'web', 'namespace' => 'Modules\News\Http\Controlle
 Route::group(['prefix' => 'api/v1', 'namespace' => 'Modules\News\Http\Controllers\Api\V1'], function () {
     Route::post('/login', 'UserController@Login')->name('api.v1.core.login');
 
-    Route::group([ 'middleware'=>'api_check'], function () {
+    Route::group([], function () {
         //Posts
-        Route::post('/news/categories', 'NewsController@listCategories')->name('api.v1.news.categories');
         Route::post('/news/posts', 'NewsController@listPosts')->name('api.v1.news.posts');
         Route::post('/news/detailPost', 'NewsController@detailPost')->name('api.v1.news.detail');
     
