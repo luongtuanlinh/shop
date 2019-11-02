@@ -155,142 +155,210 @@ class Permission
                 ],
                 'name' => trans('core::listPermission.name_group')
             ],
-            // 'Modules\Exams\Http\Controllers\QuestionController' => [
-            //     'id' => 5,
-            //     'actions' => [
-            //         "index" => [
-            //             "id" => 20,
-            //             "name" => trans('core::listPermission.view')
-            //         ],
-            //         "show" => [
-            //             "id" => 20,
-            //             "name" => trans('core::listPermission.view')
-            //         ],
-            //         "create" => [
-            //             "id" => 21,
-            //             "name" => trans('core::listPermission.create')
-            //         ],
-            //         "store" => [
-            //             "id" => 21,
-            //             "name" => trans('core::listPermission.create')
-            //         ],
-            //         "edit" => [
-            //             "id" => 22,
-            //             "name" => "Duyệt đề"
-            //         ],
-            //         "update" => [
-            //             "id" => 22,
-            //             "name" => "Duyệt đề"
-            //         ],
-            //         "destroy" => [
-            //             "id" => 23,
-            //             "name" => trans('core::listPermission.delete')
-            //         ]
-            //     ],
-            //     'name' => "Câu hỏi"
-            // ],
-            // 'Modules\Exams\Http\Controllers\ContestController' => [
-            //     'id' => 6,
-            //     'actions' => [
-            //         "index" => [
-            //             "id" => 24,
-            //             "name" => trans('core::listPermission.view')
-            //         ],
-            //         "show" => [
-            //             "id" => 24,
-            //             "name" => trans('core::listPermission.view')
-            //         ],
-            //         "create" => [
-            //             "id" => 25,
-            //             "name" => trans('core::listPermission.create')
-            //         ],
-            //         "store" => [
-            //             "id" => 25,
-            //             "name" => trans('core::listPermission.create')
-            //         ],
-            //         "edit" => [
-            //             "id" => 26,
-            //             "name" => trans('core::listPermission.edit')
-            //         ],
-            //         "update" => [
-            //             "id" => 26,
-            //             "name" => trans('core::listPermission.edit')
-            //         ],
-            //         "destroy" => [
-            //             "id" => 27,
-            //             "name" => trans('core::listPermission.delete')
-            //         ]
-            //     ],
-            //     'name' => "Bài thi"
-            // ],
-            // 'Modules\Exams\Http\Controllers\ColorCodeController' => [
-            //     'id' => 6,
-            //     'actions' => [
-            //         "index" => [
-            //             "id" => 28,
-            //             "name" => trans('core::listPermission.view')
-            //         ],
-            //         "show" => [
-            //             "id" => 28,
-            //             "name" => trans('core::listPermission.view')
-            //         ],
-            //         "create" => [
-            //             "id" => 29,
-            //             "name" => trans('core::listPermission.create')
-            //         ],
-            //         "store" => [
-            //             "id" => 29,
-            //             "name" => trans('core::listPermission.create')
-            //         ],
-            //         "edit" => [
-            //             "id" => 30,
-            //             "name" => trans('core::listPermission.edit')
-            //         ],
-            //         "update" => [
-            //             "id" => 30,
-            //             "name" => trans('core::listPermission.edit')
-            //         ],
-            //         "destroy" => [
-            //             "id" => 31,
-            //             "name" => trans('core::listPermission.delete')
-            //         ]
-            //     ],
-            //     'name' => "Kỳ thi"
-            // ],
-            // 'Modules\Exams\Http\Controllers\TagController' => [
-            //     'id' => 6,
-            //     'actions' => [
-            //         "index" => [
-            //             "id" => 32,
-            //             "name" => trans('core::listPermission.view')
-            //         ],
-            //         "show" => [
-            //             "id" => 32,
-            //             "name" => trans('core::listPermission.view')
-            //         ],
-            //         "create" => [
-            //             "id" => 33,
-            //             "name" => trans('core::listPermission.create')
-            //         ],
-            //         "store" => [
-            //             "id" => 33,
-            //             "name" => trans('core::listPermission.create')
-            //         ],
-            //         "edit" => [
-            //             "id" => 34,
-            //             "name" => trans('core::listPermission.edit')
-            //         ],
-            //         "update" => [
-            //             "id" => 34,
-            //             "name" => trans('core::listPermission.edit')
-            //         ],
-            //         "destroy" => [
-            //             "id" => 35,
-            //             "name" => trans('core::listPermission.delete')
-            //         ]
-            //     ],
-            //     'name' => "Nhãn dán"
-            // ],
+//            'Modules\Orders\Http\Controllers\OrdersController' => [
+//                'id' => 5,
+//                'actions' => [
+//                    "index" => [
+//                        "id" => 20,
+//                        "name" => trans('core::listPermission.view')
+//                    ],
+//                    "view" => [
+//                        "id" => 20,
+//                        "name" => trans('core::listPermission.view')
+//                    ],
+//                    "create" => [
+//                        "id" => 21,
+//                        "name" => trans('core::listPermission.create')
+//                    ],
+//                    "store" => [
+//                        "id" => 21,
+//                        "name" => trans('core::listPermission.create')
+//                    ],
+//                    "edit" => [
+//                        "id" => 22,
+//                        "name" => trans('core::listPermission.edit')
+//                    ],
+//                    "update" => [
+//                        "id" => 22,
+//                        "name" => trans('core::listPermission.edit')
+//                    ],
+//                    "destroy" => [
+//                        "id" => 23,
+//                        "name" => trans('core::listPermission.delete')
+//                    ]
+//                ],
+//                'name' => "Quản lý đặt hàng"
+//            ],
+            'Modules\Product\Http\Controllers\SizeController' => [
+                'id' => 6,
+                'actions' => [
+                    "index" => [
+                        "id" => 24,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "show" => [
+                        "id" => 24,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "create" => [
+                        "id" => 25,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "store" => [
+                        "id" => 25,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "edit" => [
+                        "id" => 26,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "update" => [
+                        "id" => 26,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "destroy" => [
+                        "id" => 27,
+                        "name" => trans('core::listPermission.delete')
+                    ]
+                ],
+                'name' => "Quản lý size"
+            ],
+            'Modules\Product\Http\Controllers\ProductController' => [
+                'id' => 7,
+                'actions' => [
+                    "index" => [
+                        "id" => 28,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "show" => [
+                        "id" => 28,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "create" => [
+                        "id" => 29,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "store" => [
+                        "id" => 29,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "edit" => [
+                        "id" => 30,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "update" => [
+                        "id" => 30,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "destroy" => [
+                        "id" => 31,
+                        "name" => trans('core::listPermission.delete')
+                    ]
+                ],
+                'name' => "Quản lý sản phẩm"
+            ],
+            'Modules\Product\Http\Controllers\ColorsController' => [
+                'id' => 8,
+                'actions' => [
+                    "index" => [
+                        "id" => 32,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "show" => [
+                        "id" => 32,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "create" => [
+                        "id" => 33,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "store" => [
+                        "id" => 33,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "edit" => [
+                        "id" => 34,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "update" => [
+                        "id" => 34,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "destroy" => [
+                        "id" => 35,
+                        "name" => trans('core::listPermission.delete')
+                    ]
+                ],
+                'name' => "Quản lý màu"
+            ],
+            'Modules\Saleoff\Http\Controllers\SaleoffController' => [
+                'id' => 9,
+                'actions' => [
+                    "index" => [
+                        "id" => 36,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "show" => [
+                        "id" => 36,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "create" => [
+                        "id" => 37,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "store" => [
+                        "id" => 37,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "edit" => [
+                        "id" => 38,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "update" => [
+                        "id" => 38,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "destroy" => [
+                        "id" => 39,
+                        "name" => trans('core::listPermission.delete')
+                    ]
+                ],
+                'name' => "Quản lý khuyến mãi"
+            ],
+            'Modules\Product\Http\Controllers\CategoryController' => [
+                'id' => 9,
+                'actions' => [
+                    "index" => [
+                        "id" => 36,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "show" => [
+                        "id" => 36,
+                        "name" => trans('core::listPermission.view')
+                    ],
+                    "create" => [
+                        "id" => 37,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "store" => [
+                        "id" => 37,
+                        "name" => trans('core::listPermission.create')
+                    ],
+                    "editCategory" => [
+                        "id" => 38,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "update" => [
+                        "id" => 38,
+                        "name" => trans('core::listPermission.edit')
+                    ],
+                    "deleteCategory" => [
+                        "id" => 39,
+                        "name" => trans('core::listPermission.delete')
+                    ]
+                ],
+                'name' => "Quản lý loại sản phẩm"
+            ],
         ];
     }
 }
