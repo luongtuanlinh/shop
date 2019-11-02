@@ -22,5 +22,8 @@ return [
     'cover3' => 'Ảnh 3',
     'cover4' => 'Ảnh 4',
     'cover5' => 'Ảnh 5',
+    'seo_title' => 'Tiêu đề seo',
+    'seo_des' => 'Mô tả',
+    'seo_key' => 'Từ khóa',
 
 ];

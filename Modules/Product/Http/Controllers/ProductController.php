@@ -67,6 +67,9 @@ class ProductController extends Controller
         $material = $request->material;
         $description = $request->description;
         $category_id = $request->category_id;
+        $seo_title = $request->seo_title;
+        $seo_description = $request->seo_description;
+        $seo_key = $request->seo_key;
         $created_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
 
@@ -118,7 +121,10 @@ class ProductController extends Controller
             'admin_id' => $admin_id,
             'category_id' => $category_id,
             'cover_path' => json_encode($list_img),
-            'created_at' => $created_at
+            'created_at' => $created_at,
+            'seo_title' => $seo_title,
+            'seo_description' => $seo_description,
+            'seo_key' => $seo_key
         ];
 
         $created = $this->product->insertProduct($array);
@@ -173,6 +179,9 @@ class ProductController extends Controller
         $material = $request->material;
         $description = $request->description;
         $category_id = $request->category_id;
+        $seo_title = $request->seo_title;
+        $seo_description = $request->seo_description;
+        $seo_key = $request->seo_key;
         $updated_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
 
@@ -222,13 +231,16 @@ class ProductController extends Controller
             'admin_id' => $admin_id,
             'category_id' => $category_id,
             'cover_path' => json_encode($list_img),
-            'updated_at' => $updated_at
+            'updated_at' => $updated_at,
+            'seo_title' => $seo_title,
+            'seo_description' => $seo_description,
+            'seo_key' => $seo_key
         ];
 
         $updated = $this->product->updateProduct($id, $array);
 
         if ($updated) {
-            return redirect()->back()->withFlashSuccess(@trans('product::notify.edit_product_success'));
+            return redirect()->back()->withFlashSuccess( @trans('product::notify.edit_product_success') );
         } else {
             return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
         }
