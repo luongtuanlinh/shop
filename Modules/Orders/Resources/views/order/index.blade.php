@@ -145,7 +145,8 @@
                 "columnDefs": [
                     { "width": "7%", "targets": 0},
                     { "width": "13%", "targets": 7},
-                    {"width": "20%", "targets": 6}
+                    { "width": "10%", "targets": 6},
+                    { "width": "11%", "targets": 4}
                 ]
             });
 

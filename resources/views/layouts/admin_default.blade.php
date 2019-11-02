@@ -91,7 +91,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     </aside>
     <div class="content-wrapper">
         @include('core::messages.msg')
-        @include('includes.mesage')
+        {{-- @include('includes.mesage') --}}
         @yield('content')
     </div>
     <footer class="main-footer">

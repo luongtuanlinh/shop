@@ -16,19 +16,19 @@ Route::get('/size/get', 'SizeController@get')->name('product.size.get');
 
 Route::group(['middleware' => ['web', 'auth', 'verify.role'], 'prefix' => 'admin'], function()
 {
-        Route::get('/product/get', 'ProductController@get')->name('product.product.get');
+        Route::get('/product/get', 'ProductController@get')->name('product.product.get')->middleware(['verify.role:show']);
 
         Route::get('/product/getchoose', 'ProductController@getDataChoose')->name('product.product.getChoose');
 
         Route::resource('product', 'ProductController', ['as' => 'product']);
         
-        Route::get('/product/delete/{id}', 'ProductController@destroy')->name('product.product.delete');
+        Route::get('/product/delete/{id}', 'ProductController@destroy')->name('product.product.delete')->middleware(['verify.role:destroy']);;
 
         Route::resource('category', 'CategoryController', ['as' => 'product']);
 
-        Route::post('/category/edit', 'CategoryController@editCategory')->name('product.category.editcate');
+        Route::post('/category/edit', 'CategoryController@editCategory')->name('product.category.editcate')->middleware(['verify.role:editCategory']);
 
-        Route::post('/category/delete', 'CategoryController@deleteCategory')->name('product.category.deleteCate');
+        Route::post('/category/delete', 'CategoryController@deleteCategory')->name('product.category.deleteCate')->middleware(['verify.role:deleteCategory']);
 
         Route::resource('size', 'SizeController', ['as' => 'product']);
 
@@ -53,15 +53,15 @@ Route::group(['middleware' => ['web', 'auth', 'verify.role'], 'prefix' => 'admin
                 Route::get('delete_amount/{id}', 'ColorsController@deleteAmount')->name('product.color.delete_amount');
 
                 // route for color
-                Route::get('/get_color', 'ColorsController@getListColor')->name('product.color.list_color');
+                Route::get('/get_color', 'ColorsController@getListColor')->name('product.color.list_color')->middleware(['verify.role:show']);
 
-                Route::post('/create', 'ColorsController@store')->name('product.color.create');
+                Route::post('/create', 'ColorsController@store')->name('product.color.create')->middleware(['verify.role:create']);
 
-                Route::get('edit/{id}', 'ColorsController@edit')->name('product.color.edit');
+                Route::get('edit/{id}', 'ColorsController@edit')->name('product.color.edit')->middleware(['verify.role:edit']);
 
-                Route::post('update', 'ColorsController@update')->name('product.color.update');
+                Route::post('update', 'ColorsController@update')->name('product.color.update')->middleware(['verify.role:edit']);
 
-                Route::get('delete/{id}', 'ColorsController@destroy')->name('product.color.delete');
+                Route::get('delete/{id}', 'ColorsController@destroy')->name('product.color.delete')->middleware(['verify.role:destroy']);
         });
 
 });

@@ -27,6 +27,9 @@ class Orders extends Model
 
     const UPDATED_STATUS = 1;
     const NOT_UPDATED_STATUS = 0;
+
+    const PAID_STATUS = 1;
+    const NOT_PAY_STATUS = 0;
     public $timestamps = false;
 
     /**
@@ -114,6 +117,11 @@ class Orders extends Model
         $order_items = [];
         $index_color = 0;
         foreach ($params["product_id"] as $key => $value){
+            // OrderItems::where('order_id', $params['order_id'])
+            // ->where('product_id',  $params["product_id"][$key])
+            // ->where('color_id',  $params["color"][$key])
+            // ->where('size_id',  $params["size"][$key])
+            // ->delete();
             $product = Product::whereId($value)->first();
             $item = [];
             $item["order_id"] = $params["order_id"];

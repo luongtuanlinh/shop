@@ -104,7 +104,11 @@ class OrdersController extends Controller
                 return number_format($order->count_price);
             })
             ->editColumn('deliver_time', function ($order) {
-                return "<button type='button' class='btn btn-success btn-xs'><i class='fa fa-clock-o'>$order->deliver_time</i></button>";
+                if (!empty($order->deliver_time)) {
+                    return "<button type='button' class='btn btn-success btn-xs'><i class='fa fa-clock-o'>$order->deliver_time</i></button>";
+                } else {
+                    return "<button type='button' class='btn btn-danger btn-xs'><i class='fa fa-clock-o'>$order->deliver_time</i></button>";
+                }
             })
             ->addColumn('actions', function ($order) {
                 $html = Orders::genActionCollumn($order->id);
@@ -130,8 +134,19 @@ class OrdersController extends Controller
     public function view($id, Request $request){
         $order = Orders::where('id', $id)->first();
         $customer = Customer::whereId($order->customer_id)->first();
+        $order_items = OrderItems::join('products', 'products.id' , '=', 'order_product.product_id')->where('order_id', $id)->get();
+        $total = 0;
+        foreach ($order_items as $item) {
+            $item->cate_name = Category::whereId($item->category_id)->first()->cate_name;
+            $item->color = Color::where('id', $item->color_id)->first()->color;
+            $item->size = Size::where('id', $item->size_id)->first()->size_name;
+            $total += $item->amount * $item->price;
+        }
+        $order->total_price = $total;
+        $order->save();
         $order->customer_name = $customer->customer_name;
-        return view('orders::order.edit',['order' => $order]);
+        $order->customer_phone = $customer->customer_phone;
+        return view('orders::order.edit',['order' => $order, 'order_items' => $order_items]);
     }
 
     public function getOrderItems($id, Request $request) {
@@ -144,6 +159,10 @@ class OrdersController extends Controller
         ->escapeColumns([])
         ->addColumn('id', function($item) {
             return $item->product_id;
+        })
+        ->addColumn('category', function($item) {
+            $category = Category::whereId($item->category_id)->first()->cate_name;
+            return $category;
         })
         ->addColumn('product_name', function($item) {
             return Product::whereId($item->product_id)->first()->name;
@@ -166,12 +185,19 @@ class OrdersController extends Controller
         })
         ->editColumn('amount', function($item) {
             // $html = "<input type='number' min='0' id='item".$item->id."' value='".$item->amount."/>";
-            $html = "<input style='width: 50px; border: 0px solid;' type='number' min='0' id='item".$item->id."' value='".$item->amount."'/>";
+            $html = "<input style='width: 50px; border: 0px solid;' type='number' min='1' max='4' id='item".$item->id."' value='".$item->amount."'/>";
             return $html;
+        })
+        ->addColumn('sell_price', function($item) {
+            return $item->price;
         })
         ->addColumn('total_price', function($item) {
             // $order_price += $item->amount * $item->sell_price;
-            return $item->amount * $item->sell_price;
+            return $item->amount * $item->price;
+        })
+        ->addColumn('action', function($item) {
+            $html = '<button type="button" class="btn btn-danger btn-xs" onclick="deleteRow($(this))"><i class="fa fa-minus">Xoá</i></button>';
+            return $html;
         })
         ->make(true);
     }
@@ -182,13 +208,13 @@ class OrdersController extends Controller
      */
     public function update(Request $request){
         $params = $request->all();
-
+        // dd($params);
         $validatorArray = [
-            'type' => 'required',
-            'product_id' => 'required',
-            'unit' => 'required',
-            'amount' => 'required',
-            'sell_price'  => 'required',
+            'type' => '',
+            'product_id' => '',
+            'size_id' => '',
+            'color_id' => '',
+            'amount' => '',
         ];
 
         $validator = Validator::make($params, $validatorArray);
@@ -196,11 +222,52 @@ class OrdersController extends Controller
             return redirect()->back()->withInput()->withErrors($validator->messages());
         }
         DB::beginTransaction();
-        $order = Orders::with("order_item")->where('id',$params['order_id'])->first();
+        $order = Orders::where('id',$params['order_id'])->first();
         try {
-            
+            if (!empty($params['product_id']) && !empty($params['size']) && !empty($params['color']) && !empty($params['amount'])) {
+                Orders::insertOrderitem($params);
+                $order_items = OrderItems::join('products', 'products.id', '=', 'order_product.product_id')->where('order_product.order_id', $order->id)->get();
+                $total = 0;
+                foreach ($order_items as $item) {
+                    $total += $item->amount * $item->price;
+                }
+                $order->total_price = $total;
+
+                $order->save();
+            }
+
+            if (!empty($params['order_status'])) {
+                if($params['order_status'] < $order->order_status) {
+                    return redirect()->back()->withErrors('Cập nhật trạng thái đơn hàng không thành công!');
+                } else {
+                    if ($params['order_status'] == \Modules\Orders\Entities\Orders::DELIVERED) {
+                        if(empty($order->deliver_time)) {
+                            $order->order_status = $params['order_status'];
+                            $order->deliver_time = Carbon::today()->toDateString();
+                        }
+                    }
+                    if ($params['order_status'] == \Modules\Orders\Entities\Orders::SUCCESS_STATUS) {
+                        if(empty($order->deliver_time)) {
+                            $order->order_status = $params['order_status'];
+                            $order->deliver_time = Carbon::today()->toDateString();
+                        }
+                        if($order->payment_status == 0) {
+                            $order->payment_status = 1;
+                        }
+                        $order->order_status = $params['order_status'];
+                    }
+                    if ($params['order_status'] == \Modules\Orders\Entities\Orders::SHIPPED_STATUS || $params['order_status'] == \Modules\Orders\Entities\Orders::PROCESSING_STATUS) {
+                        $order->order_status = $params['order_status'];
+                    }
+                    // if (!empty('subcrible')) {
+                    //     // Sua database
+                    // }
+
+                    $order->save();
+                }
+            }
             DB::commit();
-            return redirect()->back()->with('messages','Đổi trạng thái đơn hàng thành công');
+            return redirect()->back()->with('messages','Cập nhật đơn hàng thành công');
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('[Product] ' . $e->getMessage());
@@ -268,6 +335,16 @@ class OrdersController extends Controller
             $params['order_id'] = Orders::insertGetId($order);
             //update order item
             Orders::insertOrderitem($params);
+
+            $order = Orders::where('id', $params['order_id'])->first();
+            $order_items = OrderItems::join('products', 'products.id', '=', 'order_product.product_id')->where('order_product.order_id', $params['order_id'])->get();
+            $total = 0;
+            foreach ($order_items as $item) {
+                $total += $item->amount * $item->price;
+            }
+            $order->total_price = $total;
+            
+            $order->save();
 
             DB::commit();
             return redirect(route('order.index'))->with('messages','Tạo đơn hàng thành công');
