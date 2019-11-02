@@ -80,10 +80,10 @@ class NewsPost extends Model
      */
     public static function getPostRelate($post_id)
     {
-        return self::select('id', 'title')
-            ->whereRaw("id IN (SELECT post_id FROM news_category_posts WHERE category_id IN (SELECT category_id FROM news_category_posts WHERE post_id = {$post_id}))")
+        return self::select('id', 'title', 'published_at')
+            // ->whereRaw("id IN (SELECT post_id FROM news_category_posts WHERE category_id IN (SELECT category_id FROM news_category_posts WHERE post_id = {$post_id}))")
             ->where('id', '!=', $post_id)
-            ->where('post_status',self::STATUS_PUBLISHED)->limit(2)->get()->toArray();
+            ->where('post_status',self::STATUS_PUBLISHED)->limit(3)->get()->toArray();
     }
     
     /**
@@ -132,12 +132,12 @@ class NewsPost extends Model
      * @param $post_id
      * @param $user_id
      */
-    public static function ascView($post_id, $user_id)
+    public static function ascView($post_id)
     {
         $user_id = $user_id->id;
-        $checkview = NewsPostView::where('user_id',$user_id)->where('post_id',$post_id)->first();
+        $checkview = NewsPostView::where('post_id',$post_id)->first();
 
-        if (count($checkview) > 0) {
+        if (!empty($checkview) > 0) {
             $initial_time = Carbon::parse($checkview->created_at);
             $diff_time = Carbon::now()->diffInMinutes($initial_time);
             if ($diff_time > 60) {
@@ -156,7 +156,6 @@ class NewsPost extends Model
             $post_save->save();
 
             NewsPostView::create(array(
-                'user_id' => $user_id,
                 'post_id' => $post_id,
                 'created_at' => date('Y-m-d H:i:s')
             ));
