@@ -25,9 +25,9 @@
         font-style: bold;
     }
 
-    td select2-dropdown select2-dropdown--below {
+    /* td select2-dropdown select2-dropdown--below {
         width: 140px;
-    }
+    } */
 
     .form-group>.select2 {
         height: 34px;
@@ -399,46 +399,6 @@
                 }
             });
         }
-        // function addRow(_this) {
-        //     $(_this).remove();
-        //     var str_row = "";
-        //     count = count + 1;
-        //     str_row += "<tr>\n" +
-        //         "                                    <td>#"+ count +"</td>\n" +
-        //         "                                    <td>\n" +
-        //         "                                        <select class=\"form-control select2\" name=\"type[]\" id=\"type_"+count+"\" onchange=\"filterProduct($(this).val(), '"+count+"')\">\n" +
-        //         "                                            <option value=\"\">--Chọn loại sp--</option>\n"  +
-        //         "                                        </select>\n" +
-        //         "                                    </td>\n" +
-        //         "                                    <td>\n" +
-        //         "                                        <select class=\"form-control select2\" name=\"product_id[]\" id=\"product_id_"+count+"\" onchange=\"filter('"+count+"')\">\n" +
-        //         "                                            <option value=\"\">--Chọn sản phẩm--</option>\n" +
-        //         "                                        </select>\n" +
-        //         "                                    </td>\n" +
-        //         "                                    <td>\n" +
-        //         "                                        <select class=\"form-control select2\" name=\"unit[]\" id=\"unit_"+count+"\" onchange=\"filterUnit('"+count+"')\">\n" +
-        //         "                                            <option value=\"\">--Chọn đơn vị--</option>\n" +
-        //         "                                        </select>\n" +
-        //         "                                    </td>\n" +
-        //         "                                     <td>\n" +
-        //         "                                        <input class=\"typeahead form-control\" oninput=\"filterColor($(this))\" autocomplete=\"off\" data-index="+ count +" id=\"colorcode_id_"+ count +"\" style=\"margin:0px auto;\" name=\"color_id[]\" type=\"text\" disabled>\n" +
-        //         "                                    </td>"+
-        //         "                                       <td>\n" +
-        //         "                                        <button type=\"button\" id=\"color_"+ count +"\" style=\"width: 20px; height: 20px; background-color: white\"></button>\n" +
-        //         "                                    </td>"+
-        //             "<td id=\"inventory_"+ count +"\">0</td>"+
-        //         "                                    <td><input type=\"number\" min=\"1\" value=\"1\" name=\"amount[]\" id=\"amount_"+count+"\" oninput='changeAmount(\""+count+"\")' class=\"form-control\"></td>\n" +
-        //         "                                    <td id=\"percent_"+count+"\"><input type=\"hidden\" id=\"color_percent_"+ count +"\" name=\"color_percent[]\" value=\"\"><span>0%</span></td>\n" +
-        //         "                                    <td id=\"tt_"+count+"\"><input type=\"hidden\" id=\"tt_hidden_"+count+"\" value=\"\"><span>0</span></td>\n" +
-        //         "                                    <td id=\"price_"+count+"\"><input type=\"hidden\" id=\"price_hidden_"+count+"\" name=\"sell_price[]\"><span>0</span></td>\n" +
-        //         "                                    <td id=\"sum_price_"+count+"\">0</td>\n" +
-        //         "                                    <td id='td-"+ count +"'><button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"addRow($(this))\"><i class=\"fa fa-plus\">Thêm</i></button>" +
-        //         "                                           <button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteRow($(this))\"><i class=\"fa fa-minus\">Xoá</i></button></td>\n" +
-        //         "                                </tr>";
-        //     $("tbody").append(str_row);
-        //     $(".select2").select2();
-        //     filterColor(_this);
-        // }
 
         $('input.typeahead-mobile').typeahead({
             source:  function (query, process) {
