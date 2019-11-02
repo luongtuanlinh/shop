@@ -8,6 +8,7 @@ use Modules\Product\Entities\Product;
 use Modules\Product\Entities\Category;
 use Validator;
 use Response;
+use stdClass;
 
 class ProductController extends Controller
 {
@@ -20,28 +21,31 @@ class ProductController extends Controller
     }
 
     public function getProductForTopic(Request $request) {
-        // try{
+        try{
             $listCateParent = Category::where('parent_id', 0)
                                         ->whereNull('deleted_at')
                                         ->get();
             $listData = array();
             if (count($listCateParent) > 0) {
                 foreach($listCateParent as $key => $value) {
-                    $listData[$value->id] = Product::with('category')
-                                              ->with('sales')
-                                              ->whereNull('deleted_at')
-                                              ->where('status', 1)
-                                              ->whereHas('category', function($q) use ($value){
+                    $listData[$key] = new stdClass();
+                    $listData[$key]->category = $value;
+                    if ($key < 3) {
+                        $listProduct = Product::with('category')
+                                                ->with('sales')
+                                                ->whereNull('deleted_at')
+                                                ->where('status', 1)
+                                                ->whereHas('category', function($q) use ($value){
                                                     $q->where('id', $value->id)
-                                                      ->orWhere('parent_id', $value->id);
+                                                        ->orWhere('parent_id', $value->id);
                                                 })
-                                              ->get();
+                                                ->get();
+                        $listProduct = $this->convertImageHome($listProduct);
+                        $listData[$key]->product = $listProduct;
+                    }
                 }
-                $listDataFirst = Product::with('category')
-                                    ->with('sales')
-                                    ->whereNull('deleted_at')
-                                    ->where('status', 2)
-                                    ->get();
+                $listDataFirst = $this->product->getProductFirst();
+                $listDataFirst = $this->convertImageHome($listDataFirst);
 
                 if ($listData) {
                     return Response::json([
@@ -57,9 +61,38 @@ class ProductController extends Controller
                 }
             }
 
-        // }catch (\Exception $ex){
-        //     return response()->json(['status' => 403, $ex->getMessage()]);
-        // }
+        }catch (\Exception $ex){
+            return response()->json(['status' => 403, $ex->getMessage()]);
+        }
+    }
+
+    public function convertImageHome($listProduct) {
+        foreach($listProduct as $key => $item) {
+            if ($item->cover_path != null) {
+                $listPath = json_decode($item->cover_path);
+                $listProduct[$key]->cover_path1 = null ;
+                $listProduct[$key]->cover_path2 = url($listPath[0]);
+            }
+        }
+        return $listProduct;
+    }
+
+    public function convertImage($listProduct) {
+        foreach($listProduct as $key => $item) {
+            if ($item->cover_path != null) {
+                $listPath = json_decode($item->cover_path);
+                $newArr = array();
+                foreach ($listPath as $key2 => $path) {
+                    if ($path) {
+                        $newArr[$key2] = url($path);
+                    } else {
+                        $newArr[$key2] = null;
+                    }
+                }
+                $listProduct[$key]->cover_path = $newArr;
+            }
+        }
+        return $listProduct;
     }
 
     public function getDetaiProduct(Request $request) {

@@ -73,6 +73,14 @@ class Product extends Model
                     ->where("id", $id)->first();
     }
 
+    public function getProductFirst(){
+        return $this->with('category')
+                    ->with('sales')
+                    ->whereNull('deleted_at')
+                    ->where('status', 2)
+                    ->get();
+    }
+
     public function getProductByCategory($cate_id) {
         return Product::with('category')
                     ->with('sales')
