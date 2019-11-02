@@ -36,10 +36,10 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">{{trans('news::post_edit.content')}} (*)</label>
-                                    <div id="typeContentNews" class="col-md-12" style="display: {{$post->post_type == 'news' ? 'block' : 'none'}}">
+                                    <div id="typeContentNews" class="col-md-12"> 
                                         <textarea id="post-data" name="data" class="form-control">{{ $post->data }}</textarea>
                                     </div>
-                                    <div id="typeContentOther" class="col-md-12" style="display: {{$post->post_type != 'news' ? 'block' : 'none'}};">
+                                    <!-- <div id="typeContentOther" class="col-md-12" style="display: {{$post->post_type != 'news' ? 'block' : 'none'}};">
                                         <table class="table table-responsive table-bordered">
                                             <thead>
                                             <th>Caption</th>
@@ -84,7 +84,7 @@
                                             </tr>
                                             </tfoot>
                                         </table>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -93,6 +93,7 @@
                                     <select name="post_type" class="form-control" onchange="return post.changeType(this);">
                                         {{--<option value="pdf" {{ $post->post_type == 'pdf' ?'selected' : '' }}>PDF</option>--}}
                                         <option value="news" {{ $post->post_type == 'news' ?'selected' : '' }}>{{trans('news::post_edit.type_news')}}</option>
+                                        <option value="sale" {{ $post->post_type == 'sale' ?'selected' : '' }}>Khuyến mại</option>
                                         {{--<option value="image" {{ $post->post_type == 'image' ?'selected' : '' }}>{{trans('news::post_edit.type_image')}}</option>--}}
                                         {{--<option value="video" {{ $post->post_type == 'video' ?'selected' : '' }}>{{trans('news::post_edit.type_video')}}</option>--}}
                                     </select>

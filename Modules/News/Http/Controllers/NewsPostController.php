@@ -246,6 +246,7 @@ class NewsPostController extends Controller
             $post['post_status'] = $request->post_status;
             $post['post_famous'] = $request->post_famous;
             $post['published_at'] = Carbon::parse($request->published_at)->toDateTimeString();
+            //dd($request->post_type);
 
             //Image
             $media = NewsPost::uploadMedia();
