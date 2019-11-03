@@ -7,7 +7,7 @@ use App\Models\Shop\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-
+use Yajra\DataTables\DataTables;
 
 class SaleoffController extends Controller
 {
@@ -21,6 +21,29 @@ class SaleoffController extends Controller
         return view('saleoff::index', compact('sales'));
     }
 
+    public function get() {
+        $query = Sale::query();
+
+        return DataTables::of($query)
+        ->escapeColumns([])
+        // ->editColumn('cover_img', function($query) {
+        //     return "<img src='".$query->cover_img."' style='width: 180px; height: 140px;'/>";
+        // })
+        ->editColumn('start_time', function($query) {
+            return "<button type='button' class='btn btn-success btn-xs'><i class='fa fa-clock-o'>$query->start_time</i></button>";
+        })
+        ->editColumn('end_time', function($query) {
+            return "<button type='button' class='btn btn-success btn-xs'><i class='fa fa-clock-o'>$query->end_time</i></button>";
+        })
+        ->editColumn('created_at', function($query) {
+            return "<button type='button' class='btn btn-success btn-xs'><i class='fa fa-clock-o'>$query->created_at</i></button>";
+        })
+        ->addColumn('actions', function($query) {
+            $html = '<a href="'. route('admin.saleoff.edit', $query->id).'" type="button" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i>&nbsp;  View </a>';
+            return $html;
+        })
+        ->make(true);
+    }
     /**
      * Show the form for creating a new resource.
      * @return Response

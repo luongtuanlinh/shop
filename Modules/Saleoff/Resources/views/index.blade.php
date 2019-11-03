@@ -1,175 +1,176 @@
-@extends('admin.app')
-@push('css')
-
-@endpush
+@extends('layouts.admin_default')
+@section('title', "Khuyến mại")
 @section('content')
-    <div class="content-wrapper" style="min-height: 1231.06px;">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Danh sách các sự kiện</h1>
-                        <a role="button" href="{{route('admin.saleoff.create')}}" class="btn btn-success">
-                            <i class="fas fa-plus"></i>Thêm sự kiện sale mới
-                        </a>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="#">Trang quản lý</a></li>
-                            <li class="breadcrumb-item active">Sale off</li>
-                        </ol>
-                    </div>
+<style>
+    .select2-container--default .select2-selection--single {
+        background-color: #fff;
+        border: 1px solid #d2d6de !important;
+        border-radius: 0 !important;
+        height: 100% !important;
+    }
+
+    .daterangepicker select.hourselect,
+    .daterangepicker select.minuteselect,
+    .daterangepicker select.secondselect,
+    .daterangepicker select.ampmselect {
+        width: 60px;
+        margin-bottom: 0;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        Danh sách khuyến mại
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{{ route('admin_home') }}"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+        <li class="active">Khuyến mại</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="box box-info">
+
+            <div class="box-header">
+                {{-- @include('agency::includes.message') --}}
+                @if(session()->has('messages'))
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Thông báo</h4>
+                    {{session('messages')}}
                 </div>
-            </div><!-- /.container-fluid -->
-        </section>
-
-        <!-- Main content -->
-        <section class="content">
-
-            <!-- Default box -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Sự kiện</h3>
-
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
-                                title="Collapse">
-                            <i class="fas fa-minus"></i></button>
-                        <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip"
-                                title="Remove">
-                            <i class="fas fa-times"></i></button>
-                    </div>
-                </div>
-                <div class="card-body p-0" style="display: block;">
-                    <table class="table table-striped projects">
+                @else
+                @endif
+                <h3 class="box-title">Danh sách đợt khuyến mãi</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover" id="post_table">
                         <thead>
-                        <tr>
-                            <th style="width: 1%">
-                                #
-                            </th>
-                            <th style="width: 20%">
-                                Tên
-                            </th>
-                            <th style="width: 20%">
-                                Thời gian
-                            </th>
-                            <th style="width: 20%">
-                                Lời giới thiệu
-                            </th>
-                            <th style="width: 10%">Sản phẩm</th>
-                            <th style="width: 29%" class="text-center">
-                                Thao tác
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($sales as $index => $sale)
                             <tr>
-                                <td>
-                                    {{$index+1}}
-                                </td>
-                                <td>
-                                    <a>
-                                        {{$sale->event_name}}
-                                    </a>
-                                    <br>
-                                    <small>
-                                        Tạo lúc: {{$sale->created_at}}
-                                    </small>
-                                </td>
-                                <td>
-                                    <div>
-                                        Từ {{substr($sale->start_time,0,10)}} <br>tới {{ substr($sale->end_time,0,10) }}
-                                    </div>
-                                </td>
-                                <td>
-                                    {{$sale->introduction}}
-                                </td>
-                                <td>
-                                    <a href="#" data-toggle="modal" data-target="#{{'sale-' . $sale->id}}">Xem</a>
-                                </td>
-                                <td class="project-state">
-
-                                    {{--                                    <a class="btn btn-info btn-sm" href="{{route('admin.children1s.edit',['children1' => $post->slug])}}">--}}
-                                    <a class="btn btn-info btn-sm"
-                                       href="{{route('admin.saleoff.edit',['id'=> $sale->id])}}">
-                                        <i class="fas fa-pencil-alt">
-                                        </i>
-                                        Sửa
-                                    </a>
-                                    <a class="btn btn-danger btn-sm" href="#" onclick="event.preventDefault(); if( confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) document.getElementById('{{"delete-".$sale->id}}').submit();">
-                                        <i class="fas fa-trash-alt">
-                                        </i>
-                                        Xóa
-                                    </a>
-                                    <form id={{'delete-'.$sale->id}} action="{{route('admin.saleoff.destroy')}}"
-                                            method="POST" style="display: none;">
-                                        <input value="{{$sale->id}}" name="id">
-                                        {{ csrf_field() }}
-                                        {{method_field('delete')}}
-                                    </form>
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="{{'sale-' . $sale->id}}" tabindex="-1" role="dialog"
-                                         aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title"
-                                                        id="exampleModalLongTitle">{{$sale->event_name}}</h5>
-                                                    <button type="button" class="close" data-dismiss="modal"
-                                                            aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>{{$sale->introduction}}</p>
-                                                    <p style="float: left">Danh sách các sản phẩm được giảm giá</p>
-                                                    <br>
-                                                    <table class="table table-head-fixed" name="product-table">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Tên sản phẩm</th>
-                                                            <th>Mã sản phẩm</th>
-                                                            <th>Giá gốc</th>
-                                                            <th>Giảm</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        @foreach($sale->products as $index => $product)
-                                                            <tr>
-                                                                <td>{{$index+1}}</td>
-                                                                <td>{{$product->name}}</td>
-                                                                <td>{{$product->code}}</td>
-                                                                <td>{{$product->price}}</td>
-                                                                <td>{{$product->pivot->discount}} %</td>
-                                                            </tr>
-                                                        @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <div class="modal-footer">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
+                                <th>TT</th>
+                                <th>Tên sự kiện</th>
+                                <th>Mô tả</th>
+                                <th>Bắt đầu</th>
+                                <th>Kết thúc</th>
+                                <th>Ngày tạo</th>
+                                <th class="action">Hành động</th>
                             </tr>
-                        @endforeach
-                        </tbody>
+                        </thead>
                     </table>
                 </div>
-                <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-
-        </section>
-        <!-- /.content -->
+                <!--table-responsive-->
+            </div><!-- /.box-body -->
+        </div>
+        <!-- /.box -->
     </div>
+    <!-- /.col -->
+    </div>
+</section>
 @endsection
-@push('js')
-    <script>
-        $('[name=product-table]').DataTable();
-    </script>
-@endpush
+@section('scripts')
+<script src="{{ asset('admin-lte/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('admin-lte/plugins/datatables/dataTables.bootstrap.js') }}"></script>
+<script>
+    $(function() {
+            table=$('#post_table').DataTable({
+                processing: true,
+                serverSide: true,
+                bAutoWidth: false,
+                searching: false,
+                ajax: {
+                    url: '{{ route("admin.saleoff.get") }}',
+                    type: 'get',
+                    data: function(d) {
+                        d.csrf = '{{csrf_field()}}';
+                    }
+                },
+                columns: [
+                    {data: 'id'},
+                    {data: 'event_name'},
+                    {data: 'introduction'},
+                    // {data: 'cover_img'},
+                    {data: 'start_time', sortable: true},
+                    {data: 'end_time', sortable: true},
+                    {data: 'created_at', sortable: true},
+                    {data: 'actions', orderable: false}
+                ],
+                "order": [[ 0, "desc" ]],
+                "language": {
+                    "lengthMenu": "Hiển thị _MENU_ bản ghi trên một trang",
+                    "zeroRecords": "Không tìm bản ghi phù hợp",
+                    "info": "Đang hiển thị trang _PAGE_ of _PAGES_",
+                    "infoEmpty": "Không có dữ liệu",
+                    "infoFiltered": "(lọc từ tổng số _MAX_ bản ghi)",
+                    "info": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_ kết quả",
+                    "paginate": {
+                        "previous":   "«",
+                        "next":       "»"
+                    },
+                    "sProcessing": '<i class="fa fa-spinner fa-pulse fa-fw"></i> Loading'
+                },
+                "columnDefs": [
+                    { "width": "7%", "targets": 0},
+                    { "width": "10%", "targets": 6},
+                    { "width": "11%", "targets": 3},
+                    { "width": "11%", "targets": 4},
+                    { "width": "11%", "targets": 5},
+                ]
+            });
+
+        });
+
+        function filter(){
+            table.draw();
+        }
+
+        $(function () {
+            $('#datetimepicker1').daterangepicker({
+                locale: {
+                    format: 'DD-MM-YYYY'
+                },
+
+                timePicker: true,
+            });
+
+        });
+
+        $(document).ready(function(){
+            $('.input-group-addon').click(function(){
+                $('#datetimepicker1 ').focus();
+            });
+        });
+
+        $('input').on( "keypress", function(event) {
+            if (event.which == 13 && !event.shiftKey) {
+                event.preventDefault();
+                filter();
+            }
+        });
+
+        $('input#datetimepicker1').change(function(){
+            return filter();
+        });
+        
+        function changeStatus() {
+            var list = [];
+            $('input:checked').each(function () {
+                list.push($(this).val());
+            });
+            btn_loading.loading("post_table");
+            $.ajax({
+                data:{
+                    id : list
+                },
+                url: "{{ route('order.change.status') }}",
+                type: "GET",
+                success: function (data) {
+                    btn_loading.hide();
+                    alert(data.message);
+                    location.reload();
+                }
+            })
+        }
+
+</script>
+@endsection
