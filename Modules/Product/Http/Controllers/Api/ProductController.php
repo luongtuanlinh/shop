@@ -24,7 +24,7 @@ class ProductController extends Controller
     }
 
     public function getProductForTopic(Request $request) {
-        // try{
+        try{
             $listCateParent = Category::where('parent_id', 0)
                                         ->whereNull('deleted_at')
                                         ->get();
@@ -51,14 +51,21 @@ class ProductController extends Controller
                 } else {
                     return Response::json([
                         'status' => 404,
-                        'message' => 'Không tìm thấy dữ liệu'
+                        'result' => [],
+                        'firstList' => []
                     ]);
                 }
+            } else {
+                return Response::json([
+                    'status' => 404,
+                    'result' => [],
+                    'firstList' => []
+                ]);
             }
 
-        // }catch (\Exception $ex){
-        //     return response()->json(['status' => 403, $ex->getMessage()]);
-        // }
+        }catch (\Exception $ex){
+            return response()->json(['status' => 403, $ex->getMessage()]);
+        }
     }
 
     public function convertImageHome($listProduct) {
