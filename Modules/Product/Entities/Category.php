@@ -68,5 +68,11 @@ class Category extends Model
         }
         return $listCate;
     }
+
+    public function getCateParent(){
+        return $this->where('parent_id', 0)
+                    ->whereNull('deleted_at')
+                    ->get();
+    }
     
 }

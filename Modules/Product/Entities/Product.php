@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Session;
 use DB;
+use DateTime;
 
 class Product extends Model
 {
@@ -68,29 +69,53 @@ class Product extends Model
     }
 
     public function getProductById($id){
-        return $this->with('sales')
+        return $this->with(['sales' => function ($query) {
+                        $dayNow = new DateTime();
+                        $query->where('end_time', '>=', $dayNow);
+                    }])
                     ->with('colors')
                     ->where("id", $id)->first();
     }
 
     public function getProductFirst(){
         return $this->with('category')
-                    ->with('sales')
+                    ->with(['sales' => function ($query) {
+                        $dayNow = new DateTime();
+                        $query->where('end_time', '>=', $dayNow);
+                    }])
                     ->whereNull('deleted_at')
                     ->where('status', 2)
                     ->get();
     }
 
+    public function getProductHome($cate_id){
+        return $this->with('category')
+                    ->with(['sales' => function ($query) {
+                        $dayNow = new DateTime();
+                        $query->where('end_time', '>=', $dayNow);
+                    }])
+                    ->whereNull('deleted_at')
+                    ->where('status', 1)
+                    ->whereHas('category', function($q) use ($cate_id){
+                        $q->where('id', $cate_id)
+                            ->orWhere('parent_id', $cate_id);
+                    })
+                    ->get();
+    }
+
     public function getProductByCategory($cate_id) {
         return Product::with('category')
-                    ->with('sales')
+                    ->with(['sales' => function ($query) {
+                        $dayNow = new DateTime();
+                        $query->where('end_time', '>=', $dayNow);
+                    }])
                     ->whereNull('deleted_at')
                     ->where('status', '!=' , -1)
                     ->whereHas('category', function($q) use ($cate_id){
                         $q->where('id', $cate_id)
                         ->orWhere('parent_id', $cate_id);
                     })
-                    ->get();
+                    ->paginate(12);
     }
 
     public static function genColumnHtml($data){

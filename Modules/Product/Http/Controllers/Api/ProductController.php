@@ -21,7 +21,7 @@ class ProductController extends Controller
     }
 
     public function getProductForTopic(Request $request) {
-        try{
+        // try{
             $listCateParent = Category::where('parent_id', 0)
                                         ->whereNull('deleted_at')
                                         ->get();
@@ -30,22 +30,14 @@ class ProductController extends Controller
                 foreach($listCateParent as $key => $value) {
                     $listData[$key] = new stdClass();
                     $listData[$key]->category = $value;
-                    if ($key < 3) {
-                        $listProduct = Product::with('category')
-                                                ->with('sales')
-                                                ->whereNull('deleted_at')
-                                                ->where('status', 1)
-                                                ->whereHas('category', function($q) use ($value){
-                                                    $q->where('id', $value->id)
-                                                        ->orWhere('parent_id', $value->id);
-                                                })
-                                                ->get();
-                        $listProduct = $this->convertImageHome($listProduct);
-                        $listData[$key]->product = $listProduct;
-                    }
+
+                    $listProduct = $this->product->getProductHome($value->id);
+                    $listProduct = $this->convertImageHome($listProduct);
+
+                    $listData[$key]->product = $listProduct;
                 }
-                $listDataFirst = $this->product->getProductFirst();
-                $listDataFirst = $this->convertImageHome($listDataFirst);
+                $getDataFirst = $this->product->getProductFirst();
+                $listDataFirst = $this->convertImageHome($getDataFirst);
 
                 if ($listData) {
                     return Response::json([
@@ -61,17 +53,20 @@ class ProductController extends Controller
                 }
             }
 
-        }catch (\Exception $ex){
-            return response()->json(['status' => 403, $ex->getMessage()]);
-        }
+        // }catch (\Exception $ex){
+        //     return response()->json(['status' => 403, $ex->getMessage()]);
+        // }
     }
 
     public function convertImageHome($listProduct) {
         foreach($listProduct as $key => $item) {
             if ($item->cover_path != null) {
                 $listPath = json_decode($item->cover_path);
-                $listProduct[$key]->cover_path1 = null ;
-                $listProduct[$key]->cover_path2 = url($listPath[0]);
+                $listProduct[$key]->cover_path1 = $listPath[0] ? url($listPath[0]) : null;
+                $listProduct[$key]->cover_path2 = $listPath[1] ? url($listPath[1]) : null;
+            } else {
+                $listProduct[$key]->cover_path1 = null;
+                $listProduct[$key]->cover_path2 = null;
             }
         }
         return $listProduct;
@@ -146,21 +141,9 @@ class ProductController extends Controller
             $listCate = Category::where('parent_id', $cate_id)
                                 ->whereNull('deleted_at')
                                 ->get();
+           
             if ($product) {
-                foreach($product as $key => $item) {
-                    if ($item->cover_path != null) {
-                        $listPath = json_decode($item->cover_path);
-                        $newArr = array();
-                        foreach ($listPath as $key2 => $path) {
-                            if ($path) {
-                                $newArr[$key2] = url($path);
-                            } else {
-                                $newArr[$key2] = null;
-                            }
-                        }
-                        $product[$key]->cover_path = $newArr;
-                    }
-                }
+                $product = $this->convertImageHome($product);
                 return Response::json([
                     'status' => 200, 
                     'result' => $product,
@@ -184,15 +167,45 @@ class ProductController extends Controller
     }
 
     public function getProduct(Request $request) {
-        // try{
-            $listData = Product::with('category')
-                                ->with('sales')
-                                ->whereNull('deleted_at')
-                                ->get();
-            $listCate = Category::where('parent_id', 0)
-                                ->whereNull('deleted_at')
-                                ->get();
-            if ($listData) {
+        try {
+            //Params
+            $params = $request->all();
+            $page = isset($params['page']) ? (int)$params['page'] : 1;
+            $pageSize = isset($params['page_size']) ? (int)$params['page_size'] : 12;
+
+            //Sortby
+            $sortBy = isset($params['sort_by']) ? $params['sort_by'] : "";
+            $sortType = isset($params['sort_type']) ? $params['sort_type'] : "asc";
+
+
+            $result = array();
+            $query = Product::with(['sales' => function ($query) {
+                                    $dayNow = new DateTime();
+                                    $query->where('end_time', '>=', $dayNow);
+                                }])
+                                ->with('category')
+                                ->whereNull('deleted_at');
+
+            if (!empty($params['cate_id'])) {
+                $cate_id = $params['cate_id'];
+                $query = $query->whereHas('category', function($q) use ($cate_id){
+                            $q->where('id', $cate_id)
+                            ->orWhere('parent_id', $cate_id);
+                        });
+            }
+        
+            $count = $query->count();
+            $pages = ceil($count / $pageSize);
+            if ($count > (($page - 1) * $pageSize)) {
+                $listData = $query->orderBy($sortBy, $sortType)->skip(($page - 1) * $pageSize)->take($pageSize)->get();
+
+                if (!empty($params['cate_id'])) {
+                    $listCate = $this->category->getCateParent();
+                } else {
+                    $listCate = Category::where('parent_id', $cate_id)
+                                        ->whereNull('deleted_at')
+                                        ->get();
+                }
                 return Response::json([
                     'status' => 200,
                     'result' => $listData,
@@ -204,9 +217,8 @@ class ProductController extends Controller
                     'message' => 'Không tìm thấy dữ liệu'
                 ]);
             }
-
-        // }catch (\Exception $ex){
-        //     return response()->json(['status' => 403, $ex->getMessage()]);
-        // }
+        } catch (\Exception $ex) {
+            return $this->errorResponse([], $ex->getMessage());
+        }
     }
 }

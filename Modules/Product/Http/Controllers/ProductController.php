@@ -275,27 +275,13 @@ class ProductController extends Controller
 
     public function getChooseProduct(Request $request) {
         $categories = Category::whereNull('deleted_at')->get();
-        $listCateParent = Category::where('parent_id', 0)
-            ->whereNull('deleted_at')
-            ->get();
-        $listDataFirst = Product::with('category')
-            ->with('sales')
-            ->whereNull('deleted_at')
-            ->where('status', 2)
-            ->get();
+        $listCateParent = $this->category->getCateParent();
+        $listDataFirst = $this->product->getProductFirst();
         $listData = array();
         $listCate = array();
         if (count($listCateParent) > 0) {
             foreach ($listCateParent as $key => $value) {
-                $listData[$value->id] = Product::with('category')
-                    ->with('sales')
-                    ->whereNull('deleted_at')
-                    ->where('status', 1)
-                    ->whereHas('category', function ($q) use ($value) {
-                        $q->where('id', $value->id)
-                            ->orWhere('parent_id', $value->id);
-                    })
-                    ->get();
+                $listData[$value->id] = $this->product->getProductHome($value->id);
                 $listCate[$value->id] = Category::where('parent_id', $value->id)->whereNull('deleted_at')->get();
             }
             foreach ($listDataFirst as $key => $item) {
@@ -356,6 +342,7 @@ class ProductController extends Controller
                 ->addColumn('cover_path', function ($product) {
                     if ($product->cover_path != null) {
                         $data = json_decode($product->cover_path);
+                        $data = (array)$data;
                         $html = '';
                         foreach ($data as $key => $path) {
                             $html .= '<img class="image-product" src="'.( ($path != null) ? url($path) : "") .'">';
