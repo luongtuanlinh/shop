@@ -6,11 +6,11 @@
 
 @section('content')
 <section class="content-header">
-    <h1>Quản lý số lượng</h1>
+    <h1>Quản lý size, màu sản phẩm</h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin_home') }}"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
         <li><a href="{{ route('product.product.index') }}">{{ trans('product::product.title') }}</a></li>
-        <li class="active">Quản lý số lượng</li>
+        <li class="active">Quản lý size, màu</li>
     </ol>
 </section>
 <section class="content">

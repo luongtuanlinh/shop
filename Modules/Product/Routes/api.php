@@ -25,16 +25,19 @@ Route::group(['namespace' => 'Api'], function () {
 
         Route::post('/all', 'ProductController@getProduct');
 
-        Route::get('/{id}', 'ProductController@getDetaiProduct');
-
+        Route::get('/detail/{id}', 'ProductController@getDetaiProduct');
         
     });
 
+    Route::get('/size_color', 'ProductController@getSizeColor');
+
     Route::group(['prefix' => 'category'], function () {
 
-        Route::get('/{id}', 'ProductController@getProductByCategory');
+        Route::get('/product/{id}', 'ProductController@getProductByCategory');
 
         Route::get('/', 'ProductController@getCategory');
+
+        Route::get('/get_cate/{id}', 'ProductController@getCategoryById');
 
     });
 });

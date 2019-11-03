@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\Category;
+use Modules\Product\Entities\Size;
+use Modules\Product\Entities\Color;
 use Validator;
 use Response;
 use stdClass;
+use Datetime;
 
 class ProductController extends Controller
 {
@@ -97,13 +100,14 @@ class ProductController extends Controller
             if (!$id) {
                 return response()->json(['success' => 500, 'Invalid id']);
             }
-            $product = $this->product->getProductById($id);
 
+            $product = $this->product->getProductById($id);
             if ($product) {
                 if ($product->cover_path != null) {
                     $product->cover_path = json_decode($product->cover_path);
+                    $arr_path = (array)$product->cover_path;
                     $arr = array();
-                    foreach ($product->cover_path as $key => $path) {
+                    foreach ($arr_path as $key => $path) {
                         if ($path) {
                             $arr[$key] = url($path);
                         } else {
@@ -166,40 +170,88 @@ class ProductController extends Controller
         }
     }
 
-    public function getProduct(Request $request) {
+    public function getSizeColor() {
+        $listSize = Size::all();
+        $listColor = Color::all();
+        if ($listSize) {
+            return Response::json(['status' => 200, 'listSize' => $listSize, 'listColor' => $listColor]);
+        } else {
+            return Response::json(['status' => 404, 'message' => 'Không tìm thấy dữ liệu']);
+        }
+    }
+
+    public function getCategoryById(Request $request) {
         try {
+            $id = $request->id;
+            $category = Category::where('id', $id)->first();
+            if ($category) {
+                return Response::json(['status' => 200, 'result' => $category]);
+            } else {
+                return Response::json(['status' => 404, 'message' => 'Không tìm thấy dữ liệu']);
+            }
+        } catch (\Exception $ex) {
+            return Response::json(['status' => 500, 'message' => 'Đã có lỗi xảy ra']);
+        }
+    }
+
+    public function getProduct(Request $request) {
+        // try {
             //Params
             $params = $request->all();
             $page = isset($params['page']) ? (int)$params['page'] : 1;
             $pageSize = isset($params['page_size']) ? (int)$params['page_size'] : 12;
 
             //Sortby
-            $sortBy = isset($params['sort_by']) ? $params['sort_by'] : "";
-            $sortType = isset($params['sort_type']) ? $params['sort_type'] : "asc";
+            $sortBy = isset($params['sort_by']) ? $params['sort_by'] : 'created_at';
+            $sortType = isset($params['sort_type']) ? $params['sort_type'] : "ASC";
+            
+            //sort size and color
+            $size_id = isset($params['size_id']) ? $params['size_id'] : 'all';
+            $color_id = isset($params['color_id']) ? $params['color_id'] : "all";
 
+            //sort by price
 
             $result = array();
-            $query = Product::with(['sales' => function ($query) {
+            $query = Product::with(['sales' => function ($sale) {
                                     $dayNow = new DateTime();
-                                    $query->where('end_time', '>=', $dayNow);
+                                    $sale->where('end_time', '>=', $dayNow);
                                 }])
                                 ->with('category')
                                 ->whereNull('deleted_at');
-
-            if (!empty($params['cate_id'])) {
-                $cate_id = $params['cate_id'];
+            $cate_id = isset($params['cate_id']) ? $params['cate_id'] : null;
+            if ($cate_id != null) {
                 $query = $query->whereHas('category', function($q) use ($cate_id){
                             $q->where('id', $cate_id)
                             ->orWhere('parent_id', $cate_id);
                         });
             }
-        
-            $count = $query->count();
-            $pages = ceil($count / $pageSize);
-            if ($count > (($page - 1) * $pageSize)) {
-                $listData = $query->orderBy($sortBy, $sortType)->skip(($page - 1) * $pageSize)->take($pageSize)->get();
 
-                if (!empty($params['cate_id'])) {
+            if ($size_id != 'all' && $color_id == 'all') {
+                $query = $query->whereHas('colors', function($q) use ($size_id){
+                    $q->where('size_id', $size_id);
+                });
+            }
+
+            if ($color_id != 'all' && $size_id == 'all') {
+                $query = $query->whereHas('colors', function($q) use ($color_id){
+                    $q->where('color_id', $color_id);
+                });
+            }
+
+            if ($color_id != 'all' && $size_id != 'all') {
+                $query = $query->whereHas('colors', function($q) use ($color_id, $size_id){
+                    $q->where('color_id', $color_id)
+                      ->where('size_id', $size_id);
+                });
+            }
+
+            $query = $query->orderby($sortBy, $sortType);
+
+            $listData = $query->paginate($pageSize, ['*'], 'page', $page);
+            $listData = $this->convertImageHome($listData);
+            if ($listData) {
+
+                if ($cate_id == null) {
                     $listCate = $this->category->getCateParent();
                 } else {
                     $listCate = Category::where('parent_id', $cate_id)
@@ -217,8 +269,8 @@ class ProductController extends Controller
                     'message' => 'Không tìm thấy dữ liệu'
                 ]);
             }
-        } catch (\Exception $ex) {
-            return $this->errorResponse([], $ex->getMessage());
-        }
+        // } catch (\Exception $ex) {
+        //     return $this->errorResponse([], $ex->getMessage());
+        // }
     }
 }

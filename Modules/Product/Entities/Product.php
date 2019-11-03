@@ -124,7 +124,7 @@ class Product extends Model
         if(!empty($data)){
             $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';
             $collum .= '<a href="'. route('product.product.delete', $data->id) .'" onclick="return confirm('.$message.')" class="btn btn-sm btn-danger">Xóa</a>';
-            $collum .= '<a type="button" href="' .route('product.color.get', $data->id) .'" class="btn btn-default btn-sm">Quản lý số lượng</a>';
+            $collum .= '<a type="button" href="' .route('product.color.get', $data->id) .'" class="btn btn-default btn-sm">Quản lý size, màu</a>';
 
             // if(Session::get('edit')) {
             //     $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';

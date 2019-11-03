@@ -388,6 +388,7 @@ class ProductController extends Controller
             ->addColumn('cover_path', function ($product) {
                 if ($product->cover_path != null) {
                     $data = json_decode($product->cover_path);
+                    $data = (array)$data;
                     $html = '';
                     foreach ($data as $key => $path) {
                         $html .= '<img class="image-product" src="' . (($path != null) ? url($path) : "") . '">';
