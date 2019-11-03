@@ -9,7 +9,6 @@
 namespace Modules\Orders\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -23,6 +22,7 @@ use Modules\Orders\Entities\OrderItems;
 use Modules\Orders\Entities\Orders;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductPrice;
+use Validator;
 
 class OrderController extends ApiController
 {
@@ -95,80 +95,58 @@ class OrderController extends ApiController
         try {
             //Params
 
-            $params = $request->json()->all();
+            $params = $request->all();
+            
             $validatorArray = [
                 'name' => 'required',
-                'mobile' => 'required',
+                'mobile' => 'required', 
+                'more_info' => '',
                 'address'  => 'required',
-                'type_customer' => 'required',
-//                'deliver_time' => 'required',
                 'province_id'   => 'required',
                 'commune_id'    => 'required',
                 'district_id'   => 'required',
+                'total' => 'required|min:0'
             ];
-            if(empty($request->user('api')->id)){
-                return $this->errorResponse([], "Không tồn tại người dùng này");
-            }
+
             $validator = Validator::make($params, $validatorArray);
             if ($validator->fails()) {
-                return $this->errorResponse([], $validator->messages());
+                return redirect()->back()->withInput()->withErrors($validator->messages());
             }
 
-
-            $customer = [];
-            $customer['name'] = trim($params['name']);
-            $customer['mobile'] = trim($params['mobile']);
-            $customer['address'] = trim($params['address']);
-            $customer['province_id'] = trim($params['province_id']);
-            $customer['district_id'] = trim($params['district_id']);
-            $customer['commune_id'] = trim($params['commune_id']);
-            $customer['type'] = trim($params['type_customer']);
-            $customer['created_at'] = Carbon::now();
-            $customer_id = Customer::insertGetId($customer);
-
-            //create order
-            $agency = Agency::where('user_id', $request->user('api')->id)->first();
+            if(empty($params["customer_id"])){
+                $customer = [];
+                $customer['customer_name'] = trim($params['name']);
+                $customer['customer_phone'] = trim($params['mobile']);
+                $customer['customer_address'] = trim($params['address']);
+                $customer['province_id'] = trim($params['province_id']);
+                $customer['district_id'] = trim($params['district_id']);
+                $customer['commune_id'] = trim($params['commune_id']);
+                $customer['created_at'] = Carbon::now();
+                $customer_id = Customer::insertGetId($customer);
+            }else{
+                $customer_id = $params["customer_id"];
+            }
 
             $order = [];
-            if(!empty($agency)){
-                $order["created_user_id"] = $agency->user_id;
-                $order["creater"] = $agency->name;
-                $order["user_level"] = $agency->level;
-                $order["deliver_address"] = trim($params['address']);
-            }else{
-                return $this->errorResponse([], "Không tồn tại đại lý này");
-            }
-            $total = 0;
-            foreach ($params["items"] as $key => $param){
-                $object = ProductPrice::where([
-                    "product_id" => $param["product_id"],
-                    "unit" =>  $param["unit"]
-                ])->first();
-
-                if(empty($object)){
-                    $params["items"][$key]["sell_price"] = 0;
-                    $total += 0;
-                }else{
-                    $params["items"][$key]["sell_price"] = $object->price;
-                    $total += $object->price * $params["items"][$key]["amount"];
-                }
-            }
-
-            $order["status"] = Orders::PENDING_STATUS;
-            $order["total"] = $total;
-            $order["discount"] = (double) 0;
-            $order["tax"] = (double) 0;
-            $order["customer_type"] = ($params['type_customer'] == "1") ? "Công ty" : "Cá nhân";
-            $order["customer_name"] = trim($params['name']);
-            $order["customer_address"] = trim($params['address']);
-            $order["customer_phone"] = trim($params['mobile']);
+            $order["deliver_address"] = $customer['customer_address'];
+            $order["order_status"] = Orders::PENDING_STATUS;
+            $order["total_price"] = $params['total'];
             $order["customer_id"] = $customer_id;
-            $order["deliver_time"] = Carbon::createFromTimestamp($params['deliver_time'] / 1000);
             $order["created_at"] = Carbon::now();
-            $order["is_update"] = 0;
             $params['order_id'] = Orders::insertGetId($order);
             //update order item
-            Orders::insertOrderitemApi($params);
+            Orders::insertOrderitem($params);
+
+            $order = Orders::where('id', $params['order_id'])->first();
+            $order_items = OrderItems::join('products', 'products.id', '=', 'order_product.product_id')->where('order_product.order_id', $params['order_id'])->get();
+            $total = 0;
+            foreach ($order_items as $item) {
+                $total += $item->amount * $item->price;
+            }
+            $order->total_price = $total;
+            
+            $order->save();
+
             DB::commit();
             return $this->successResponse([], 'Response Successfully');
 

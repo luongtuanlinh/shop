@@ -19,12 +19,8 @@ Route::group(['namespace' => 'Api'], function () {
 
     Route::group(['prefix' => 'v1', 'namespace' => 'V1'], function () {
         //Posts
-        Route::group(['middleware' => 'client.credentials'], function (){
-            Route::post('listOrders', 'OrderController@listOrders');
-            Route::get('/order/view/{id}', 'OrderController@view');
-            Route::post('/order/edit', 'OrderController@editOrder');
-            Route::post('createOrder', 'OrderController@createOrder');
-            Route::get('/customer/search', 'CustomerController@search');
-        });
+        Route::post('/orders/categories', 'OrderController@listCategories')->name('api.v1.news.categories');
+        Route::post('/orders/orders', 'OrderController@listOrders')->name('api.v1.news.orders');
+        Route::post('/orders/create', 'OrderController@createOrder')->name('api.v1.orders.create');
     });
 });
