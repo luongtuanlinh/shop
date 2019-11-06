@@ -9,7 +9,7 @@
     <ol class="breadcrumb">
         <li><a href="{{ route('admin_home') }}"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
         <li><a href="{{ route('product.product.index') }}">{{ trans('product::product.title') }}</a></li>
-        <li><a href="{{ route('product.color.get', $productId) }}">Quản lý số lượng</a></li>
+        <li><a href="{{ route('product.color.get', $productId) }}">Quản lý size, màu</a></li>
         <li class="active">Thêm</li>
     </ol>
 </section>

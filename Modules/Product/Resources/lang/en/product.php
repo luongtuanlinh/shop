@@ -16,6 +16,8 @@ return [
     'enter_description' => 'Nhập vào mô tả cho sản phẩm',
     'category' => 'Loại sản phẩm',
     'save' => 'Lưu sản phẩm',
+    'origin' => 'Xuất xứ',
+    'enter_origin' => 'Nhập vào xuất xứ sản phẩm',
     'cancel' => 'Hủy',
     'cover1' => 'Ảnh 1 (Ảnh chính)',
     'cover2' => 'Ảnh 2 (Ảnh phụ)',

@@ -39,6 +39,10 @@
                         <label>{{ trans('product::product.category') }}</label>
                         {!! Form::select('category_id', $selectedCategories, old('category_id'), ['class'=>'form-control select2']) !!}
                     </div>
+                    <div class="form-group">
+                        <label>{{ trans('product::product.origin') }}</label>
+                        <input name="origin" type="text" class="form-control" value="{{ old('location') }}" placeholder="{{ trans('product::product.enter_origin') }}" required>
+                    </div>
                     <hr>
                     <h3>Thông tin seo sản phẩm</h3>
                     <div class="form-group">

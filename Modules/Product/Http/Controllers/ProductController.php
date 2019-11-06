@@ -70,6 +70,7 @@ class ProductController extends Controller
         $seo_title = $request->seo_title;
         $seo_description = $request->seo_description;
         $seo_key = $request->seo_key;
+        $origin = $request->origin;
         $created_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
 
@@ -124,13 +125,14 @@ class ProductController extends Controller
             'created_at' => $created_at,
             'seo_title' => $seo_title,
             'seo_description' => $seo_description,
-            'seo_key' => $seo_key
+            'seo_key' => $seo_key,
+            'location' => $origin
         ];
 
         $created = $this->product->insertProduct($array);
 
         if ($created) {
-            return redirect()->back()->withFlashSuccess(@trans('product::notify.add_product_success'));
+            return redirect()->route('product.product.index')->withFlashSuccess(@trans('product::notify.add_product_success'));
         } else {
             return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
         }
@@ -182,6 +184,7 @@ class ProductController extends Controller
         $seo_title = $request->seo_title;
         $seo_description = $request->seo_description;
         $seo_key = $request->seo_key;
+        $location = $request->location;
         $updated_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
 
@@ -234,13 +237,14 @@ class ProductController extends Controller
             'updated_at' => $updated_at,
             'seo_title' => $seo_title,
             'seo_description' => $seo_description,
-            'seo_key' => $seo_key
+            'seo_key' => $seo_key,
+            'location' => $location
         ];
 
         $updated = $this->product->updateProduct($id, $array);
 
         if ($updated) {
-            return redirect()->back()->withFlashSuccess( @trans('product::notify.edit_product_success') );
+            return redirect()->route('product.product.index')->withFlashSuccess( @trans('product::notify.edit_product_success') );
         } else {
             return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
         }
@@ -335,17 +339,13 @@ class ProductController extends Controller
                         return null;
                     }
                 })
-                ->addColumn('source', function ($product) {
-
-                    return 'Trung quốc';
-                })
                 ->addColumn('cover_path', function ($product) {
                     if ($product->cover_path != null) {
                         $data = json_decode($product->cover_path);
                         $data = (array)$data;
                         $html = '';
-                        foreach ($data as $key => $path) {
-                            $html .= '<img class="image-product" src="'.( ($path != null) ? url($path) : "") .'">';
+                        if ($data != null) {
+                            $html .= '<img class="image-product" src="'.( ($data[0] != null) ? url($data[0]) : "") .'">';
                         }
                         return $html;
                     }else{

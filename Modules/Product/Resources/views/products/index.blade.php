@@ -82,7 +82,7 @@
                     {data: 'cover_path', orderable: false},
                     {data: 'material', orderable: false},
                     {data: 'description', orderable: false},
-                    {data: 'source', orderable: false},
+                    {data: 'location', orderable: false},
                     {data: 'actions', orderable: false}
                 ],
                 "order": [[ 0, "desc" ]],
