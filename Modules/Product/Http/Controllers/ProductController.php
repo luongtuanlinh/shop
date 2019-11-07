@@ -15,6 +15,7 @@ use App\Models\KMsg;
 use Auth;
 use Modules\Product\Entities\Color;
 use Validator;
+use stdClass;
 
 class ProductController extends Controller
 {
@@ -132,9 +133,9 @@ class ProductController extends Controller
         $created = $this->product->insertProduct($array);
 
         if ($created) {
-            return redirect()->route('product.product.index')->withFlashSuccess(@trans('product::notify.add_product_success'));
+            return redirect()->route('product.product.index')->with('messages', @trans('product::notify.add_product_success'));;
         } else {
-            return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
+            return redirect()->back()->withErrors(@trans('product::notify.has_err'));
         }
     }
 
@@ -244,9 +245,9 @@ class ProductController extends Controller
         $updated = $this->product->updateProduct($id, $array);
 
         if ($updated) {
-            return redirect()->route('product.product.index')->withFlashSuccess( @trans('product::notify.edit_product_success') );
+            return redirect()->route('product.product.index')->with('messages', @trans('product::notify.edit_product_success'));
         } else {
-            return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
+            return redirect()->back()->withErrors(@trans('product::notify.has_err'));
         }
     }
 
@@ -271,22 +272,30 @@ class ProductController extends Controller
         $delete_product =  $this->product->updateProduct($id, $data);
 
         if ($delete_product) {
-            return redirect()->back()->withFlashSuccess(@trans('product::notify.delete_product_success'));
+            return redirect()->back()->with('messages', @trans('product::notify.delete_product_success'));
         } else {
-            return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
+            return redirect()->back()->withErrors(@trans('product::notify.has_err'));
         }
     }
 
     public function getChooseProduct(Request $request) {
-        $categories = Category::whereNull('deleted_at')->get();
         $listCateParent = $this->category->getCateParent();
         $listDataFirst = $this->product->getProductFirst();
         $listData = array();
-        $listCate = array();
         if (count($listCateParent) > 0) {
             foreach ($listCateParent as $key => $value) {
-                $listData[$value->id] = $this->product->getProductHome($value->id);
-                $listCate[$value->id] = Category::where('parent_id', $value->id)->whereNull('deleted_at')->get();
+                $listData[$key] = new stdClass();
+                $listProduct = $this->product->getProductHome($value->id);
+                foreach ($listProduct as $key2 => $item) {
+                    if ($item->cover_path != null) {
+                        $listPath = json_decode($item->cover_path);
+                        if ($listPath[0] != null) {
+                            $listProduct[$key2]->cover_path1 = url($listPath[0]);
+                        }
+                    }
+                }
+                $listData[$key]->product = $listProduct;
+                $listData[$key]->category = $value;
             }
             foreach ($listDataFirst as $key => $item) {
                 if ($item->cover_path != null) {
@@ -296,18 +305,8 @@ class ProductController extends Controller
                     }
                 }
             }
-            foreach ($listData as $key => $value) {
-                foreach ($value as $key2 => $item) {
-                    if ($item->cover_path != null) {
-                        $listPath = json_decode($item->cover_path);
-                        if ($listPath[0] != null) {
-                            $listData[$key][$key2]->cover_path = url($listPath[0]);
-                        }
-                    }
-                }
-            }
         }
-        return view('product::products/first', compact('categories', 'listData', 'listCate', 'listDataFirst'));
+        return view('product::products/first', compact('listData', 'listDataFirst'));
     }
 
     public function get(Request $request)
@@ -407,7 +406,7 @@ class ProductController extends Controller
         $category_id = $request->cate_id;
         $count = count($dataChoose);
         if ($count > 4 ) {
-            return redirect()->back()->withFlashDanger('Bạn chỉ được chọn tối đa 4 sản phẩm' );
+            return redirect()->back()->withErrors('Bạn chỉ được chọn tối đa 4 sản phẩm' );
         } else {
             if ($category_id == 0) {
                 
@@ -416,7 +415,7 @@ class ProductController extends Controller
 
                 $update_new_data = Product::whereIn('id', $dataChoose)
                                 ->update(['status' => '2']);
-                return redirect()->back()->withFlashSuccess('Update danh sách thành công');
+                return redirect()->back()->with('messages', 'Update danh sách thành công');
             } else {
                 $update_old_data = Product::where('status', 1)
                                         ->whereHas('category', function($q) use ($category_id){
@@ -431,7 +430,7 @@ class ProductController extends Controller
                                                 ->orWhere('parent_id', $category_id);
                                             })
                                             ->update(['status' => '1']);
-                return redirect()->back()->withFlashSuccess('Update danh sách thành công');
+                return redirect()->back()->with('messages', 'Update danh sách thành công');
             }
         }
     }

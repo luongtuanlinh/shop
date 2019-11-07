@@ -35,17 +35,17 @@
             @else 
             <p>Chưa có sản phẩm nổi bật</p>
             @endif
-            @foreach($listCate as $key => $value)
+            @foreach($listData as $key => $value)
                 <p class="trending">
-                    <span><i class="fa fa-circle" aria-hidden="true"></i></span> Top sản phẩm {{ $key }}
-                    <span class="add-top" data-id="{{ $key }}">Chọn</span>
+                    <span><i class="fa fa-circle" aria-hidden="true"></i></span> Top sản phẩm {{ $value->category->cate_name }}
+                    <span class="add-top" data-id="{{ $value->category->id }}">Chọn</span>
                 </p>
-                @if ( count($listData[$key]) > 0)
+                @if ( count($value->product) > 0)
                 <div class="row">
-                    @foreach($listData[$key] as $item)
+                    @foreach($value->product as $item)
                     <div class="col-md-3">
                         <div class="box-product">
-                            <img class="img-product" src="{{ ($item->cover_path != null ) ? $item->cover_path : url('img/fashion.png') }}">
+                            <img class="img-product" src="{{ ($item->cover_path1 != null ) ? $item->cover_path1 : url('img/fashion.png') }}">
                             <p class="product-name">{{ $item->name }}</p>
                             <p>{{ $item->price }} vnd</p>
                         </div>

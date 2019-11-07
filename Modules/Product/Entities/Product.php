@@ -139,7 +139,7 @@ class Product extends Model
     public static function genColumnChoose($data){
         $collum = "";
         if(!empty($data)){
-            $collum .= '<input type="checkbox" value=" '. $data->id. '" name="dataChoose[]">';
+            $collum .= `<input type="checkbox" value=" '. $data->id. '" name="dataChoose[]" `. ($data->status == 1 || $data->status == 2) ? 'checked' : ''.`>`;
         }
         return $collum;
     }
