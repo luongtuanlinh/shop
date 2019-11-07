@@ -58,9 +58,8 @@
                         <h3 class="box-title">Danh sách đơn hàng</h3>
                         <div class="pull-right">
                         @if(Session::get('create'))
-                                <a class="btn btn-success btn-sm" href="#" onclick="return changeStatus()">Đổi trạng thái</a>
                                 <a class="btn btn-success btn-sm" href="{{ route('order.create') }}">Tạo đơn hàng</a>
-                                <a class="btn btn-success btn-sm" href="{{ route('order.excel') }}">Excel</a>
+                                {{-- <a class="btn btn-success btn-sm" href="{{ route('order.excel') }}">Excel</a> --}}
 
                         @endif
                         </div>
