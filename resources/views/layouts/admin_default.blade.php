@@ -20,6 +20,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" type="text/css" href="{{asset('/css/prism.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('/css/prism.css')}}">
     <link rel="manifest" href="{{asset('/js/chat-agency/manifest.json')}}"> 
+    @yield('before-styles-end')
     <!-- Ionicons -->
 <!--
     <link rel="stylesheet" href="{{ asset('admin-lte/ionicons/css/ionicons.min.css') }}">
@@ -90,6 +91,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     </aside>
     <div class="content-wrapper">
         @include('core::messages.msg')
+        {{-- @include('includes.mesage') --}}
         @yield('content')
     </div>
     <footer class="main-footer">
