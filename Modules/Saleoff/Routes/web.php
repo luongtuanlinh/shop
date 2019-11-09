@@ -18,7 +18,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/create', 'SaleoffController@create')->name('create')->middleware(['verify.role:create']);
         Route::post('/store', 'SaleoffController@store')->name('store')->middleware(['verify.role:create']);
         Route::get('/{id}/edit/', 'SaleoffController@edit')->name('edit')->middleware(['verify.role:edit']);
-        Route::put('/{id}/update', 'SaleoffController@update')->name('update')->middleware(['verify.role:edit']);
+        Route::post('/{id}/update', 'SaleoffController@update')->name('update')->middleware(['verify.role:edit']);
         Route::delete('/destroy', 'SaleoffController@destroy')->name('destroy')->middleware(['verify.role:destroy']);
     });
 });

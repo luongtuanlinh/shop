@@ -28,25 +28,29 @@
 </section>
 <section class="content">
     <div class="row">
-        <div class="box box-info">
+        <div class="col-md-12">
+            <div class="box box-info">
 
-            <div class="box-header">
-                {{-- @include('agency::includes.message') --}}
-                @if(session()->has('messages'))
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h4><i class="icon fa fa-check"></i> Thông báo</h4>
-                    {{session('messages')}}
+                <div class="box-header">
+                    {{-- @include('agency::includes.message') --}}
+                    @if(session()->has('messages'))
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h4><i class="icon fa fa-check"></i> Thông báo</h4>
+                            {{session('messages')}}
+                        </div>
+                    @else
+                    @endif
+                    <h3 class="box-title">Danh sách đợt khuyến mãi</h3>
+                    <div class="pull-right">
+                        <a class="btn btn-success btn-sm" href="{{ route('admin.saleoff.create') }}">Tạo sale</a>
+                    </div>
                 </div>
-                @else
-                @endif
-                <h3 class="box-title">Danh sách đợt khuyến mãi</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body">
-                <div class="table-responsive">
-                    <table class="table table-condensed table-hover" id="post_table">
-                        <thead>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <div class="table-responsive">
+                        <table class="table table-condensed table-hover" id="post_table">
+                            <thead>
                             <tr>
                                 <th>TT</th>
                                 <th>Tên sự kiện</th>
@@ -56,11 +60,12 @@
                                 <th>Ngày tạo</th>
                                 <th class="action">Hành động</th>
                             </tr>
-                        </thead>
-                    </table>
-                </div>
-                <!--table-responsive-->
-            </div><!-- /.box-body -->
+                            </thead>
+                        </table>
+                    </div>
+                    <!--table-responsive-->
+                </div><!-- /.box-body -->
+            </div>
         </div>
         <!-- /.box -->
     </div>
