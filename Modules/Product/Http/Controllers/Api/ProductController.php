@@ -4,6 +4,7 @@ namespace Modules\Product\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Core\Http\Controllers\ApiController;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\Category;
 use Modules\Product\Entities\Size;
@@ -13,7 +14,7 @@ use Response;
 use stdClass;
 use Datetime;
 
-class ProductController extends Controller
+class ProductController extends ApiController
 {
     protected $product;
     protected $category;
@@ -43,28 +44,16 @@ class ProductController extends Controller
                 $listDataFirst = $this->convertImageHome($getDataFirst);
 
                 if ($listData) {
-                    return Response::json([
-                        'status' => 200,
-                        'result' => $listData,
-                        'firstList' => $listDataFirst
-                    ]);
+                    return $this->successResponse(['result' => $listData, 'firstList' => $listDataFirst], 'Response Successfully');
                 } else {
-                    return Response::json([
-                        'status' => 404,
-                        'result' => [],
-                        'firstList' => []
-                    ]);
+                    return $this->errorResponse([], 'Something went wrong!');
                 }
             } else {
-                return Response::json([
-                    'status' => 404,
-                    'result' => [],
-                    'firstList' => []
-                ]);
+                return $this->errorResponse([], 'Something went wrong!');
             }
 
         }catch (\Exception $ex){
-            return response()->json(['status' => 403, $ex->getMessage()]);
+            return $this->errorResponse([], $ex->getMessage());
         }
     }
 
@@ -105,7 +94,7 @@ class ProductController extends Controller
             $id = $request->id;
             
             if (!$id) {
-                return response()->json(['success' => 500, 'Invalid id']);
+                return $this->errorResponse([], 'Invalid!');
             }
 
             $product = $this->product->getProductById($id);
@@ -126,54 +115,40 @@ class ProductController extends Controller
 
                 $category = $this->category->getCategoryById($product->category_id);
                 
-                return Response::json([
-                    'status' => 200,
-                    'result' => $product,
-                    'category' => $category
-                ]);
+                return $this->successResponse(['result' => $product, 'category' => $category], 'Response Successfully');
             } else {
-                return Response::json([
-                    'status' => 404,
-                    'message' => 'Không tìm thấy dữ liệu'
-                ]);
+                return $this->errorResponse([], 'None data!');
             }
         } catch (\Exception $ex){
-            return response()->json(['status' => 403, $ex->getMessage()]);
+            return $this->errorResponse([], $ex->getMessage());
         }
     }
 
-    public function getProductByCategory(Request $request) {
-        // try{
-            $cate_id = $request->id;
-            if (!$cate_id) {
-                return response()->json(['success' => 500, 'Invalid category id']);
-            }
-            $product = $this->product->getProductByCategory($cate_id);
-            $listCate = Category::where('parent_id', $cate_id)
-                                ->whereNull('deleted_at')
-                                ->get();
+    // public function getProductByCategory(Request $request) {
+    //         $cate_id = $request->id;
+    //         if (!$cate_id) {
+    //             return response()->json(['success' => 500, 'Invalid category id']);
+    //         }
+    //         $product = $this->product->getProductByCategory($cate_id);
+    //         $listCate = Category::where('parent_id', $cate_id)
+    //                             ->whereNull('deleted_at')
+    //                             ->get();
            
-            if ($product) {
-                $product = $this->convertImageHome($product);
-                return Response::json([
-                    'status' => 200, 
-                    'result' => $product,
-                    'listCate' => $listCate
-                    ]);
-            } else {
-                return Response::json(['status' => 404, 'message' => 'Không tìm thấy dữ liệu']);
-            }
-        // } catch (\Exception $ex){
-        //     return Response::json(['status' => 500, 'message' => 'Đã có lỗi xảy ra']);
-        // }
-    }
+    //         if ($product) {
+    //             $product = $this->convertImageHome($product);
+    //             return $this->successResponse(['result' => $product, 'listCate' => $listCate], 'Response Successfully');
+    //         } else {
+    //             return $this->errorResponse([], 'None data!');
+    //         }
+        
+    // }
 
     public function getCategory() {
         $categories = $this->category->getCategoryList();
         if ($categories) {
-            return Response::json(['status' => 200, 'result' => $categories]);
+            return $this->successResponse(['result' => $categories], 'Response Successfully');
         } else {
-            return Response::json(['status' => 404, 'message' => 'Không tìm thấy dữ liệu']);
+            return $this->errorResponse([], 'None data!');
         }
     }
 
@@ -181,9 +156,9 @@ class ProductController extends Controller
         $listSize = Size::all();
         $listColor = Color::all();
         if ($listSize) {
-            return Response::json(['status' => 200, 'listSize' => $listSize, 'listColor' => $listColor]);
+            return $this->successResponse(['listSize' => $listSize, 'listColor' => $listColor], 'Response Successfully');
         } else {
-            return Response::json(['status' => 404, 'message' => 'Không tìm thấy dữ liệu']);
+            return $this->errorResponse([], 'None data!');
         }
     }
 
@@ -192,12 +167,12 @@ class ProductController extends Controller
             $id = $request->id;
             $category = Category::where('id', $id)->first();
             if ($category) {
-                return Response::json(['status' => 200, 'result' => $category]);
+                return $this->successResponse(['result' => $category], 'Response Successfully');
             } else {
-                return Response::json(['status' => 404, 'message' => 'Không tìm thấy dữ liệu']);
+                return $this->errorResponse([], 'None data!');
             }
         } catch (\Exception $ex) {
-            return Response::json(['status' => 500, 'message' => 'Đã có lỗi xảy ra']);
+            return $this->errorResponse([], $ex->getMessage());
         }
     }
 
@@ -233,24 +208,12 @@ class ProductController extends Controller
                         });
             }
 
-            if ($size_id != 'all' && $color_id == 'all') {
-                $query = $query->whereHas('colors', function($q) use ($size_id){
-                    $q->where('size_id', $size_id);
-                });
-            }
-
-            if ($color_id != 'all' && $size_id == 'all') {
-                $query = $query->whereHas('colors', function($q) use ($color_id){
-                    $q->where('color_id', $color_id);
-                });
-            }
-
-            if ($color_id != 'all' && $size_id != 'all') {
-                $query = $query->whereHas('colors', function($q) use ($color_id, $size_id){
-                    $q->where('color_id', $color_id)
-                      ->where('size_id', $size_id);
-                });
-            }
+            // if ($color_id != 'all' && $size_id != 'all') {
+            //     $query = $query->whereHas('colors', function($q) use ($color_id, $size_id){
+            //         $q->where('color_id', $color_id)
+            //           ->where('size_id', $size_id);
+            //     });
+            // }
 
             $query = $query->orderby($sortBy, $sortType);
 
@@ -265,16 +228,9 @@ class ProductController extends Controller
                                         ->whereNull('deleted_at')
                                         ->get();
                 }
-                return Response::json([
-                    'status' => 200,
-                    'result' => $listData,
-                    'listCate' => $listCate
-                ]);
+                return $this->successResponse(['result' => $listData, 'listCate' => $listCate], 'Response Successfully');
             } else {
-                return Response::json([
-                    'status' => 404,
-                    'message' => 'Không tìm thấy dữ liệu'
-                ]);
+                return $this->errorResponse([], 'None data!');
             }
         // } catch (\Exception $ex) {
         //     return $this->errorResponse([], $ex->getMessage());

@@ -1,5 +1,8 @@
 @extends('layouts.admin_default')
 @section('title', trans('product::product.title'))
+@section ('before-styles-end')
+    <link rel="stylesheet" href="{{ asset('css/product.css') }}"> 
+@stop
 @section('content')
 <section class="content-header">
     <h1>{{trans('product::product.title_edit')}}</h1>
@@ -39,6 +42,44 @@
                         <div class="form-group">
                             <label>{{ trans('product::product.origin') }}</label>
                             <input name="location" type="text" class="form-control" value="{{ $product->location }}" placeholder="{{ trans('product::product.enter_origin') }}" required>
+                        </div>
+                        <hr>
+                        <h3>Phân loại sản phẩm</h3>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">S :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[0]->color }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">M :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[1]->color }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">L :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[2]->color }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">XL :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[3]->color }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">XXL :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[4]->color }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">XXXL :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[5]->color }}">
+                            </div>
                         </div>
                         <hr>
                         <h3>Thông tin seo sản phẩm</h3>

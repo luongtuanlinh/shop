@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\Size;
 use Modules\Product\Entities\Category;
+use Modules\Product\Entities\ProductSize;
 use Yajra\Datatables\Datatables;
 use Intervention\Image\Facades\Image as Image;
 use App\Models\KMsg;
@@ -74,6 +75,7 @@ class ProductController extends Controller
         $origin = $request->origin;
         $created_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
+        $listSize = $request->size;
 
         $validatorArray = [
             'name' => 'required',
@@ -114,26 +116,38 @@ class ProductController extends Controller
                 $list_img[$i] = null;
             }
         }
+        $product = new Product();
+        $product->name = $name;
+        $product->price = $price;
+        $product->material = $material;
+        $product->description = $description;
+        $product->admin_id = $admin_id;
+        $product->category_id = $category_id;
+        $product->cover_path = json_encode($list_img);
+        $product->created_at = $created_at;
+        $product->seo_title = $seo_title;
+        $product->seo_description = $seo_description;
+        $product->seo_key = $seo_key;
+        $product->location = $origin;
+        $product->save();
 
-        $array = [
-            'name' => $name,
-            'price' => $price,
-            'material' => $material,
-            'description' => $description,
-            'admin_id' => $admin_id,
-            'category_id' => $category_id,
-            'cover_path' => json_encode($list_img),
-            'created_at' => $created_at,
-            'seo_title' => $seo_title,
-            'seo_description' => $seo_description,
-            'seo_key' => $seo_key,
-            'location' => $origin
-        ];
+        $product_id = $product->id;
 
-        $created = $this->product->insertProduct($array);
-
-        if ($created) {
-            return redirect()->route('product.product.index')->with('messages', @trans('product::notify.add_product_success'));;
+        if ($product_id) {
+            foreach ($listSize as $key => $value) {
+                if ($value !== null ) {
+                    $size_id = $key + 1;
+                    $
+                    $arr = [
+                        'product_id' => $product_id,
+                        'size_id' => $size_id,
+                        'color' => $value,
+                        'created_at' => $created_at
+                    ];
+                    $insertSize = ProductSize::insert($arr);
+                }
+            }
+            return redirect()->route('product.product.index')->with('messages', @trans('product::notify.add_product_success'));
         } else {
             return redirect()->back()->withErrors(@trans('product::notify.has_err'));
         }
@@ -159,6 +173,7 @@ class ProductController extends Controller
         $selectedCategories = array();
         $categories = Category::whereNull('deleted_at')->get();
         $product = $this->product->getProductById($id);
+       
         if ($product->cover_path != null) {
             $product->cover_path = json_decode($product->cover_path);
         }
@@ -188,6 +203,7 @@ class ProductController extends Controller
         $location = $request->location;
         $updated_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
+        $listSize = $request->size;
 
         $validatorArray = [
             'name' => 'required',
@@ -243,6 +259,14 @@ class ProductController extends Controller
         ];
 
         $updated = $this->product->updateProduct($id, $array);
+        foreach ($listSize as $key => $value) {
+            $size_id = $key + 1;
+            $arr = [
+                'color' => $value,
+                'updated_at' => $updated_at
+            ];
+            $updateSize = ProductSize::where('product_id', $id)->where('size_id', $size_id)->update($arr);
+        }
 
         if ($updated) {
             return redirect()->route('product.product.index')->with('messages', @trans('product::notify.edit_product_success'));

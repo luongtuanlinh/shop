@@ -183,3 +183,10 @@
 .btn-danger {
     margin-left: 5px;
 }
+.col-form-label {
+    margin-top: 5px;
+}
+.no-margin-lr {
+    margin-left: 0;
+    margin-right: 0;
+}
