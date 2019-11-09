@@ -13,71 +13,54 @@ use Modules\Agency\Entities\Agency;
 use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Modules\Core\Http\Controllers\ApiController;
 use Modules\Core\Models\User;
+use DB;
 
 class UserController extends ApiController
 {
     public $successStatus = 200;
 
     /**
-     * Login user and create token
-     *
-     * @param  [string] email
-     * @param  [string] password
-     * @param  [boolean] remember_me
-     * @return [string] access_token
-     * @return [string] token_type
-     * @return [string] expires_at
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * Login access Token
      */
-    public function login(Request $request)
-    {
-        //dd(1);
-        $params = $request->all();
-        $validatorArray = [
-            'phone' => 'required|string|',
-            'password' => 'required|string',
-            'remember_me' => 'boolean'
-        ];
-
-        $validator = Validator::make($params, $validatorArray);
-        if ($validator->fails()) {
-            return $this->errorResponse([], $validator->messages());
-        }
-        //$credentials = request(['username', 'password']);
+    public function Login(Request $request){
         try{
-            $user = User::where('phone','=',$request->phone)->first();
+            $params = $request->all();
+            $validatorArray = [
+                'username' => 'required',
+                'password'   => 'required',
+            ];
+            $validator = Validator::make($params, $validatorArray);
+            if ($validator->fails()) {
+                return $this->errorResponse([], $validator->messages());
+            }
+            //Check User
+            $user = User::where('username','=',$params['username'])->select(['id','username','email','password','access_token'])->first();
             if(!empty($user)){
-                if(!Auth::attempt(['phone' => $request->phone, 'password' => $request->password, 'admin' => 0],$request->remember_me))
-                    return $this->errorResponse([],'Số điện thoại hoặc mật khẩu không đúng');
-                $user->token = $params['token'];
-                $user->save();
-                $user = $request->user();
-
-                $tokenResult = $user->createToken('Personal Access Token');
-                $token = $tokenResult->token;
-                if ($request->remember_me)
-                    $token->expires_at = Carbon::now()->addWeeks(1);
-                $token->save();
-                $agency = Agency::where('user_id', $user->id)->first();
-                $result = [
-                    'user_id' => $user->id,
-                    'agency_name' => $agency->name,
-                    'agency_child_count' => Agency::where('parent', $agency->id)->count(),
-                    'access_token' => $tokenResult->accessToken,
-                    'token_type' => 'Bearer',
-                    'expires_at' => Carbon::parse(
-                        $tokenResult->token->expires_at
-                    )->toDateTimeString()
-                ];
-                return $this->successResponse(["user" => $result],'Response Successfully');
+                if(Hash::check($params['password'],$user['password'])){
+                    do {
+                        $user->access_token = bin2hex(openssl_random_pseudo_bytes(64));
+                    }
+                    while(count(User::where('access_token',$user['access_token'])->get())!=0);
+                    $usersave = User::find($user['id']);
+                    $usersave->update(['access_token'=>$user['access_token']]);
+                    unset($user['password'],$user['updated_at']);
+                    return $this->successResponse($user,'Response Successfully');
+                }
+                else {
+                    return $this->errorResponse([],'Password is maybe wrong');
+                }
             }
             else{
-                return $this->errorResponse([],'Số điện thoại không đúng ');
+                return $this->errorResponse([],'Username is maybe wrong');
             }
-
-        }catch (\Exception $ex){
+        }
+        catch(Exception $ex){
             return $this->errorResponse([],$ex->getMessage());
         }
     }
@@ -118,4 +101,95 @@ class UserController extends ApiController
         return response()->json($request->user());
     }
 
+    public function store(Request $request)
+    {
+        $params = $request->all();
+        $validatorArray = [
+            'username' => 'required|unique:users',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed',
+            'password_confirmation' => 'required|min:6'
+        ];
+
+
+        $validator = Validator::make($request->all(), $validatorArray);
+        if ($validator->fails()) {
+            $message = $validator->errors();
+            return response()->json(['status' => 403, 'message' => $message->first()]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $result = User::create([
+                "username" => $params["username"],
+                "email" => $params["email"],
+                "password" => $params["password"],
+                "avatar" => $avatar,
+                'admin' => 0,
+            ]);
+
+            DB::commit();
+            return response()->json(['status' => 201, 'messages'=>'Tạo mới người dùng thành công']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['status' => 403,  $ex->getMessage()]);
+        }
+    }
+
+    public function update(Request $request)
+    {
+        $params = $request->all();
+
+        $validatorArray = [
+            'access_token'=>'required',
+            'file' => 'required'
+        ];
+        // dd($params);
+        $validator = Validator::make($params, $validatorArray);
+        if ($validator->fails()) {
+            $message = $validator->errors();
+            return $this->errorResponse($params,'Username is maybe wrong');
+        }
+        return 1;
+        $obj = User::withTrashed()->where("access_token", $params['access_token'])->first();
+        if ($obj) {
+            if($request->hasFile('file')){
+                $img = $request->file('file')->getClientOriginalName();
+                $request->file->move('img/user',$img);
+                $obj->avatar = $img;
+            }
+            if(!empty($params['password'])){
+                $obj->password = $params['password'];
+            }
+            $obj->save();
+
+            $item = new \stdClass();
+            $item->avatar = $obj->avatar;
+
+           return $this->successResponse($item,'Response Successfully');
+        } else {
+            return $this->errorResponse([],'Username is maybe wrong');
+        }
+    }
+
+    public function getInfo(Request $request)
+    {
+        $params = $request->all();
+        $currentUser = Auth::user();
+
+        $validatorArray = [
+            'access_token'=>'required',
+        ];
+        $validator = Validator::make($request->all(), $validatorArray);
+        if ($validator->fails()) {
+            $message = $validator->errors();
+            return $this->errorResponse([],'Username is maybe wrong');
+        }
+        $obj = User::select('username', 'email', 'phone', 'avatar')->withTrashed()->where("access_token", $params['access_token'])->first();
+        if ($obj) {
+            return $this->successResponse($obj,'Response Successfully');
+        } else {
+            return $this->errorResponse([],'Username is maybe wrong');
+        }
+    }
 }
