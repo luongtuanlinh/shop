@@ -18,7 +18,9 @@ Route::group(['middleware' => ['web', 'auth', 'verify.role'], 'prefix' => 'admin
 {
         Route::get('/product/get', 'ProductController@get')->name('product.product.get')->middleware(['verify.role:show']);
 
-        Route::get('/product/getchoose', 'ProductController@getDataChoose')->name('product.product.getChoose');
+        Route::get('/product/getchoose', 'ProductController@getDataChoose')->name('product.product.get_choose');
+
+        Route::get('/product/choose/{cate_id}', 'ProductController@chooseData')->name('product.product.choose_poduct');
 
         Route::resource('product', 'ProductController', ['as' => 'product']);
         

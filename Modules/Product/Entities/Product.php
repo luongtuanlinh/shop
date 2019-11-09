@@ -47,6 +47,11 @@ class Product extends Model
         return $this->hasMany(ProductColor::class,'product_id','id');
     }
 
+    public function productSize()
+    {
+        return $this->hasMany(ProductSize::class,'product_id','id');
+    }
+
     public function orders()
     {
         return $this->belongsToMany(Order::class,'order_product','product_id','order_id');
@@ -73,7 +78,7 @@ class Product extends Model
                         $dayNow = new DateTime();
                         $query->where('end_time', '>=', $dayNow);
                     }])
-                    ->with('colors')
+                    ->with('productSize')
                     ->where("id", $id)->first();
     }
 
@@ -122,9 +127,9 @@ class Product extends Model
         $message = "'Bạn có chắc chắn muốn xóa sản phẩm này?'";
         $collum = "";
         if(!empty($data)){
-            $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';
+            $collum .= '<a href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';
             $collum .= '<a href="'. route('product.product.delete', $data->id) .'" onclick="return confirm('.$message.')" class="btn btn-sm btn-danger">Xóa</a>';
-            $collum .= '<a type="button" href="' .route('product.color.get', $data->id) .'" class="btn btn-default btn-sm">Quản lý size, màu</a>';
+            $collum .= '<a href="' .route('product.color.get', $data->id) .'" class="btn btn-default btn-sm">Quản lý size, màu</a>';
 
             // if(Session::get('edit')) {
             //     $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';

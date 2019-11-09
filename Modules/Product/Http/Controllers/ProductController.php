@@ -278,6 +278,15 @@ class ProductController extends Controller
         }
     }
 
+    public function chooseData(Request $request) {
+        $cate_id = $request->cate_id;
+        if ($cate_id == 'undefined') {
+            return back();
+        }
+
+        return view('product::products/first_choose', compact('cate_id'));
+    }
+
     public function getChooseProduct(Request $request) {
         $listCateParent = $this->category->getCateParent();
         $listDataFirst = $this->product->getProductFirst();
@@ -355,8 +364,7 @@ class ProductController extends Controller
             ->make(true);
     }
 
-    public function getDataChoose(Request $request)
-    {
+    public function getDataChoose(Request $request) {
         $query = Product::with('category')->whereNull('deleted_at');
 
         return Datatables::of($query)
@@ -370,6 +378,8 @@ class ProductController extends Controller
                                     ->orWhereHas('category', function ($q) use ($value) {
                                         $q->where('parent_id', $value);
                                     });
+                            } else {
+                                $query->where('status', '<>', 1);
                             }
                         }
                     }
@@ -377,8 +387,12 @@ class ProductController extends Controller
             })
             ->escapeColumns([])
             ->addColumn('actions', function ($product) {
-                $html = Product::genColumnChoose($product);
-                return $html;
+                $data = new stdClass();
+                $data->status = $product->status;
+                $data->id = $product->id;
+                $data->cate_id = $product->category_id;
+                $data = json_encode($data);
+                return $data;
             })
             ->addColumn('cate_name', function ($product) {
 
@@ -389,8 +403,8 @@ class ProductController extends Controller
                     $data = json_decode($product->cover_path);
                     $data = (array)$data;
                     $html = '';
-                    foreach ($data as $key => $path) {
-                        $html .= '<img class="image-product" src="' . (($path != null) ? url($path) : "") . '">';
+                    if ($data != null) {
+                        $html .= '<img class="image-product" src="'.( ($data[0] != null) ? url($data[0]) : "") .'">';
                     }
                     return $html;
                 } else {
@@ -400,37 +414,90 @@ class ProductController extends Controller
             ->make(true);
     }
 
-    public function updateChoosen(Request $request)
-    {
-        $dataChoose = $request->dataChoose;
-        $category_id = $request->cate_id;
-        $count = count($dataChoose);
-        if ($count > 4 ) {
-            return redirect()->back()->withErrors('Bạn chỉ được chọn tối đa 4 sản phẩm' );
-        } else {
+    public function updateChoosen(Request $request) {
+        if ($request->ajax()) {
+            $product_id = $request->product_id;
+            $category_id = $request->cate_id;
+            $status = $request->status;
+            if(!$product_id) {
+                return \response()->json([
+                    'status' => 403,
+                    'mess' => 'Dữ liệu đầu vào không đúng, hãy thử lại sau!',
+                ]);
+            }
             if ($category_id == 0) {
+                if ($status == 1) {
+                    $count =  Product::where('status', 2)
+                                    ->whereNull('deleted_at')
+                                    ->count();
+                    if ($count >= 4) {
+                        return \response()->json([
+                            'status' => 403,
+                            'mess' => 'Bạn chỉ được chọn tối đa 4 sản phẩm',
+                        ]);
+                    }
+
+                    $update_new_data = Product::where('id', $product_id)
+                                                ->update(['status' => '2']);
+                } else {
+                    $update_new_data = Product::where('id', $product_id)
+                                                ->update(['status' => '0']);
+                }
+
+                if ($update_new_data) {
+                    return \response()->json([
+                        'status' => 200,
+                        'mess' => 'Update success',
+                    ]);
+                } else {
+                    return \response()->json([
+                        'status' => 401,
+                        'mess' => 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+                    ]);
+                }
                 
-                $update_old_data = Product::where('status', 2)
-                                    ->update(['status' => '0']);
-
-                $update_new_data = Product::whereIn('id', $dataChoose)
-                                ->update(['status' => '2']);
-                return redirect()->back()->with('messages', 'Update danh sách thành công');
             } else {
-                $update_old_data = Product::where('status', 1)
-                                        ->whereHas('category', function($q) use ($category_id){
-                                            $q->where('id', $category_id)
-                                            ->orWhere('parent_id', $category_id);
-                                        })
-                                        ->update(['status' => '0']);
-
-                $update_new_data = Product::whereIn('id', $dataChoose)
+                
+                if ($status == 1) {
+                    $count_data = Product::where('status', 1)
+                                    ->whereNull('deleted_at')
+                                    ->whereHas('category', function($q) use ($category_id){
+                                        $q->where('id', $category_id)
+                                        ->orWhere('parent_id', $category_id);
+                                    })
+                                    ->count();
+                    if ($count_data >= 4) {
+                        return \response()->json([
+                            'status' => 403,
+                            'mess' => 'Bạn chỉ được chọn tối đa 4 sản phẩm',
+                        ]); 
+                    }
+                    $update_new_data = Product::where('id', $product_id)
                                             ->whereHas('category', function($q) use ($category_id){
                                                 $q->where('id', $category_id)
                                                 ->orWhere('parent_id', $category_id);
                                             })
                                             ->update(['status' => '1']);
-                return redirect()->back()->with('messages', 'Update danh sách thành công');
+                } else {
+                    $update_new_data = Product::where('id', $product_id)
+                                            ->whereHas('category', function($q) use ($category_id){
+                                                $q->where('id', $category_id)
+                                                ->orWhere('parent_id', $category_id);
+                                            })
+                                            ->update(['status' => '0']);
+                }
+
+                if ($update_new_data) {
+                    return \response()->json([
+                        'status' => 200,
+                        'mess' => 'Update success',
+                    ]);
+                } else {
+                    return \response()->json([
+                        'status' => 401,
+                        'mess' => 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+                    ]);
+                }              
             }
         }
     }
