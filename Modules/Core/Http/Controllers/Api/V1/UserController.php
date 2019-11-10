@@ -38,7 +38,7 @@ class UserController extends ApiController
             ];
             $validator = Validator::make($params, $validatorArray);
             if ($validator->fails()) {
-                return $this->successResponse(["errors" => "Some thing was wrong"],'Response Successfully');
+                return $this->successResponse(["errors" => [0 => "Đã có lỗi xảy ra."]],'Response Successfully');
             }
             //Check User
             $user = User::where('username','=',$params['username'])->select(['id','username','email','password','access_token'])->first();
@@ -54,11 +54,11 @@ class UserController extends ApiController
                     return $this->successResponse($user,'Response Successfully');
                 }
                 else {
-                    return $this->successResponse(['errors' => "Password is maybe wrong"],'Response Successfully');
+                    return $this->successResponse(['errors' => [0 => "Mật khẩu không."]],'Response Successfully');
                 }
             }
             else{
-                return $this->successResponse(['errors' => "Username is maybe wrong"],'Response Successfully');
+                return $this->successResponse(['errors' => [0 => "Tên đăng nhập không đúng."]],'Response Successfully');
             }
         }
         catch(\Exception $ex){
@@ -149,7 +149,7 @@ class UserController extends ApiController
         // dd($params);
         $validator = Validator::make($params, $validatorArray);
         if ($validator->fails()) {
-            return $this->successResponse(["errors" => "Xảy ra lỗi trong quá trình up file"],'Response Successfully');
+            return $this->successResponse(["errors" => [0 => "Xảy ra lỗi trong quá trình up file."]],'Response Successfully');
         }
         $obj = User::withTrashed()->where("access_token", $params['access_token'])->first();
         if ($obj) {
@@ -168,7 +168,7 @@ class UserController extends ApiController
 
            return $this->successResponse($item,'Response Successfully');
         } else {
-            return $this->successResponse(["errors" => "User may be wrong"],'Response Successfully');
+            return $this->successResponse(["errors" => [0 => "Người dùng không tồn tại."]],'Response Successfully');
         }
     }
 
@@ -181,13 +181,13 @@ class UserController extends ApiController
         ];
         $validator = Validator::make($request->all(), $validatorArray);
         if ($validator->fails()) {
-            return $this->successResponse(["errors" => "User may be wrong"],'Response Successfully');
+            return $this->successResponse(["errors" => [0 => "Người dùng không tồn tại."]],'Response Successfully');
         }
         $obj = User::select('username', 'email', 'phone', 'avatar')->withTrashed()->where("access_token", $params['access_token'])->first();
         if ($obj) {
             return $this->successResponse($obj,'Response Successfully');
         } else {
-            return $this->successResponse(["errors" => "User may be wrong"],'Response Successfully');
+            return $this->successResponse(["errors" => [0 => "Người dùng không tồn tại."]],'Response Successfully');
         }
     }
 }
