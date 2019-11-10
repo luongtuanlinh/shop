@@ -48,37 +48,37 @@
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">S :</label>
                             <div class="col-sm-10 no-padding">
-                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[0]->color }}">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[1]) > 0 ? $listSize[1] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">M :</label>
                             <div class="col-sm-10 no-padding">
-                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[1]->color }}">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[2]) > 0 ? $listSize[2] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">L :</label>
                             <div class="col-sm-10 no-padding">
-                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[2]->color }}">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[3]) > 0 ? $listSize[3] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">XL :</label>
                             <div class="col-sm-10 no-padding">
-                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[3]->color }}">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[4]) > 0 ? $listSize[4] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">XXL :</label>
                             <div class="col-sm-10 no-padding">
-                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[4]->color }}">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[5]) > 0 ? $listSize[5] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">XXXL :</label>
                             <div class="col-sm-10 no-padding">
-                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ $product->product_size[5]->color }}">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[6]) > 0 ? $listSize[6] : '' }}">
                             </div>
                         </div>
                         <hr>

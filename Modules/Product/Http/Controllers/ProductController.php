@@ -137,7 +137,6 @@ class ProductController extends Controller
             foreach ($listSize as $key => $value) {
                 if ($value !== null ) {
                     $size_id = $key + 1;
-                    $
                     $arr = [
                         'product_id' => $product_id,
                         'size_id' => $size_id,
@@ -173,6 +172,13 @@ class ProductController extends Controller
         $selectedCategories = array();
         $categories = Category::whereNull('deleted_at')->get();
         $product = $this->product->getProductById($id);
+
+        $listSize = [];
+        if (count($product->product_size) ) {
+            foreach ($product->product_size as $key => $value) {
+                $listSize[$value->size_id] = $value->color;
+            }
+        }
        
         if ($product->cover_path != null) {
             $product->cover_path = json_decode($product->cover_path);
@@ -181,7 +187,7 @@ class ProductController extends Controller
         foreach ($categories as $category) {
             $selectedCategories[$category->id] = $category->cate_name;
         }
-        return view('product::products/edit', compact('selectedCategories', 'product'));
+        return view('product::products/edit', compact('selectedCategories', 'product', 'listSize'));
     }
 
     /**
