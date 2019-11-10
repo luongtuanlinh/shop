@@ -9,6 +9,7 @@
 namespace Modules\Core\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use Modules\Agency\Entities\Agency;
 use Validator;
 use Illuminate\Http\Request;
@@ -37,7 +38,7 @@ class UserController extends ApiController
             ];
             $validator = Validator::make($params, $validatorArray);
             if ($validator->fails()) {
-                return $this->errorResponse([], $validator->messages());
+                return $this->successResponse(["errors" => "Some thing was wrong"],'Response Successfully');
             }
             //Check User
             $user = User::where('username','=',$params['username'])->select(['id','username','email','password','access_token'])->first();
@@ -53,15 +54,16 @@ class UserController extends ApiController
                     return $this->successResponse($user,'Response Successfully');
                 }
                 else {
-                    return $this->errorResponse([],'Password is maybe wrong');
+                    return $this->successResponse(['errors' => "Password is maybe wrong"],'Response Successfully');
                 }
             }
             else{
-                return $this->errorResponse([],'Username is maybe wrong');
+                return $this->successResponse(['errors' => "Username is maybe wrong"],'Response Successfully');
             }
         }
-        catch(Exception $ex){
-            return $this->errorResponse([],$ex->getMessage());
+        catch(\Exception $ex){
+            Log::info($ex->getMessage());
+            return $this->successResponse([],$ex->getMessage());
         }
     }
 
@@ -132,7 +134,7 @@ class UserController extends ApiController
             return $this->successResponse(["success" => 1],'Response Successfully');
         } catch (\Exception $e) {
             DB::rollback();
-            return $this->successResponse(["errors" => $ex->getMessage()],'Response Successfully');
+            return $this->successResponse(["errors" => $e->getMessage()],'Response Successfully');
         }
     }
 
@@ -147,10 +149,8 @@ class UserController extends ApiController
         // dd($params);
         $validator = Validator::make($params, $validatorArray);
         if ($validator->fails()) {
-            $message = $validator->errors();
-            return $this->errorResponse($params,'Username is maybe wrong');
+            return $this->successResponse(["errors" => "Xảy ra lỗi trong quá trình up file"],'Response Successfully');
         }
-        return 1;
         $obj = User::withTrashed()->where("access_token", $params['access_token'])->first();
         if ($obj) {
             if($request->hasFile('file')){
@@ -168,28 +168,26 @@ class UserController extends ApiController
 
            return $this->successResponse($item,'Response Successfully');
         } else {
-            return $this->errorResponse([],'Username is maybe wrong');
+            return $this->successResponse(["errors" => "User may be wrong"],'Response Successfully');
         }
     }
 
     public function getInfo(Request $request)
     {
         $params = $request->all();
-        $currentUser = Auth::user();
 
         $validatorArray = [
             'access_token'=>'required',
         ];
         $validator = Validator::make($request->all(), $validatorArray);
         if ($validator->fails()) {
-            $message = $validator->errors();
-            return $this->errorResponse([],'Username is maybe wrong');
+            return $this->successResponse(["errors" => "User may be wrong"],'Response Successfully');
         }
         $obj = User::select('username', 'email', 'phone', 'avatar')->withTrashed()->where("access_token", $params['access_token'])->first();
         if ($obj) {
             return $this->successResponse($obj,'Response Successfully');
         } else {
-            return $this->errorResponse([],'Username is maybe wrong');
+            return $this->successResponse(["errors" => "User may be wrong"],'Response Successfully');
         }
     }
 }
