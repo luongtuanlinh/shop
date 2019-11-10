@@ -114,7 +114,7 @@
                                                                                 {{--<th>Mã sản phẩm</th>--}}
                                                                                 {{--<th>Giá sản phẩm</th>--}}
                                                                                 {{--<th>Khuyến mại</th>--}}
-                                                                                {{--<th>Phần trăm</th>--}}
+                                                                                {{--<th>Giá sau giảm</th>--}}
                                                                             {{--</tr>--}}
                                                                             {{--</thead>--}}
                                                                             {{--<tbody>--}}
@@ -134,7 +134,7 @@
                                                                                            {{--class="form-control"--}}
                                                                                            {{--:id="product.id"--}}
                                                                                            {{--:disabled="!isSaleArr.includes(product.id)"--}}
-                                                                                           {{--type="number" max="99"--}}
+                                                                                           {{--type="number" max="1000000000000000"--}}
                                                                                     {{-->--}}
                                                                                 {{--</td>--}}
                                                                             {{--</tr>--}}
