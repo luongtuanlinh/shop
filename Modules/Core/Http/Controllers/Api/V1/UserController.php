@@ -114,8 +114,7 @@ class UserController extends ApiController
 
         $validator = Validator::make($request->all(), $validatorArray);
         if ($validator->fails()) {
-            $message = $validator->errors();
-            return response()->json(['status' => 403, 'message' => $message->first()]);
+            return $this->successResponse(["errors" => $validator->messages()],'Response Successfully');
         }
 
         DB::beginTransaction();
@@ -124,15 +123,15 @@ class UserController extends ApiController
                 "username" => $params["username"],
                 "email" => $params["email"],
                 "password" => $params["password"],
-                "avatar" => $avatar,
+                // "avatar" => $params["avatar"],
                 'admin' => 0,
             ]);
 
             DB::commit();
-            return response()->json(['status' => 201, 'messages'=>'Tạo mới người dùng thành công']);
+            return $this->successResponse(["success" => 1],'Response Successfully');
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['status' => 403,  $ex->getMessage()]);
+            return $this->successResponse(["errors" => $ex->getMessage()],'Response Successfully');
         }
     }
 
