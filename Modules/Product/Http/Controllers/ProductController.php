@@ -271,7 +271,19 @@ class ProductController extends Controller
                 'color' => $value,
                 'updated_at' => $updated_at
             ];
-            $updateSize = ProductSize::where('product_id', $id)->where('size_id', $size_id)->update($arr);
+            if (ProductSize::where('product_id', '=', $id)->where('size_id', $size_id)->exists()) {
+                $updateSize = ProductSize::where('product_id', $id)->where('size_id', $size_id)->update($arr);
+            } else {
+                if($value != null) {
+                    $arr_new = [
+                        'product_id' => $id,
+                        'size_id' => $size_id,
+                        'color' => $value,
+                        'created_at' => $updated_at
+                    ];
+                    $insertSize = ProductSize::insert($arr_new);
+                }
+            }
         }
 
         if ($updated) {
