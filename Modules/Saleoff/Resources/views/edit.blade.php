@@ -111,7 +111,7 @@
                                                                     <th>Mã sản phẩm</th>
                                                                     <th>Giá sản phẩm</th>
                                                                     <th>Khuyến mại</th>
-                                                                    <th>Phần trăm</th>
+                                                                    <th>Giá sau giảm</th>
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -133,7 +133,7 @@
                                                                                 :id="product.id"
                                                                                 :disabled="!isSaleArr.includes(product.id)"
                                                                                 :value="discounts[product.id]"
-                                                                                type="number" max="99"
+                                                                                type="number" max="1000000000000000000000000000000"
                                                                         >
                                                                     </td>
                                                                 </tr>
