@@ -122,7 +122,7 @@ class NewsController extends ApiController
             
             
             $result = array();
-            $query = NewsPost::select(DB::raw('id, title, slug, thumbnail, images, summary, post_type, post_view, data, media, created_id, published_at, created_at'));
+            $query = NewsPost::where('status', '!=', NewsPost::STATUS_DELETED)->select(DB::raw('id, title, slug, thumbnail, images, summary, post_type, post_view, data, media, created_id, published_at, created_at'));
             
             if (!empty($params['category_id'])) {
                 $category_id = $params['category_id'];

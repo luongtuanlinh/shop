@@ -207,6 +207,7 @@ class ProductController extends Controller
         $seo_description = $request->seo_description;
         $seo_key = $request->seo_key;
         $location = $request->location;
+        $has_quantity = $request->has_quantity;
         $updated_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
         $listSize = $request->size;
@@ -261,7 +262,8 @@ class ProductController extends Controller
             'seo_title' => $seo_title,
             'seo_description' => $seo_description,
             'seo_key' => $seo_key,
-            'location' => $location
+            'location' => $location,
+            'has_quantity' => $has_quantity
         ];
 
         $updated = $this->product->updateProduct($id, $array);

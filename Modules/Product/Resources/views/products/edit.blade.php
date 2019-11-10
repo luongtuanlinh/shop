@@ -43,6 +43,13 @@
                             <label>{{ trans('product::product.origin') }}</label>
                             <input name="location" type="text" class="form-control" value="{{ $product->location }}" placeholder="{{ trans('product::product.enter_origin') }}" required>
                         </div>
+                        <div class="form-group">
+                            <label>Trang thái</label>
+                            <select class="form-control" name="has_quantity">
+                                <option value="0" {{ ($product->has_quantity == 0) ? "selected" : "" }}>Hết hàng</option>
+                                <option value="1" {{ ($product->has_quantity == 1) ? "selected" : "" }}>Còn hàng</option>
+                            </select>
+                        </div>
                         <hr>
                         <h3>Phân loại sản phẩm</h3>
                         <div class="form-group row no-margin-lr">

@@ -21,6 +21,7 @@ class Product extends Model
         'material',
         'description',
         'category_id',
+        'has_quantity'
     ];
 
     public function sales()
