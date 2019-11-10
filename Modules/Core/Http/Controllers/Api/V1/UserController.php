@@ -123,6 +123,7 @@ class UserController extends ApiController
                 "username" => $params["username"],
                 "email" => $params["email"],
                 "password" => $params["password"],
+                "phone" => $params["phone"],
                 // "avatar" => $params["avatar"],
                 'admin' => 0,
             ]);
