@@ -143,21 +143,16 @@ class Orders extends Model
     public static function insertOrderitemApi($params){
         OrderItems::where('order_id', $params['order_id'])->delete();
         $order_items = [];
-        foreach ($params["items"] as $param){
+        foreach ($params["products"] as $product){
+            $product_item = Product::whereId($product->product_id)->first();
             $item = [];
-            $item["order_id"] = $params['order_id'];
-            $item["product_id"] = $param["product_id"];
-            $item["product_name"] = Product::where('id', $param["product_id"])->first()->name;
-            $item["amount"] = $param["amount"];
-            $item["sell_price"] = $param["sell_price"];
-            $item["unit"] = $param["unit"];
-            if(!empty($param["colorcode_id"])){
-                $item["colorcode_id"] = $param["colorcode_id"];
-                $item["color_percent"] = (double) (!empty($param["color_percent"])) ? $param["color_percent"] : 0;
-            }else{
-                $item["colorcode_id"] = null;
-                $item["color_percent"] = 0;
-            }
+            $item["order_id"] = $params["order_id"];
+            $item["product_id"] = $product->product_id;
+            $item["size_id"] = $product->size;
+            $item["color_id"] = $product->color;
+            $item["amount"] = $product->amount;
+            $item["sell_price"] = $product_item->get('price');
+            $item["list_price"] = $product_item->get('price'); // gia goc
             $item["created_at"] = Carbon::now();
             array_push($order_items, $item);
         }
