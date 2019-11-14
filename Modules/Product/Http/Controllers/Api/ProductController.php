@@ -8,7 +8,7 @@ use Modules\Core\Http\Controllers\ApiController;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\Category;
 use Modules\Product\Entities\Size;
-use Modules\Product\Entities\Color;
+use Modules\Product\Entities\Sale;
 use Validator;
 use Response;
 use stdClass;
@@ -235,5 +235,72 @@ class ProductController extends ApiController
         // } catch (\Exception $ex) {
         //     return $this->errorResponse([], $ex->getMessage());
         // }
+    }
+
+    public function getProductSaleOff(Request $request) {
+       
+        //Params
+        $params = $request->all();
+        $page = isset($params['page']) ? (int)$params['page'] : 1;
+        $pageSize = isset($params['page_size']) ? (int)$params['page_size'] : 12;
+
+        //Sortby
+        $sortBy = isset($params['sort_by']) ? $params['sort_by'] : 'created_at';
+        $sortType = isset($params['sort_type']) ? $params['sort_type'] : "ASC";
+        
+        //sort size and color
+        $size_id = isset($params['size_id']) ? $params['size_id'] : 'all';
+        $color_id = isset($params['color_id']) ? $params['color_id'] : "all";
+
+        $dayNow = new DateTime();
+        $listSale = Sale::whereNull('deleted_at')
+                        ->where('end_time', '>=', $dayNow)->get(); 
+
+        $dataSale = [];
+        foreach ($listSale as $key => $value) {
+            $dataSale[$key] = new stdClass();
+            $sale_id = $value->id;
+            $query = Product::whereNull('deleted_at')
+                                ->with(['sales' => function ($sale) {
+                                    $dayNow = new DateTime();
+                                    $sale->where('end_time', '>=', $dayNow);
+                                }])
+                                ->whereHas('sales', function($q) use ($sale_id){
+                                    $q->where('sale_id', $sale_id);
+                                });
+
+            $cate_id = isset($params['cate_id']) ? $params['cate_id'] : null;
+            if ($cate_id != null) {
+                $query = $query->whereHas('category', function($q) use ($cate_id) {
+                            $q->where('id', $cate_id)
+                            ->orWhere('parent_id', $cate_id);
+                        });
+            }
+
+            $query = $query->orderby($sortBy, $sortType);
+
+            $product = $query->paginate($pageSize, ['*'], 'page', $page);
+
+            $product = $this->convertImageHome($product);
+            
+            $dataSale[$key]->sale = $value;
+            $dataSale[$key]->product = $product;
+            $dataSale[$key]->total = $product->total();
+            $dataSale[$key]->last_page = $product->lastPage();
+        }
+
+        if ($dataSale) {
+
+            if ($cate_id == null) {
+                $listCate = $this->category->getCateParent();
+            } else {
+                $listCate = Category::where('parent_id', $cate_id)
+                                    ->whereNull('deleted_at')
+                                    ->get();
+            }
+            return $this->successResponse(['dataSale' => $dataSale, 'listCate' => $listCate], 'Response Successfully');
+        } else {
+            return $this->errorResponse([], 'None data!');
+        }
     }
 }

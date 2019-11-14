@@ -26,6 +26,8 @@ Route::group(['namespace' => 'Api'], function () {
         Route::post('/all', 'ProductController@getProduct');
 
         Route::post('/detail', 'ProductController@getDetaiProduct');
+
+        Route::post('/saleoff', 'ProductController@getProductSaleOff');
         
     });
 
