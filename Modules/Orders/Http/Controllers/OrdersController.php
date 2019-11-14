@@ -297,10 +297,11 @@ class OrdersController extends Controller
             'name' => 'required',
             'mobile' => 'required', 
             'more_info' => '',
+            'shipping_fee' => 'min:0',
             'address'  => 'required',
-            'province_id'   => 'required',
-            'commune_id'    => 'required',
-            'district_id'   => 'required',
+            'province_id'   => '',
+            'commune_id'    => '',
+            'district_id'   => '',
             'total' => 'required|min:0'
         ];
 
@@ -330,6 +331,7 @@ class OrdersController extends Controller
             $order["deliver_address"] = $customer['customer_address'];
             $order["order_status"] = Orders::PENDING_STATUS;
             $order["total_price"] = $params['total'];
+            $order["ship_price"] = $params['shipping_fee'];
             $order["customer_id"] = $customer_id;
             $order["created_at"] = Carbon::now();
             $params['order_id'] = Orders::insertGetId($order);

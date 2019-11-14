@@ -72,8 +72,8 @@
                                 value="{{ old('mobile') }}" required>
                         </div>
                         <div class="form-group remove-date">
-                            <label>Lưu ý</label>
-                            <textarea style="width: 100%;" name="more_info"></textarea>
+                            <label>Phí vận chuyển</label>
+                            <input type="number" id="shipping" class="form-control" value="0" name="shipping_fee" min="0"/>
                         </div>
 
                     </div>
@@ -324,6 +324,8 @@
                 }
                 total += parseInt(value);
             });
+            let shipping_fee = $("#shipping").val();
+            total += parseInt(shipping_fee);
             $("#sum_price #total").val(total);
             $("#sum_price span").html("");
             $("#sum_price span").html(addCommas(total));
@@ -527,7 +529,17 @@
         var commune_text = "";
         function filterArea(id, type, parent_type, old_value) {
             var text = $("#" + parent_type).find(":selected").text();
-            console.log(text);
+            if (parent_type == "province") {
+                if (text.search('Hà Nội') > -1) {
+                    $("#shipping").html("");
+                    $("#shipping").val("20000");
+                    total();
+                } else {
+                    $("#shipping").html("");
+                    $("#shipping").val("30000");
+                    total();
+                }
+            }
             text = text.trim();
             if(type != "district"){
                 district_text = text;
