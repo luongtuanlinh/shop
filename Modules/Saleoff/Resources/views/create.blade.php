@@ -365,29 +365,29 @@
                 }, 0);
             },
         });
-        {{--$('#sale-form').submit(function (event) {--}}
-            {{--event.preventDefault();--}}
-            {{--let saleProductIds = $("input[name='discount']:enabled").map(function () {--}}
-                {{--return $(this).attr('id');--}}
-            {{--}).get();--}}
-            {{--let percentageDiscounts = $("input[name='discount']:enabled").map(function () {--}}
-                {{--return $(this).val()--}}
-            {{--}).get();--}}
-            {{--let params = {--}}
-                {{--event_name: $('#event_name').val(),--}}
-                {{--introduction: $('#introduction').val(),--}}
-                {{--period: $('#period').val(),--}}
-                {{--saleProductIds: saleProductIds,--}}
-                {{--percentageDiscounts : percentageDiscounts,--}}
-            {{--};--}}
-            {{--axios.post("{{route('admin.saleoff.store')}}",--}}
-                {{--params--}}
-            {{--).then(function (res) {--}}
-                {{--alert('thanh cong');--}}
-            {{--}).catch(function (err) {--}}
-                {{--alert('loi');--}}
-            {{--});--}}
-        {{--})--}}
+        // {{--$('#sale-form').submit(function (event) {--}}
+        //     {{--event.preventDefault();--}}
+        //     {{--let saleProductIds = $("input[name='discount']:enabled").map(function () {--}}
+        //         {{--return $(this).attr('id');--}}
+        //     {{--}).get();--}}
+        //     {{--let percentageDiscounts = $("input[name='discount']:enabled").map(function () {--}}
+        //         {{--return $(this).val()--}}
+        //     {{--}).get();--}}
+        //     {{--let params = {--}}
+        //         {{--event_name: $('#event_name').val(),--}}
+        //         {{--introduction: $('#introduction').val(),--}}
+        //         {{--period: $('#period').val(),--}}
+        //         {{--saleProductIds: saleProductIds,--}}
+        //         {{--percentageDiscounts : percentageDiscounts,--}}
+        //     {{--};--}}
+        //     {{--axios.post("{{route('admin.saleoff.store')}}",--}}
+        //         {{--params--}}
+        //     {{--).then(function (res) {--}}
+        //         {{--alert('thanh cong');--}}
+        //     {{--}).catch(function (err) {--}}
+        //         {{--alert('loi');--}}
+        //     {{--});--}}
+        // {{--})--}}
     </script>
     <script type="text/javascript">
         $(document).ready(function(){
