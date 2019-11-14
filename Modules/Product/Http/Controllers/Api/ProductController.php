@@ -195,11 +195,11 @@ class ProductController extends ApiController
 
             $result = array();
             $query = Product::with(['sales' => function ($sale) {
-                                    $dayNow = new DateTime();
-                                    $sale->where('end_time', '>=', $dayNow);
-                                }])
-                                ->with('category')
-                                ->whereNull('deleted_at');
+                                $dayNow = new DateTime();
+                                $sale->where('end_time', '>=', $dayNow);
+                            }])
+                            ->with('category')
+                            ->whereNull('deleted_at');
             $cate_id = isset($params['cate_id']) ? $params['cate_id'] : null;
             if ($cate_id != null) {
                 $query = $query->whereHas('category', function($q) use ($cate_id){
@@ -208,12 +208,24 @@ class ProductController extends ApiController
                         });
             }
 
-            // if ($color_id != 'all' && $size_id != 'all') {
-            //     $query = $query->whereHas('colors', function($q) use ($color_id, $size_id){
-            //         $q->where('color_id', $color_id)
-            //           ->where('size_id', $size_id);
-            //     });
-            // }
+            if ($color_id != 'all' && $size_id != 'all') {
+                $query = $query->whereHas('product_size', function($q) use ($color_id, $size_id){
+                    $q->where('color', $color_id)
+                      ->where('size_id', $size_id);
+                });
+            }
+
+            if ($color_id != 'all' && $size_id == 'all') {
+                $query = $query->whereHas('product_size', function($q) use ($color_id, $size_id){
+                    $q->where('color', $color_id);
+                });
+            }
+
+            if ($color_id == 'all' && $size_id != 'all') {
+                $query = $query->whereHas('product_size', function($q) use ($color_id, $size_id){
+                     $q->where('size_id', $size_id);
+                });
+            }
 
             $query = $query->orderby($sortBy, $sortType);
 
@@ -260,7 +272,8 @@ class ProductController extends ApiController
         foreach ($listSale as $key => $value) {
             $dataSale[$key] = new stdClass();
             $sale_id = $value->id;
-            $query = Product::whereNull('deleted_at')
+            $query = Product::select(DB::raw('query as product_offer'))
+                                ->whereNull('deleted_at')
                                 ->with(['sales' => function ($sale) {
                                     $dayNow = new DateTime();
                                     $sale->where('end_time', '>=', $dayNow);
@@ -277,6 +290,25 @@ class ProductController extends ApiController
                         });
             }
 
+            if ($color_id != 'all' && $size_id != 'all') {
+                $query = $query->whereHas('product_size', function($q) use ($color_id, $size_id){
+                    $q->where('color', $color_id)
+                      ->where('size_id', $size_id);
+                });
+            }
+
+            if ($color_id != 'all' && $size_id == 'all') {
+                $query = $query->whereHas('product_size', function($q) use ($color_id, $size_id){
+                    $q->where('color', $color_id);
+                });
+            }
+
+            if ($color_id == 'all' && $size_id != 'all') {
+                $query = $query->whereHas('product_size', function($q) use ($color_id, $size_id){
+                     $q->where('size_id', $size_id);
+                });
+            }
+
             $query = $query->orderby($sortBy, $sortType);
 
             $product = $query->paginate($pageSize, ['*'], 'page', $page);
@@ -287,6 +319,8 @@ class ProductController extends ApiController
             $dataSale[$key]->product = $product;
             $dataSale[$key]->total = $product->total();
             $dataSale[$key]->last_page = $product->lastPage();
+            $dataSale[$key]->from = $product->firstItem();
+            $dataSale[$key]->to = $product->lastItem();
         }
 
         if ($dataSale) {
