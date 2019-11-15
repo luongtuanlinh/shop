@@ -118,7 +118,8 @@
                                 {{ csrf_field() }}
                                 <!-- id cua don hang minh dinh update -->
                                 <input type="hidden" name="order_id" value="{{$order->id}}">
-                                <input type="hidden" name="order_status" value="{{  $order->order_status }}" id="order_status">
+                                <input type="hidden" name="order_status" value="{{  $order->order_status }}"
+                                    id="order_status">
                                 <input type="hidden" name="payment_status" value="{{ $order->payment_status  }}"
                                     id="payment_status">
 
@@ -167,36 +168,41 @@
                                         <th>Thành tiền</th>
                                         {{-- <th>Hành động</th> --}}
                                         @if($order->order_status <= Modules\Orders\Entities\Orders::PROCESSING_STATUS)
-                                        <th>Hành động</th>
-                                        @endif
+                                            <th>Hành động</th>
+                                            @endif
                                     </thead>
                                     <tbody id="tbody">
                                         @foreach ($order_items as $key => $item)
                                         <tr>
                                             <td>#{{ $key + 1 }}</td>
                                             <td>{{ $item->cate_name }}</td>
-                                            <td>{{ $item->name }}<input type="hidden" name="product_id[]" value="{{ $item->product_id }}"></td>
-                                            <td>{{ $item->size }}<input type="hidden" name="size[]" value="{{ $item->size_id }}"></td>
-                                            <td>{{ $item->color }}<input type="hidden" name="color[]" value="{{ $item->color_id }}"></td>
-                                            <td>{{ $item->amount }}<input type="hidden" name="amount[]" value="{{ $item->color_id }}"></td>
+                                            <td>{{ $item->name }}<input type="hidden" name="product_id[]"
+                                                    value="{{ $item->product_id }}"></td>
+                                            <td>{{ $item->size }}<input type="hidden" name="size[]"
+                                                    value="{{ $item->size_id }}"></td>
+                                            <td>{{ $item->color }}<input type="hidden" name="color[]"
+                                                    value="{{ $item->color }}"></td>
+                                            <td>{{ $item->amount }}<input type="hidden" name="amount[]"
+                                                    value="{{ $item->amount }}"></td>
                                             <td>{{ number_format($item->price) }}</td>
                                             <td>{{ number_format($item->price * $item->amount) }}</td>
-                                            @if($order->order_status <= Modules\Orders\Entities\Orders::PROCESSING_STATUS)
-                                            <td><button type="button" class="btn btn-danger btn-xs"
-                                                    onclick="deleteRow($(this))"><i
-                                                        class="fa fa-minus">Xoá</i></button></td>
-                                            @endif
+                                            @if($order->order_status <=
+                                                Modules\Orders\Entities\Orders::PROCESSING_STATUS) <td><button
+                                                    type="button" class="btn btn-danger btn-xs"
+                                                    onclick="deleteRow($(this))"><i class="fa fa-minus">Xoá</i></button>
+                                                </td>
+                                                @endif
                                         </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         @if($order->order_status <= Modules\Orders\Entities\Orders::PROCESSING_STATUS)
                                             <tr>
-                                                <td colspan="9" class="text-center"><button type="button" id="add_button_1"
-                                                        class="btn btn-info btn-xs" onclick="addRow()"><i
-                                                            class="fa fa-plus">Thêm</i></button></td>
+                                            <td colspan="9" class="text-center"><button type="button" id="add_button_1"
+                                                    class="btn btn-info btn-xs" onclick="addRow()"><i
+                                                        class="fa fa-plus">Thêm</i></button></td>
                                             </tr>
-                                        @endif
+                                            @endif
                                     </tfoot>
                                 </table>
 
@@ -204,15 +210,32 @@
                                     <h3 id="total-title">Đơn hàng</h3>
                                     <div id="note" class="col-md-6">
                                         <h3>Đổi trạng thái đơn hàng</h3>
-                                        <span> Status</span><br>
-                                        <select id="select_status" class="form-control">
-                                            @foreach(\Modules\Orders\Entities\Orders::listStatus() as $key => $value)
-                                            <option value="{{ $key }}" @if ($key==$order->order_status)
-                                                {{ "selected" }}
-                                                @endif
-                                                >{{ $value }}</option>
-                                            @endforeach
-                                        </select>
+                                        <div><span>Trạng thái đơn hàng</span><br>
+                                            <select id="select_status" class="form-control">
+                                                @foreach(\Modules\Orders\Entities\Orders::listStatus() as $key =>
+                                                $value)
+                                                <option value="{{ $key }}" @if ($key==$order->order_status)
+                                                    {{ "selected" }}
+                                                    @endif
+                                                    >{{ $value }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div style="margin-top:20px;">
+                                            <span>Trạng thái thanh toán</span><br>
+                                            <select id="select_payment_status" class="form-control">
+                                                <option value="{{ \Modules\Orders\Entities\Orders::NOT_PAY_STATUS }}" 
+                                                @if ($order->payment_status ==
+                                                    \Modules\Orders\Entities\Orders::NOT_PAY_STATUS)
+                                                    selected
+                                                    @endif >Chưa thanh toán</option>
+                                                <option value="{{ \Modules\Orders\Entities\Orders::PAID_STATUS }}"
+                                                @if ($order->payment_status ==
+                                                    \Modules\Orders\Entities\Orders::PAID_STATUS)
+                                                    selected
+                                                    @endif >Đã thanh toán</option>
+                                            </select>
+                                        </div>
                                         {{-- <span> Miêu tả</span><br>
                                         <textarea name="subcrible" id="" cols="30" rows="4"></textarea> --}}
                                     </div>
@@ -232,6 +255,8 @@
                                                 <td>{{ number_format($order->total_price) }}</td>
                                             </tr>
                                             <tr>
+                                                <td>Hình thức thanh toán: </td>
+                                                <td>{{ $order->payment }}</td>    
                                             </tr>
                                             {{-- <tr>
                                                 <td>Thành tiền: </td>
@@ -239,17 +264,19 @@
                                             </tr> --}}
                                             <tr>
                                                 <td>Trạng thái: </td>
-                                                @if ($order->payment_status == \Modules\Orders\Entities\Orders::NOT_PAY_STATUS)
-                                                    <td>Chưa thanh toán</td>
+                                                @if ($order->payment_status ==
+                                                \Modules\Orders\Entities\Orders::NOT_PAY_STATUS)
+                                                <td>Chưa thanh toán</td>
                                                 @endif
-                                                @if ($order->payment_status == \Modules\Orders\Entities\Orders::PAID_STATUS)
-                                                    <td>Đã thanh toán</td>
+                                                @if ($order->payment_status ==
+                                                \Modules\Orders\Entities\Orders::PAID_STATUS)
+                                                <td>Đã thanh toán</td>
                                                 @endif
 
                                             </tr>
                                         </table>
                                         <button type="submit" name="update" value="Update"
-                                        class="btn btn-info pull-left" style="font-weight: bold">Update</button>
+                                            class="btn btn-info pull-left" style="font-weight: bold">Update</button>
 
                                     </div>
                                 </div>
@@ -367,9 +394,8 @@
             })
         }
 
-        function filterProductProperties(index) {
+        function filterSize(index) {
             var product = $("#product_id_" + index).select2('data');
-            console.log(product);
             $("#sell_price_" + index + " span").html("");
             $("#sell_price_" + index + " span").append(addCommas(product[0].price));
             $("#price_hidden_" + index).val(product[0].price);
@@ -390,9 +416,15 @@
                     }
                 }
             });
+        }
+        function filterColor(index) {
+            var product = $("#product_id_" + index).select2('data');
+            var size = $("#size_" + index).select2('data');
+            console.log(size);
             $.ajax({
                 data: {
                     product_id: product[0].id,
+                    size_id: size[0].id,
                 },
                 url: "{{ route('order.product.filterColor') }}",
                 type: "GET",
@@ -405,6 +437,7 @@
                     }
                 }
             })
+
         }
 
         function addCommas(nStr)
