@@ -13,6 +13,34 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/product', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:api')->get('/product', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::group(['namespace' => 'Api'], function () {
+
+    Route::group(['prefix' => 'v1/product'], function () {
+
+        Route::post('/', 'ProductController@getProductForTopic');
+
+        Route::post('/all', 'ProductController@getProduct');
+
+        Route::post('/detail', 'ProductController@getDetaiProduct');
+
+        Route::post('/saleoff', 'ProductController@getProductSaleOff');
+        
+    });
+
+    Route::post('v1/size_color', 'ProductController@getSizeColor');
+
+    Route::group(['prefix' => 'v1/category'], function () {
+
+        Route::post('/product', 'ProductController@getProductByCategory');
+
+        Route::post('/', 'ProductController@getCategory');
+
+        Route::post('/get_cate', 'ProductController@getCategoryById');
+
+    });
 });
+

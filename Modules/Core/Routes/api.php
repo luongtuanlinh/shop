@@ -21,11 +21,10 @@ Route::group(['namespace' => 'Api'], function () {
     Route::group(['prefix' => 'v1', 'namespace' => 'V1'], function () {
         //Posts
         Route::post('login', 'UserController@login');
-        Route::group(['middleware' => 'client.credentials'], function (){
-            Route::get('details', 'UserController@details');
-        });
-
-
+        Route::post('signup', 'UserController@store');
+        Route::post('logout', 'UserController@logout');
+        Route::post('/user/update', 'UserController@update');
+        Route::post('/user/info', 'UserController@getInfo');
     });
 });
 

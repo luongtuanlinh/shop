@@ -3,7 +3,7 @@
 return [
     'users' => [
         'route'      => 'core.user.index',
-        'permission' => [8,9,10,11],
+        'permission' => [],
         'class'      => '',
         'icon'       => 'fa fa-user',
         'name'       => 'users',
@@ -11,8 +11,8 @@ return [
         'order'      => 7,
         'sub'        => [
             [
-                'route'      => 'core.user.index',
-                'permission' => [8,9,10,11],
+                'route'      => 'core.user.create',
+                'permission' => [],
                 'class'      => '',
                 'icon'       => 'fa fa-user',
                 'name'       => 'users',
@@ -22,7 +22,7 @@ return [
             ],
             [
                 'route'      => 'core.role.index',
-                'permission' => [12,13,14,15],
+                'permission' => [],
                 'class'      => '',
                 'icon'       => 'fa fa-user',
                 'name'       => 'roles',
@@ -32,7 +32,7 @@ return [
             ],
             [
                 'route'      => 'core.group.index',
-                'permission' => [16,17,18,19],
+                'permission' => [],
                 'class'      => '',
                 'icon'       => 'fa fa-user',
                 'name'       => 'groups',

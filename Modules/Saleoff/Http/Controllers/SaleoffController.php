@@ -4,10 +4,15 @@ namespace Modules\Saleoff\Http\Controllers;
 
 use App\Models\Shop\Product;
 use App\Models\Shop\Sale;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Modules\Saleoff\Entities\ProductSale;
+use Yajra\DataTables\DataTables;
+use Validator;
 
 class SaleoffController extends Controller
 {
@@ -21,6 +26,29 @@ class SaleoffController extends Controller
         return view('saleoff::index', compact('sales'));
     }
 
+    public function get() {
+        $query = Sale::query();
+
+        return DataTables::of($query)
+        ->escapeColumns([])
+        // ->editColumn('cover_img', function($query) {
+        //     return "<img src='".$query->cover_img."' style='width: 180px; height: 140px;'/>";
+        // })
+        ->editColumn('start_time', function($query) {
+            return "<button type='button' class='btn btn-success btn-xs'><i class='fa fa-clock-o'>$query->start_time</i></button>";
+        })
+        ->editColumn('end_time', function($query) {
+            return "<button type='button' class='btn btn-success btn-xs'><i class='fa fa-clock-o'>$query->end_time</i></button>";
+        })
+        ->editColumn('created_at', function($query) {
+            return "<button type='button' class='btn btn-success btn-xs'><i class='fa fa-clock-o'>$query->created_at</i></button>";
+        })
+        ->addColumn('actions', function($query) {
+            $html = '<a href="'. route('admin.saleoff.edit', $query->id).'" type="button" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i>&nbsp;  View </a>';
+            return $html;
+        })
+        ->make(true);
+    }
     /**
      * Show the form for creating a new resource.
      * @return Response
@@ -49,19 +77,30 @@ class SaleoffController extends Controller
      */
     public function store(Request $request)
     {
-        $sale = new Sale();
-        $sale['event_name'] = $request['event_name'];
-        $sale['introduction'] = $request['introduction'];
-        $sale['start_time'] = substr($request['period'], 0, 10);
-        $sale['end_time'] = substr($request['period'], 13, 10);
-        $sale->save();
-        for ($i = 0; $i < count($request['saleProductIds']); $i++) {
-            if ($request['percentageDiscounts'][$i] > 99) $request['percentageDiscounts'][$i] = 99;
-            if ($request['percentageDiscounts'][$i] < 0) $request['percentageDiscounts'][$i] = 0;
-            if ($request['percentageDiscounts'][$i] != 0)
-                $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
+        
+        DB::beginTransaction();
+        try {
+            $sale = new Sale();
+            $sale['event_name'] = $request['event_name'];
+            $sale['introduction'] = $request['introduction'];
+            $sale['start_time'] = substr($request['period'], 0, 10);
+            $sale['end_time'] = substr($request['period'], 13, 10);
+            $sale->save();
+            for ($i = 0; $i < count($request['saleProductIds']); $i++) {
+                if ($request['percentageDiscounts'][$i] > 99) $request['percentageDiscounts'][$i] = 99;
+                if ($request['percentageDiscounts'][$i] < 0) $request['percentageDiscounts'][$i] = 0;
+                if ($request['percentageDiscounts'][$i] != 0)
+                    $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
+            }
+            DB::commit();
+            return redirect(route('admin.saleoff.index'))->with('messages','Tạo sale off thành công');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('[Sale off store] ' . $e->getMessage() . " line " . $e->getLine());
+            return redirect()->back()->withInput()->withErrors(["Không thể lưu được bản ghi nào"]);
         }
-        return response()->json(['message' => 'ok']);
+
+
     }
 
     /**
@@ -81,7 +120,12 @@ class SaleoffController extends Controller
      */
     public function edit($id)
     {
-        $sale = Sale::findOrFail($id);
+        $sale = Sale::where('id', $id)->first();
+        if(empty($sale)){
+            return redirect()->back()->withInput()->withErrors(["Không tìm thấy bản ghi"]);
+        }
+        $sale->start_time = date("d-m-Y", strtotime($sale->start_time));
+        $sale->end_time = date("d-m-Y", strtotime($sale->end_time));
         $products = Product::select('id', 'name', 'price', 'code')->get();
         foreach ($products as $product) {
             $product['sale'] = false;
@@ -106,19 +150,41 @@ class SaleoffController extends Controller
      * @return Response
      */
     public function update(Request $request, $id)
-    {
-        $sale = Sale::findOrFail($id);
-        $sale['event_name'] = $request['event_name'];
-        $sale['introduction'] = $request['introduction'];
-        $sale['start_time'] = substr($request['period'], 0, 10);
-        $sale['end_time'] = substr($request['period'], 13, 10);
-        $sale->save();
-        $sale->products()->detach();
-        for ($i = 0; $i < count($request['saleProductIds']); $i++) {
-            if ($request['percentageDiscounts'][$i] > 99) $request['percentageDiscounts'][$i] = 99;
-            if ($request['percentageDiscounts'][$i] < 0) $request['percentageDiscounts'][$i] = 0;
-            if ($request['percentageDiscounts'][$i] != 0)
-                $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
+    {   
+        $params = $request->all();
+        // dd($params);
+        $validatorArray = [
+            'event_name' => 'required',
+            'period' => 'required',
+            'introduction' => 'required'
+        ];
+
+        $validator = Validator::make($params, $validatorArray);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator->messages());
+        }
+        DB::beginTransaction();
+        try {
+            $sale = Sale::findOrFail($id);
+            $sale['event_name'] = $request['event_name'];
+            $sale['introduction'] = $request['introduction'];
+            $sale['start_time'] = substr($request['period'], 0, 10);
+            $sale['end_time'] = substr($request['period'], 13, 10);
+            $sale->save();
+            $sale->products()->detach();
+            for ($i = 0; $i < count($request['saleProductIds']); $i++) {
+                if ($request['percentageDiscounts'][$i] > 99) $request['percentageDiscounts'][$i] = 99;
+                if ($request['percentageDiscounts'][$i] < 0) $request['percentageDiscounts'][$i] = 0;
+                if ($request['percentageDiscounts'][$i] != 0)
+                    $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
+              } 
+            return redirect()->back()->withInput()->withErrors(["Không tồn tại bản ghi"]);
+            DB::commit();
+            return redirect(route('admin.saleoff.index'))->with('messages','Sửa sale off thành công');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('[Sale off update] ' . $e->getMessage() . " line " . $e->getLine());
+            return redirect()->back()->withInput()->withErrors(["Không thể lưu được bản ghi nào"]);
         }
     }
 

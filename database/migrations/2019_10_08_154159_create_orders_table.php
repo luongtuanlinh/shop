@@ -16,13 +16,16 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('product_id');
-            $table->integer('user_id');
-            $table->string('phone');
-            $table->string('address');
+            $table->integer('customer_id');
+            $table->string('customer_phone');
+            $table->string('deliver_address');
             $table->string('payment');
-            $table->integer('count_product');
-            $table->integer('count_prize');
-            $table->integer('ship_prize')->default(0);
+            $table->string('payment_status')->default(0);
+            $table->integer('total_product')->nullable();
+            $table->integer('total_price')->nullable();
+            $table->integer('ship_price')->default(0);
+            $table->integer('order_status')->default(0);
+            $table->date('deliver_time')->nullable();
             $table->timestamps();
         });
     }
