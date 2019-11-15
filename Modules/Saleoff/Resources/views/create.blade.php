@@ -106,7 +106,8 @@
                                                                     <!-- /.card-header -->
                                                                     <div class="card-body table-responsive p-0"
                                                                          style="height: 300px;">
-                                                                        <table class="table table-head-fixed" id="product-table">
+                                                                        <table class="table table-head-fixed"
+                                                                               id="product-table">
                                                                             <thead>
                                                                             <tr>
                                                                                 <th>Thứ tự</th>
@@ -127,14 +128,15 @@
                                                                                     <input type="checkbox"
                                                                                            name="productId[]"
                                                                                            :value="product.id"
-                                                                                           v-model="isSaleArr">
+                                                                                           v-model="product.sale">
                                                                                 </td>
                                                                                 <td>
                                                                                     <input name="discount"
                                                                                            class="form-control"
                                                                                            :id="product.id"
-                                                                                           :disabled="!isSaleArr.includes(product.id)"
+                                                                                           :disabled="!product.sale"
                                                                                            type="number" max="99"
+                                                                                           v-model="product.percentage"
                                                                                     >
                                                                                 </td>
                                                                             </tr>
@@ -187,7 +189,6 @@
             el: "#product_list",
             data: {
                 products: {!! json_encode($products) !!},
-                isSaleArr: [],
             },
             methods: {
                 createSale: function () {
@@ -201,18 +202,28 @@
         });
         $('#sale-form').submit(function (event) {
             event.preventDefault();
-            let saleProductIds = $("input[name='discount']:enabled").map(function () {
-                return $(this).attr('id');
-            }).get();
-            let percentageDiscounts = $("input[name='discount']:enabled").map(function () {
-                return $(this).val()
-            }).get();
+            // lấy ra id của tất cả sản phẩm sale 
+            // let saleProductIds = $("input[name='discount']:enabled").map(function () {
+            //     return $(this).attr('id');
+            // }).get();
+            // // lấy ra phần trăm của tất cả sản phẩm sale
+            // let percentageDiscounts = $("input[name='discount']:enabled").map(function () {
+            //     return $(this).val()
+            // }).get();
+            let saleProductIds = [];
+            let percentageDiscounts = [];
+            for (let i = 0; i < app.products.length; i++) {
+                if (app.products[i].sale === true){
+                    saleProductIds.push(app.products[i].id);
+                    percentageDiscounts.push(app.products[i].percentage);
+                }
+            }
             let params = {
                 event_name: $('#event_name').val(),
                 introduction: $('#introduction').val(),
                 period: $('#period').val(),
                 saleProductIds: saleProductIds,
-                percentageDiscounts : percentageDiscounts,
+                percentageDiscounts: percentageDiscounts,
             };
             axios.post("{{route('admin.saleoff.store')}}",
                 params

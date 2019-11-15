@@ -35,6 +35,8 @@ class SaleoffController extends Controller
                 'name' => $product->name,
                 'price' => $product->price,
                 'code' => $product->code,
+                'percentage' => 0,
+                'sale' => false
             ]);
         }); //
         return view('saleoff::create', compact('products'));
