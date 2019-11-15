@@ -44,7 +44,7 @@
                         <!-- /.card-header -->
                         <div class="card-body pad">
                             <div class="mb-3">
-                                <form method="post" enctype="multipart/form-data"
+                                <form method="post" enctype="multipart/form-data" novalidate
                                       action="{{route('admin.saleoff.update',['id' => $sale->id])}}" id="sale-form">
                                     {{csrf_field()}}
                                     {{method_field('PUT')}}
@@ -129,15 +129,15 @@
                                                                                     <input type="checkbox"
                                                                                            name="productId[]"
                                                                                            :value="product.id"
-                                                                                           v-model="isSaleArr">
+                                                                                           v-model="product.sale">
                                                                                 </td>
                                                                                 <td>
                                                                                     <input name="discount"
                                                                                            class="form-control"
                                                                                            :id="product.id"
-                                                                                           :disabled="!isSaleArr.includes(product.id)"
-                                                                                           :value="discounts[product.id]"
+                                                                                           :disabled="!product.sale"
                                                                                            type="number" max="99"
+                                                                                           v-model="product.percentage"
                                                                                     >
                                                                                 </td>
                                                                             </tr>
@@ -193,8 +193,6 @@
             el: "#product_list",
             data: {
                 products: {!! json_encode($products) !!},
-                isSaleArr: {!! json_encode($saleProductIds) !!},
-                discounts : {!! json_encode($discounts) !!}
             },
             methods: {},
             mounted: function () {
@@ -204,13 +202,16 @@
             },
         });
         $('#sale-form').submit(function (event) {
+            console.log('gg');
             event.preventDefault();
-            let saleProductIds = $("input[name='discount']:enabled").map(function () {
-                return $(this).attr('id');
-            }).get();
-            let percentageDiscounts = $("input[name='discount']:enabled").map(function () {
-                return $(this).val()
-            }).get();
+            let saleProductIds = [];
+            let percentageDiscounts = [];
+            for (let i = 0; i < app.products.length; i++) {
+                if (app.products[i].sale === true){
+                    saleProductIds.push(app.products[i].id);
+                    percentageDiscounts.push(parseInt(app.products[i].percentage));
+                }
+            }
             let params = {
                 event_name: $('#event_name').val(),
                 introduction: $('#introduction').val(),

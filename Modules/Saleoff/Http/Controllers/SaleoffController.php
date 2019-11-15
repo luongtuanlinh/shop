@@ -56,7 +56,10 @@ class SaleoffController extends Controller
         $sale['end_time'] = substr($request['period'], 13, 10);
         $sale->save();
         for ($i = 0; $i < count($request['saleProductIds']); $i++) {
-            $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
+            if ($request['percentageDiscounts'][$i] > 99) $request['percentageDiscounts'][$i] = 99;
+            if ($request['percentageDiscounts'][$i] < 0) $request['percentageDiscounts'][$i] = 0;
+            if ($request['percentageDiscounts'][$i] != 0)
+                $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
         }
         return response()->json(['message' => 'ok']);
     }
@@ -80,13 +83,20 @@ class SaleoffController extends Controller
     {
         $sale = Sale::findOrFail($id);
         $products = Product::select('id', 'name', 'price', 'code')->get();
-        $discounts = [];
-        $saleProductIds = [];
-        foreach ($sale->products as $product) {
-            array_push($saleProductIds, $product->id);
-            $discounts[$product->id] = $product->pivot->discount;
+        foreach ($products as $product) {
+            $product['sale'] = false;
+            $product['percentage'] = 0;
         }
-        return view('saleoff::edit', compact('sale', 'products', 'discounts', 'saleProductIds'));
+        foreach ($sale->products as $product) {
+            for ($i = 0; $i < count($products); $i++) {
+                if ($products[$i]->id == $product->id) {
+                    $products[$i]['sale'] = true;
+                    $products[$i]['percentage'] = $product->pivot->discount;
+                    break;
+                }
+            }
+        }
+        return view('saleoff::edit', compact('sale', 'products'));
     }
 
     /**
@@ -103,9 +113,12 @@ class SaleoffController extends Controller
         $sale['start_time'] = substr($request['period'], 0, 10);
         $sale['end_time'] = substr($request['period'], 13, 10);
         $sale->save();
+        $sale->products()->detach();
         for ($i = 0; $i < count($request['saleProductIds']); $i++) {
-            $sale->products()->detach();
-            $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
+            if ($request['percentageDiscounts'][$i] > 99) $request['percentageDiscounts'][$i] = 99;
+            if ($request['percentageDiscounts'][$i] < 0) $request['percentageDiscounts'][$i] = 0;
+            if ($request['percentageDiscounts'][$i] != 0)
+                $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
         }
     }
 
@@ -158,7 +171,7 @@ class SaleoffController extends Controller
                 $query = $query->orderBy('price', $filter['price']);
             }
         }
-        if (isset($filter['time'])){
+        if (isset($filter['time'])) {
             if ($filter['time'] == 'DESC' || $filter['price'] == 'ESC') {
                 $query = $query->orderBy('updated_at', $filter['time']);
             }
@@ -167,7 +180,7 @@ class SaleoffController extends Controller
 //        return response()->json([
 //            'product' => $products,
 //        ]);
-        return view('saleoff::api.index',compact('products'));
+        return view('saleoff::api.index', compact('products'));
     }
 
 }
