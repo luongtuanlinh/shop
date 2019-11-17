@@ -117,17 +117,12 @@ class Orders extends Model
         $order_items = [];
         $index_color = 0;
         foreach ($params["product_id"] as $key => $value){
-            // OrderItems::where('order_id', $params['order_id'])
-            // ->where('product_id',  $params["product_id"][$key])
-            // ->where('color_id',  $params["color"][$key])
-            // ->where('size_id',  $params["size"][$key])
-            // ->delete();
             $product = Product::whereId($value)->first();
             $item = [];
             $item["order_id"] = $params["order_id"];
             $item["product_id"] = $value;
             $item["size_id"] = $params["size"][$key];
-            $item["color_id"] = $params["color"][$key];
+            $item["color"] = $params["color"][$key];
             $item["amount"] = $params["amount"][$key];
             $item["sell_price"] = $product->price;
             $item["list_price"] = $product->price; // gia goc
@@ -149,7 +144,7 @@ class Orders extends Model
             $item["order_id"] = $params["order_id"];
             $item["product_id"] = $product->product_id;
             $item["size_id"] = $product->size;
-            $item["color_id"] = $product->color;
+            $item["color"] = $product->color;
             $item["amount"] = $product->amount;
             $item["sell_price"] = (empty($product_item)) ? 0 : $product_item->price;
             $item["list_price"] = (empty($product_item)) ? 0 : $product_item->price; // gia goc

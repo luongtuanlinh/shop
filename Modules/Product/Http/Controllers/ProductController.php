@@ -17,6 +17,7 @@ use Auth;
 use Modules\Product\Entities\Color;
 use Validator;
 use stdClass;
+use DB;
 
 class ProductController extends Controller
 {
@@ -569,9 +570,8 @@ class ProductController extends Controller
         } else {
             $html = "<option value=''>--Kích cỡ--</option>";
             $sizes = Size::join('product_size', 'sizes.id', '=', 'product_size.size_id')->where('product_size.product_id', $request->product_id)->get();
-
             foreach ($sizes as $size) {
-                $html .= "<option value='".$size->id."'>".$size->size_name."</option>";
+                $html .= "<option value='".$size->size_id."'>".$size->size_name."</option>";
             }
             
             $result->message = $html;
@@ -589,10 +589,12 @@ class ProductController extends Controller
             return \response()->json($result);
         } else {
             $html = "<option value=''>--Màu sắc--</option>";
-            $colors = Color::join('color_product', 'colors.id', '=', 'color_product.color_id')->where('color_product.product_id', $request->product_id)->get();
+            // $colors = Color::join('color_product', 'colors.id', '=', 'color_product.color_id')->where('color_product.product_id', $request->product_id)->get();
 
+            $colors = DB::table('product_size')->where('product_id', $request->product_id)->where('size_id', $request->size_id)->first()->color;
+            $colors = explode(',', $colors);
             foreach ($colors as $color) {
-                $html .= "<option value='".$color->id."'>".$color->color."</option>";
+                $html .= "<option value='".trim($color)."'>".trim($color)."</option>";
             }
             
             $result->message = $html;

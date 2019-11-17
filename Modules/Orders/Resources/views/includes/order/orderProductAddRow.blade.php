@@ -11,12 +11,13 @@
         </td>
         <td>
             <select class="form-control select2" required name="product_id[]" id="product_id_{{ strtotime('now') . $index }}"
-                onchange="return filterProductProperties('{{ strtotime('now') . $index }}')">
+                onchange="return filterSize('{{ strtotime('now') . $index }}')">
                 <option value="">--Chọn sản phẩm--</option>
             </select>
         </td>
         <td>
-            <select class="form-control select2" required name="size[]" id="size_{{ strtotime('now') . $index }}">
+            <select class="form-control select2" required name="size[]" id="size_{{ strtotime('now') . $index }}"
+            onchange="return filterColor('{{ strtotime('now') . $index }}')">
                 <option value="">--Kích cỡ--</option>
             </select>
         </td>
@@ -26,7 +27,7 @@
             </select>
         </td>
         <td id="amount">
-            <input type="number" id="amount_{{ strtotime('now') . $index }}" value="1" min="1" name="amount[]" max="4" required onchange="return changeAmount('{{ strtotime('now') . $index }}')">
+            <input type="number" id="amount_{{ strtotime('now') . $index }}" value="1" min="1" name="amount[]" max="9" required onchange="return changeAmount('{{ strtotime('now') . $index }}')">
         </td>
         <td id="sell_price_{{ strtotime('now') . $index }}">
             <input type="hidden" id="price_hidden_{{ strtotime('now') . $index }}">
