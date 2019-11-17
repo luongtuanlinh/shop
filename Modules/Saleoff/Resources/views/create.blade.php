@@ -156,15 +156,17 @@
                                 <!-- /.modal-dialog -->
                             </div>
                         </div>
+                        <button type="submit" class="btn btn-success" id="submit-button">Lưu</button>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
+
     </section>
 @endsection
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
         var app = new Vue({
             el: "#product_list",
@@ -181,16 +183,8 @@
                 }, 0);
             },
         });
-        $('#sale-form').submit(function (event) {
+        $('#submit-button').click(function (event) {
             event.preventDefault();
-            // lấy ra id của tất cả sản phẩm sale
-            // let saleProductIds = $("input[name='discount']:enabled").map(function () {
-            //     return $(this).attr('id');
-            // }).get();
-            // // lấy ra phần trăm của tất cả sản phẩm sale
-            // let percentageDiscounts = $("input[name='discount']:enabled").map(function () {
-            //     return $(this).val()
-            // }).get();
             let saleProductIds = [];
             let percentageDiscounts = [];
             for (let i = 0; i < app.products.length; i++) {
