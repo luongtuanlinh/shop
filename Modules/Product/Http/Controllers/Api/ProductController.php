@@ -266,18 +266,17 @@ class ProductController extends ApiController
 
         $dayNow = new DateTime();
         $listSale = Sale::whereNull('deleted_at')
-                        ->where('end_time', '>=', $dayNow)->get(); 
-
+                        ->where('end_time', '>=', $dayNow)
+                        ->orderby('created_at', 'DESC')
+                        ->get(); 
         $dataSale = [];
         foreach ($listSale as $key => $value) {
             $dataSale[$key] = new stdClass();
             $sale_id = $value->id;
-            $query = Product::whereNull('deleted_at')
-                                ->with(['sales' => function ($sale) {
-                                    $dayNow = new DateTime();
-                                    $sale->where('end_time', '>=', $dayNow);
-                                }])
-                                ->whereHas('sales', function($q) use ($sale_id){
+            $query = Product::select('id', 'name', 'price', 'cover_path', 'category_id')
+                                ->whereNull('deleted_at')
+                                ->with('product_sale')
+                                ->whereHas('product_sale', function($q) use ($sale_id){
                                     $q->where('sale_id', $sale_id);
                                 });
 
