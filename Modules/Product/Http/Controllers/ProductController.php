@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\Size;
 use Modules\Product\Entities\Category;
+use Modules\Product\Entities\ProductSize;
 use Yajra\Datatables\Datatables;
 use Intervention\Image\Facades\Image as Image;
 use App\Models\KMsg;
@@ -15,6 +16,8 @@ use App\Models\KMsg;
 use Auth;
 use Modules\Product\Entities\Color;
 use Validator;
+use stdClass;
+use DB;
 
 class ProductController extends Controller
 {
@@ -67,8 +70,13 @@ class ProductController extends Controller
         $material = $request->material;
         $description = $request->description;
         $category_id = $request->category_id;
+        $seo_title = $request->seo_title;
+        $seo_description = $request->seo_description;
+        $seo_key = $request->seo_key;
+        $origin = $request->origin;
         $created_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
+        $listSize = $request->size;
 
         $validatorArray = [
             'name' => 'required',
@@ -109,24 +117,39 @@ class ProductController extends Controller
                 $list_img[$i] = null;
             }
         }
+        $product = new Product();
+        $product->name = $name;
+        $product->price = $price;
+        $product->material = $material;
+        $product->description = $description;
+        $product->admin_id = $admin_id;
+        $product->category_id = $category_id;
+        $product->cover_path = json_encode($list_img);
+        $product->created_at = $created_at;
+        $product->seo_title = $seo_title;
+        $product->seo_description = $seo_description;
+        $product->seo_key = $seo_key;
+        $product->location = $origin;
+        $product->save();
 
-        $array = [
-            'name' => $name,
-            'price' => $price,
-            'material' => $material,
-            'description' => $description,
-            'admin_id' => $admin_id,
-            'category_id' => $category_id,
-            'cover_path' => json_encode($list_img),
-            'created_at' => $created_at
-        ];
+        $product_id = $product->id;
 
-        $created = $this->product->insertProduct($array);
-
-        if ($created) {
-            return redirect()->back()->withFlashSuccess(@trans('product::notify.add_product_success'));
+        if ($product_id) {
+            foreach ($listSize as $key => $value) {
+                if ($value !== null ) {
+                    $size_id = $key + 1;
+                    $arr = [
+                        'product_id' => $product_id,
+                        'size_id' => $size_id,
+                        'color' => $value,
+                        'created_at' => $created_at
+                    ];
+                    $insertSize = ProductSize::insert($arr);
+                }
+            }
+            return redirect()->route('product.product.index')->with('messages', @trans('product::notify.add_product_success'));
         } else {
-            return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
+            return redirect()->back()->withErrors(@trans('product::notify.has_err'));
         }
     }
 
@@ -150,6 +173,14 @@ class ProductController extends Controller
         $selectedCategories = array();
         $categories = Category::whereNull('deleted_at')->get();
         $product = $this->product->getProductById($id);
+
+        $listSize = [];
+        if (count($product->product_size) ) {
+            foreach ($product->product_size as $key => $value) {
+                $listSize[$value->size_id] = $value->color;
+            }
+        }
+       
         if ($product->cover_path != null) {
             $product->cover_path = json_decode($product->cover_path);
         }
@@ -157,7 +188,7 @@ class ProductController extends Controller
         foreach ($categories as $category) {
             $selectedCategories[$category->id] = $category->cate_name;
         }
-        return view('product::products/edit', compact('selectedCategories', 'product'));
+        return view('product::products/edit', compact('selectedCategories', 'product', 'listSize'));
     }
 
     /**
@@ -173,8 +204,14 @@ class ProductController extends Controller
         $material = $request->material;
         $description = $request->description;
         $category_id = $request->category_id;
+        $seo_title = $request->seo_title;
+        $seo_description = $request->seo_description;
+        $seo_key = $request->seo_key;
+        $location = $request->location;
+        $has_quantity = $request->has_quantity;
         $updated_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
+        $listSize = $request->size;
 
         $validatorArray = [
             'name' => 'required',
@@ -222,15 +259,40 @@ class ProductController extends Controller
             'admin_id' => $admin_id,
             'category_id' => $category_id,
             'cover_path' => json_encode($list_img),
-            'updated_at' => $updated_at
+            'updated_at' => $updated_at,
+            'seo_title' => $seo_title,
+            'seo_description' => $seo_description,
+            'seo_key' => $seo_key,
+            'location' => $location,
+            'has_quantity' => $has_quantity
         ];
 
         $updated = $this->product->updateProduct($id, $array);
+        foreach ($listSize as $key => $value) {
+            $size_id = $key + 1;
+            $arr = [
+                'color' => $value,
+                'updated_at' => $updated_at
+            ];
+            if (ProductSize::where('product_id', '=', $id)->where('size_id', $size_id)->exists()) {
+                $updateSize = ProductSize::where('product_id', $id)->where('size_id', $size_id)->update($arr);
+            } else {
+                if($value != null) {
+                    $arr_new = [
+                        'product_id' => $id,
+                        'size_id' => $size_id,
+                        'color' => $value,
+                        'created_at' => $updated_at
+                    ];
+                    $insertSize = ProductSize::insert($arr_new);
+                }
+            }
+        }
 
         if ($updated) {
-            return redirect()->back()->withFlashSuccess(@trans('product::notify.edit_product_success'));
+            return redirect()->route('product.product.index')->with('messages', @trans('product::notify.edit_product_success'));
         } else {
-            return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
+            return redirect()->back()->withErrors(@trans('product::notify.has_err'));
         }
     }
 
@@ -255,59 +317,39 @@ class ProductController extends Controller
         $delete_product =  $this->product->updateProduct($id, $data);
 
         if ($delete_product) {
-            return redirect()->back()->withFlashSuccess(@trans('product::notify.delete_product_success'));
+            return redirect()->back()->with('messages', @trans('product::notify.delete_product_success'));
         } else {
-            return redirect()->back()->withFlashDanger(@trans('product::notify.has_err'));
+            return redirect()->back()->withErrors(@trans('product::notify.has_err'));
         }
     }
 
-    // public function deleteProduct(Request $request) {
-    //     $id = $request->id;
-        
-    //     if ( !$id || $id == null ) {
-    //         return redirect()->back()->withFlashWarning( @trans('product::notify.has_err') );
-    //     }
+    public function chooseData(Request $request) {
+        $cate_id = $request->cate_id;
+        if ($cate_id == 'undefined') {
+            return back();
+        }
 
-    //     $time = date('Y-m-d H:i:s');
-
-    //     $data = [
-    //         'status'   => -1,
-    //         'deleted_at'  => $time
-    //     ];
-
-    //     $delete_product =  $this->product->updateProduct($id, $data);
-
-    //     if ($delete_product) {
-    //         return redirect()->back()->withFlashSuccess( @trans('product::notify.delete_product_success') );
-    //     } else {
-    //         return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
-    //     }
-    // }
+        return view('product::products/first_choose', compact('cate_id'));
+    }
 
     public function getChooseProduct(Request $request) {
-        $categories = Category::whereNull('deleted_at')->get();
-        $listCateParent = Category::where('parent_id', 0)
-            ->whereNull('deleted_at')
-            ->get();
-        $listDataFirst = Product::with('category')
-            ->with('sales')
-            ->whereNull('deleted_at')
-            ->where('status', 2)
-            ->get();
+        $listCateParent = $this->category->getCateParent();
+        $listDataFirst = $this->product->getProductFirst();
         $listData = array();
-        $listCate = array();
         if (count($listCateParent) > 0) {
             foreach ($listCateParent as $key => $value) {
-                $listData[$value->id] = Product::with('category')
-                    ->with('sales')
-                    ->whereNull('deleted_at')
-                    ->where('status', 1)
-                    ->whereHas('category', function ($q) use ($value) {
-                        $q->where('id', $value->id)
-                            ->orWhere('parent_id', $value->id);
-                    })
-                    ->get();
-                $listCate[$value->id] = Category::where('parent_id', $value->id)->whereNull('deleted_at')->get();
+                $listData[$key] = new stdClass();
+                $listProduct = $this->product->getProductHome($value->id);
+                foreach ($listProduct as $key2 => $item) {
+                    if ($item->cover_path != null) {
+                        $listPath = json_decode($item->cover_path);
+                        if ($listPath[0] != null) {
+                            $listProduct[$key2]->cover_path1 = url($listPath[0]);
+                        }
+                    }
+                }
+                $listData[$key]->product = $listProduct;
+                $listData[$key]->category = $value;
             }
             foreach ($listDataFirst as $key => $item) {
                 if ($item->cover_path != null) {
@@ -317,18 +359,8 @@ class ProductController extends Controller
                     }
                 }
             }
-            foreach ($listData as $key => $value) {
-                foreach ($value as $key2 => $item) {
-                    if ($item->cover_path != null) {
-                        $listPath = json_decode($item->cover_path);
-                        if ($listPath[0] != null) {
-                            $listData[$key][$key2]->cover_path = url($listPath[0]);
-                        }
-                    }
-                }
-            }
         }
-        return view('product::products/first', compact('categories', 'listData', 'listCate', 'listDataFirst'));
+        return view('product::products/first', compact('listData', 'listDataFirst'));
     }
 
     public function get(Request $request)
@@ -360,16 +392,13 @@ class ProductController extends Controller
                         return null;
                     }
                 })
-                ->addColumn('source', function ($product) {
-
-                    return 'Trung quốc';
-                })
                 ->addColumn('cover_path', function ($product) {
                     if ($product->cover_path != null) {
                         $data = json_decode($product->cover_path);
+                        $data = (array)$data;
                         $html = '';
-                        foreach ($data as $key => $path) {
-                            $html .= '<img class="image-product" src="'.( ($path != null) ? url($path) : "") .'">';
+                        if ($data != null) {
+                            $html .= '<img class="image-product" src="'.( ($data[0] != null) ? url($data[0]) : "") .'">';
                         }
                         return $html;
                     }else{
@@ -380,8 +409,7 @@ class ProductController extends Controller
             ->make(true);
     }
 
-    public function getDataChoose(Request $request)
-    {
+    public function getDataChoose(Request $request) {
         $query = Product::with('category')->whereNull('deleted_at');
 
         return Datatables::of($query)
@@ -391,9 +419,12 @@ class ProductController extends Controller
                         if ($key == 'category_id') {
                             if ($value != 0) {
                                 $query->where('category_id', $value)
+                                    ->where('status', '<>', 2)
                                     ->orWhereHas('category', function ($q) use ($value) {
                                         $q->where('parent_id', $value);
                                     });
+                            } else {
+                                $query->where('status', '<>', 1);
                             }
                         }
                     }
@@ -401,8 +432,12 @@ class ProductController extends Controller
             })
             ->escapeColumns([])
             ->addColumn('actions', function ($product) {
-                $html = Product::genColumnChoose($product);
-                return $html;
+                $data = new stdClass();
+                $data->status = $product->status;
+                $data->id = $product->id;
+                $data->cate_id = $product->category_id;
+                $data = json_encode($data);
+                return $data;
             })
             ->addColumn('cate_name', function ($product) {
 
@@ -411,9 +446,10 @@ class ProductController extends Controller
             ->addColumn('cover_path', function ($product) {
                 if ($product->cover_path != null) {
                     $data = json_decode($product->cover_path);
+                    $data = (array)$data;
                     $html = '';
-                    foreach ($data as $key => $path) {
-                        $html .= '<img class="image-product" src="' . (($path != null) ? url($path) : "") . '">';
+                    if ($data != null) {
+                        $html .= '<img class="image-product" src="'.( ($data[0] != null) ? url($data[0]) : "") .'">';
                     }
                     return $html;
                 } else {
@@ -423,32 +459,91 @@ class ProductController extends Controller
             ->make(true);
     }
 
-    public function updateChoosen(Request $request)
-    {
-        $dataChoose = $request->dataChoose;
-        $category_id = $request->cate_id;
-        if ($category_id == 0) {
-            $count = Product::with('category')
-                ->with('sales')
-                ->whereNull('deleted_at')
-                ->where('status', 2)
-                ->count();
-            if ($count > 4 || (count($dataChoose) + $count >= 4)) {
-                return redirect()->back()->withFlashDanger('Bạn chỉ được chọn tối đa 4 sản phẩm');
-            } else { }
-        } else {
-            $count = Product::with('category')
-                ->with('sales')
-                ->whereNull('deleted_at')
-                ->where('status', 1)
-                ->whereHas('category', function ($q) use ($value) {
-                    $q->where('id', $value->id)
-                        ->orWhere('parent_id', $value->id);
-                })
-                ->count();
-            if ($count > 4 || (count($dataChoose) + $count >= 4)) {
-                return redirect()->back()->withFlashDanger('Bạn chỉ được chọn tối đa 4 sản phẩm');
-            } else { }
+    public function updateChoosen(Request $request) {
+        if ($request->ajax()) {
+            $product_id = $request->product_id;
+            $category_id = $request->cate_id;
+            $status = $request->status;
+            if(!$product_id) {
+                return \response()->json([
+                    'status' => 403,
+                    'mess' => 'Dữ liệu đầu vào không đúng, hãy thử lại sau!',
+                ]);
+            }
+            if ($category_id == 0) {
+                if ($status == 1) {
+                    $count =  Product::where('status', 2)
+                                    ->whereNull('deleted_at')
+                                    ->count();
+                    if ($count >= 4) {
+                        return \response()->json([
+                            'status' => 403,
+                            'mess' => 'Bạn chỉ được chọn tối đa 4 sản phẩm',
+                        ]);
+                    }
+
+                    $update_new_data = Product::where('id', $product_id)
+                                                ->update(['status' => '2']);
+                } else {
+                    $update_new_data = Product::where('id', $product_id)
+                                                ->update(['status' => '0']);
+                }
+
+                if ($update_new_data) {
+                    return \response()->json([
+                        'status' => 200,
+                        'mess' => 'Update success',
+                    ]);
+                } else {
+                    return \response()->json([
+                        'status' => 401,
+                        'mess' => 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+                    ]);
+                }
+                
+            } else {
+                
+                if ($status == 1) {
+                    $count_data = Product::where('status', 1)
+                                    ->whereNull('deleted_at')
+                                    ->whereHas('category', function($q) use ($category_id){
+                                        $q->where('id', $category_id)
+                                        ->orWhere('parent_id', $category_id);
+                                    })
+                                    ->count();
+                    if ($count_data >= 4) {
+                        return \response()->json([
+                            'status' => 403,
+                            'mess' => 'Bạn chỉ được chọn tối đa 4 sản phẩm',
+                        ]); 
+                    }
+                    $update_new_data = Product::where('id', $product_id)
+                                            ->whereHas('category', function($q) use ($category_id){
+                                                $q->where('id', $category_id)
+                                                ->orWhere('parent_id', $category_id);
+                                            })
+                                            ->update(['status' => '1']);
+                } else {
+                    $update_new_data = Product::where('id', $product_id)
+                                            ->whereHas('category', function($q) use ($category_id){
+                                                $q->where('id', $category_id)
+                                                ->orWhere('parent_id', $category_id);
+                                            })
+                                            ->update(['status' => '0']);
+                }
+
+                if ($update_new_data) {
+                    return \response()->json([
+                        'status' => 200,
+                        'mess' => 'Update success',
+                    ]);
+                } else {
+                    return \response()->json([
+                        'status' => 401,
+                        'mess' => 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+                    ]);
+                }              
+            }
         }
     }
 
@@ -475,9 +570,8 @@ class ProductController extends Controller
         } else {
             $html = "<option value=''>--Kích cỡ--</option>";
             $sizes = Size::join('product_size', 'sizes.id', '=', 'product_size.size_id')->where('product_size.product_id', $request->product_id)->get();
-
             foreach ($sizes as $size) {
-                $html .= "<option value='".$size->id."'>".$size->size_name."</option>";
+                $html .= "<option value='".$size->size_id."'>".$size->size_name."</option>";
             }
             
             $result->message = $html;
@@ -495,10 +589,12 @@ class ProductController extends Controller
             return \response()->json($result);
         } else {
             $html = "<option value=''>--Màu sắc--</option>";
-            $colors = Color::join('color_product', 'colors.id', '=', 'color_product.color_id')->where('color_product.product_id', $request->product_id)->get();
+            // $colors = Color::join('color_product', 'colors.id', '=', 'color_product.color_id')->where('color_product.product_id', $request->product_id)->get();
 
+            $colors = DB::table('product_size')->where('product_id', $request->product_id)->where('size_id', $request->size_id)->first()->color;
+            $colors = explode(',', $colors);
             foreach ($colors as $color) {
-                $html .= "<option value='".$color->id."'>".$color->color."</option>";
+                $html .= "<option value='".trim($color)."'>".trim($color)."</option>";
             }
             
             $result->message = $html;

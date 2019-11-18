@@ -63,6 +63,8 @@ class SaleoffController extends Controller
                 'name' => $product->name,
                 'price' => $product->price,
                 'code' => $product->code,
+                'percentage' => 0,
+                'sale' => false
             ]);
         }); //
         return view('saleoff::create', compact('products'));
@@ -75,28 +77,20 @@ class SaleoffController extends Controller
      */
     public function store(Request $request)
     {
-        $params = $request->all();
-        // dd($params);
-        $validatorArray = [
-            'event_name' => 'required',
-            'period' => 'required',
-            'introduction' => 'required'
-        ];
-
-        $validator = Validator::make($params, $validatorArray);
-        if ($validator->fails()) {
-            return redirect()->back()->withInput()->withErrors($validator->messages());
-        }
+        
         DB::beginTransaction();
         try {
-            $sale = [];
-            $sale['event_name'] = $params['event_name'];
-            $sale['introduction'] = $params['introduction'];
-            $sale['start_time'] = date("Y-m-d H:i:s", strtotime(substr($params['period'], 0, 10)));
-            $sale['end_time'] = date("Y-m-d H:i:s", strtotime(substr($params['period'], 13, 10)));
-            $id = Sale::insertGetId($sale);
-            if(count($params['productId'])){
-                ProductSale::insertList($params['productId'], $params['discount'], $id, false);
+            $sale = new Sale();
+            $sale['event_name'] = $request['event_name'];
+            $sale['introduction'] = $request['introduction'];
+            $sale['start_time'] = substr($request['period'], 0, 10);
+            $sale['end_time'] = substr($request['period'], 13, 10);
+            $sale->save();
+            for ($i = 0; $i < count($request['saleProductIds']); $i++) {
+                if ($request['percentageDiscounts'][$i] > 99) $request['percentageDiscounts'][$i] = 99;
+                if ($request['percentageDiscounts'][$i] < 0) $request['percentageDiscounts'][$i] = 0;
+                if ($request['percentageDiscounts'][$i] != 0)
+                    $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
             }
             DB::commit();
             return redirect(route('admin.saleoff.index'))->with('messages','Tạo sale off thành công');
@@ -133,13 +127,20 @@ class SaleoffController extends Controller
         $sale->start_time = date("d-m-Y", strtotime($sale->start_time));
         $sale->end_time = date("d-m-Y", strtotime($sale->end_time));
         $products = Product::select('id', 'name', 'price', 'code')->get();
-        $discounts = [];
-        $saleProductIds = [];
-        foreach ($sale->products as $product) {
-            array_push($saleProductIds, $product->id);
-            $discounts[$product->id] = $product->pivot->discount;
+        foreach ($products as $product) {
+            $product['sale'] = false;
+            $product['percentage'] = 0;
         }
-        return view('saleoff::edit', compact('sale', 'products', 'discounts', 'saleProductIds', 'id'));
+        foreach ($sale->products as $product) {
+            for ($i = 0; $i < count($products); $i++) {
+                if ($products[$i]->id == $product->id) {
+                    $products[$i]['sale'] = true;
+                    $products[$i]['percentage'] = $product->pivot->discount;
+                    break;
+                }
+            }
+        }
+        return view('saleoff::edit', compact('sale', 'products'));
     }
 
     /**
@@ -149,7 +150,7 @@ class SaleoffController extends Controller
      * @return Response
      */
     public function update(Request $request, $id)
-    {
+    {   
         $params = $request->all();
         // dd($params);
         $validatorArray = [
@@ -164,18 +165,20 @@ class SaleoffController extends Controller
         }
         DB::beginTransaction();
         try {
-            $sale = Sale::where('id', $id)->first();
-            if(empty($sale)){
-                return redirect()->back()->withInput()->withErrors(["Không tồn tại bản ghi"]);
-            }
-            $sale->event_name = $params['event_name'];
-            $sale->introduction = $params['introduction'];
-            $sale->start_time = date("Y-m-d H:i:s", strtotime(substr($params['period'], 0, 10)));
-            $sale->end_time = date("Y-m-d H:i:s", strtotime(substr($params['period'], 13, 10)));
+            $sale = Sale::findOrFail($id);
+            $sale['event_name'] = $request['event_name'];
+            $sale['introduction'] = $request['introduction'];
+            $sale['start_time'] = substr($request['period'], 0, 10);
+            $sale['end_time'] = substr($request['period'], 13, 10);
             $sale->save();
-            if(count($params['productId']) > 0){
-                ProductSale::insertList($params['productId'], $params['discount'], $id, true);
-            }
+            $sale->products()->detach();
+            for ($i = 0; $i < count($request['saleProductIds']); $i++) {
+                if ($request['percentageDiscounts'][$i] > 99) $request['percentageDiscounts'][$i] = 99;
+                if ($request['percentageDiscounts'][$i] < 0) $request['percentageDiscounts'][$i] = 0;
+                if ($request['percentageDiscounts'][$i] != 0)
+                    $sale->products()->attach($request['saleProductIds'][$i], ['discount' => $request['percentageDiscounts'][$i]]);
+              } 
+            return redirect()->back()->withInput()->withErrors(["Không tồn tại bản ghi"]);
             DB::commit();
             return redirect(route('admin.saleoff.index'))->with('messages','Sửa sale off thành công');
         } catch (\Exception $e) {
@@ -234,7 +237,7 @@ class SaleoffController extends Controller
                 $query = $query->orderBy('price', $filter['price']);
             }
         }
-        if (isset($filter['time'])){
+        if (isset($filter['time'])) {
             if ($filter['time'] == 'DESC' || $filter['price'] == 'ESC') {
                 $query = $query->orderBy('updated_at', $filter['time']);
             }
@@ -243,7 +246,7 @@ class SaleoffController extends Controller
 //        return response()->json([
 //            'product' => $products,
 //        ]);
-        return view('saleoff::api.index',compact('products'));
+        return view('saleoff::api.index', compact('products'));
     }
 
 }

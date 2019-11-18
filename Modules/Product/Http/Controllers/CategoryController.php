@@ -67,7 +67,7 @@ class CategoryController extends Controller
         if ($create_category) {
             return redirect()->back()->withFlashSuccess( @trans('product::notify.add_cate_success') );
         } else {
-            return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
+            return redirect()->back()->withErrors( @trans('product::notify.has_err') );
         }
     }
 
@@ -129,7 +129,7 @@ class CategoryController extends Controller
         if ($update_category) {
             return redirect()->back()->withFlashSuccess( @trans('product::notify.edit_cate_success') );
         } else {
-            return redirect()->back()->withFlashDanger( @trans('product::notify.has_err') );
+            return redirect()->back()->withErrors( @trans('product::notify.has_err') );
         }
     }
 
@@ -169,7 +169,7 @@ class CategoryController extends Controller
         if (empty($delete)) {
             return redirect()->back()->withFlashSuccess( @trans('product::notify.delete_cate_success') );
         } else {
-            return redirect()->back()->withFlashDanger (@trans('product::notify.has_err') );
+            return redirect()->back()->withErrors(@trans('product::notify.has_err') );
         }
     }
 }

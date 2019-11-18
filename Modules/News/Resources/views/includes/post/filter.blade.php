@@ -32,8 +32,8 @@
             <label>{{trans('news::filter.post_status')}}</label>
             <select class="form-control select2" id="post_status" name="post_status" data-placeholder="{{trans('news::filter.post_status')}}" onchange="return filter()">
                 <option value="-1">{{trans('news::filter.post_status_all')}}</option>
-                <option value="0" {{(Request::get('post_status') === 0 ? 'selected':'')}}>Draft</option>
-                <option value="1" {{(Request::get('post_status') == 1 ? 'selected':'')}}>Release</option>
+                <option value="0" {{(Request::get('post_status') === 0 ? 'selected':'')}}>Nháp</option>
+                <option value="1" {{(Request::get('post_status') == 1 ? 'selected':'')}}>Xuất bản</option>
             </select>
         </div>
     </div>

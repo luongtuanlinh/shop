@@ -32,7 +32,7 @@
                                 <th>Tên sản phẩm</th>
                                 <th>Giá</th>
                                 <th>Loại sản phẩm</th>
-                                <th>Số lượng</th>
+                                {{-- <th>Số lượng</th> --}}
                                 <th>Ảnh</th>
                                 <th>Chất liệu</th>
                                 <th>Mô tả</th>
@@ -78,11 +78,11 @@
                     {data: 'name', orderable: false},
                     {data: 'price', sortable: true},
                     {data: 'cate_name', orderable: false},
-                    {data: 'count', sortable: true},
+                    // {data: 'count', sortable: true},
                     {data: 'cover_path', orderable: false},
                     {data: 'material', orderable: false},
                     {data: 'description', orderable: false},
-                    {data: 'source', orderable: false},
+                    {data: 'location', orderable: false},
                     {data: 'actions', orderable: false}
                 ],
                 "order": [[ 0, "desc" ]],

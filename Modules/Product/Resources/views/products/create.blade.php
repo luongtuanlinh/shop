@@ -3,6 +3,9 @@
 @section ('before-styles-end')
     <link rel="stylesheet" href="{{ asset('css/product.css') }}"> 
 @stop
+@section ('scripts')
+    <script src="{{ asset('js/bootstrap-tagsinput.js') }}"></script>
+@stop
 @section('content')
 <section class="content-header">
     <h1>{{trans('product::product.title_add')}}</h1>
@@ -38,6 +41,62 @@
                     <div class="form-group">
                         <label>{{ trans('product::product.category') }}</label>
                         {!! Form::select('category_id', $selectedCategories, old('category_id'), ['class'=>'form-control select2']) !!}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ trans('product::product.origin') }}</label>
+                        <input name="origin" type="text" class="form-control" value="{{ old('location') }}" placeholder="{{ trans('product::product.enter_origin') }}" required>
+                    </div>
+                    <hr>
+                    <h3>Thêm phân loại sản phẩm</h3>
+                    <div class="form-group row no-margin-lr">
+                        <label class="col-sm-2 col-form-label no-padding">S :</label>
+                        <div class="col-sm-10 no-padding">
+                            <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row no-margin-lr">
+                        <label class="col-sm-2 col-form-label no-padding">M :</label>
+                        <div class="col-sm-10 no-padding">
+                            <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row no-margin-lr">
+                        <label class="col-sm-2 col-form-label no-padding">L :</label>
+                        <div class="col-sm-10 no-padding">
+                            <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row no-margin-lr">
+                        <label class="col-sm-2 col-form-label no-padding">XL :</label>
+                        <div class="col-sm-10 no-padding">
+                            <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row no-margin-lr">
+                        <label class="col-sm-2 col-form-label no-padding">XXL :</label>
+                        <div class="col-sm-10 no-padding">
+                            <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row no-margin-lr">
+                        <label class="col-sm-2 col-form-label no-padding">XXXL :</label>
+                        <div class="col-sm-10 no-padding">
+                            <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
+                        </div>
+                    </div>
+                    <hr>
+                    <h3>Thông tin seo sản phẩm</h3>
+                    <div class="form-group">
+                        <span>S:</span>
+                        <input name="seo_title" type="text" class="form-control" value="{{ old('seo_title') }}">
+                    </div>
+                    <div class="form-group">
+                        <label>{{ trans('product::product.seo_des') }}</label>
+                        <textarea name="seo_description" type="text" class="form-control" value="{{ old('seo_description') }}"> </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>{{ trans('product::product.seo_key') }}</label>
+                        <textarea name="seo_key" type="text" class="form-control" value="{{ old('seo_key') }}"></textarea>
                     </div>
                 </div>
                 <div class="col-md-6">

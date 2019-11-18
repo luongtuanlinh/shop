@@ -138,7 +138,6 @@ class OrdersController extends Controller
         $total = 0;
         foreach ($order_items as $item) {
             $item->cate_name = Category::whereId($item->category_id)->first()->cate_name;
-            $item->color = Color::where('id', $item->color_id)->first()->color;
             $item->size = Size::where('id', $item->size_id)->first()->size_name;
             $total += $item->amount * $item->price;
         }
@@ -208,7 +207,6 @@ class OrdersController extends Controller
      */
     public function update(Request $request){
         $params = $request->all();
-        // dd($params);
         $validatorArray = [
             'type' => '',
             'product_id' => '',
@@ -266,6 +264,11 @@ class OrdersController extends Controller
                     $order->save();
                 }
             }
+
+            if (!empty($params['payment_status'])) {
+                $order->payment_status = $params['payment_status'];
+                $order->save();
+            }
             DB::commit();
             return redirect()->back()->with('messages','Cập nhật đơn hàng thành công');
         } catch (\Exception $e) {
@@ -296,11 +299,12 @@ class OrdersController extends Controller
         $validatorArray = [
             'name' => 'required',
             'mobile' => 'required', 
-            'more_info' => '',
+            'payment' => '',
+            'shipping_fee' => 'min:0',
             'address'  => 'required',
-            'province_id'   => 'required',
-            'commune_id'    => 'required',
-            'district_id'   => 'required',
+            'province_id'   => '',
+            'commune_id'    => '',
+            'district_id'   => '',
             'total' => 'required|min:0'
         ];
 
@@ -317,9 +321,9 @@ class OrdersController extends Controller
                 $customer['customer_name'] = trim($params['name']);
                 $customer['customer_phone'] = trim($params['mobile']);
                 $customer['customer_address'] = trim($params['address']);
-                $customer['province_id'] = trim($params['province_id']);
-                $customer['district_id'] = trim($params['district_id']);
-                $customer['commune_id'] = trim($params['commune_id']);
+                // $customer['province_id'] = trim($params['province_id']);
+                // $customer['district_id'] = trim($params['district_id']);
+                // $customer['commune_id'] = trim($params['commune_id']);
                 $customer['created_at'] = Carbon::now();
                 $customer_id = Customer::insertGetId($customer);
             }else{
@@ -330,7 +334,9 @@ class OrdersController extends Controller
             $order["deliver_address"] = $customer['customer_address'];
             $order["order_status"] = Orders::PENDING_STATUS;
             $order["total_price"] = $params['total'];
+            $order["ship_price"] = $params['shipping_fee'];
             $order["customer_id"] = $customer_id;
+            $order["payment"] = $params['payment'];
             $order["created_at"] = Carbon::now();
             $params['order_id'] = Orders::insertGetId($order);
             //update order item

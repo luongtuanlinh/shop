@@ -19,8 +19,8 @@ Route::group(['namespace' => 'Api'], function () {
 
     Route::group(['prefix' => 'v1', 'namespace' => 'V1'], function () {
         //Posts
-        Route::group(['middleware' => 'client.credentials'], function (){
-            Route::post('listOrders', 'OrderController@listOrders');
+        Route::group([], function (){
+            Route::post('list/order', 'OrderController@listOrders');
             Route::get('/order/view/{id}', 'OrderController@view');
             Route::post('/order/edit', 'OrderController@editOrder');
             Route::post('createOrder', 'OrderController@createOrder');

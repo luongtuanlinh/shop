@@ -72,8 +72,15 @@
                                 value="{{ old('mobile') }}" required>
                         </div>
                         <div class="form-group remove-date">
-                            <label>Lưu ý</label>
-                            <textarea style="width: 100%;" name="more_info"></textarea>
+                            <label>Phí vận chuyển</label>
+                            <input type="number" id="shipping" class="form-control" value="0" name="shipping_fee" min="0"/>
+                        </div>
+                        <div class="form-group remove-date">
+                            <label>Hình thức thanh toán</label>
+                            <select class="form-control" name="payment">
+                                <option value="COD">COD</option>
+                                <option value="Thanh toán Online">Thanh toán Online</option>
+                            </select>
                         </div>
 
                     </div>
@@ -154,12 +161,13 @@
                                 </td>
                                 <td>
                                     <select class="form-control select2" required name="product_id[]" id="product_id_1"
-                                        onchange="return filterProductProperties('1')">
+                                        onchange="return filterSize('1')">
                                         <option value="">--Chọn sản phẩm--</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="form-control select2" required name="size[]" id="size_1">
+                                    <select class="form-control select2" required name="size[]" id="size_1"
+                                    onchange="return filterColor('1')">
                                         <option value="">--Kích cỡ--</option>
                                     </select>
                                 </td>
@@ -169,7 +177,7 @@
                                     </select>
                                 </td>
                                 <td id="amount">
-                                    <input type="number" id="amount_1" value="1" min="1" name="amount[]" max="4"
+                                    <input type="number" id="amount_1" value="1" min="1" name="amount[]" max="9"
                                         required onchange="return changeAmount('1')">
                                 </td>
                                 <td id="sell_price_1">
@@ -257,10 +265,28 @@
             }
             return x1 + x2;
         }
+        function filterProduct(category, index) {
+            $.ajax({
+                data: {
+                    category_id: category,
+                },
+                url: "{{ route('order.product.filter') }}",
+                type: "GET",
+                success: function (data) {
+                    if(data.result == 0){
+                        alert(data.message);
+                    }else{
+                        $("#product_id_" + index).select2({
+                            data: data.message,
+                        });
+                    }
+                }
 
-        function filterProductProperties(index) {
+            })
+        }
+
+        function filterSize(index) {
             var product = $("#product_id_" + index).select2('data');
-            // console.log($("sell_price_" + index + " span").text());
             $("#sell_price_" + index + " span").html("");
             $("#sell_price_" + index + " span").append(addCommas(product[0].price));
             $("#price_hidden_" + index).val(product[0].price);
@@ -281,9 +307,15 @@
                     }
                 }
             });
+        }
+        function filterColor(index) {
+            var product = $("#product_id_" + index).select2('data');
+            var size = $("#size_" + index).select2('data');
+            console.log(size);
             $.ajax({
                 data: {
                     product_id: product[0].id,
+                    size_id: size[0].id,
                 },
                 url: "{{ route('order.product.filterColor') }}",
                 type: "GET",
@@ -296,8 +328,8 @@
                     }
                 }
             })
-        }
 
+        }
 
         function changeAmount(id){
             tt(id);
@@ -324,6 +356,8 @@
                 }
                 total += parseInt(value);
             });
+            let shipping_fee = $("#shipping").val();
+            total += parseInt(shipping_fee);
             $("#sum_price #total").val(total);
             $("#sum_price span").html("");
             $("#sum_price span").html(addCommas(total));
@@ -527,7 +561,17 @@
         var commune_text = "";
         function filterArea(id, type, parent_type, old_value) {
             var text = $("#" + parent_type).find(":selected").text();
-            console.log(text);
+            if (parent_type == "province") {
+                if (text.search('Hà Nội') > -1) {
+                    $("#shipping").html("");
+                    $("#shipping").val("20000");
+                    total();
+                } else {
+                    $("#shipping").html("");
+                    $("#shipping").val("30000");
+                    total();
+                }
+            }
             text = text.trim();
             if(type != "district"){
                 district_text = text;
@@ -555,24 +599,5 @@
             })
         }
 
-        function filterProduct(category, index) {
-            $.ajax({
-                data: {
-                    category_id: category,
-                },
-                url: "{{ route('order.product.filter') }}",
-                type: "GET",
-                success: function (data) {
-                    if(data.result == 0){
-                        alert(data.message);
-                    }else{
-                        $("#product_id_" + index).select2({
-                            data: data.message,
-                        });
-                    }
-                }
-
-            })
-        }
 </script>
 @endsection

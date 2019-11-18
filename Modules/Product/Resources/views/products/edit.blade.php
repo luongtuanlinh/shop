@@ -1,5 +1,8 @@
 @extends('layouts.admin_default')
 @section('title', trans('product::product.title'))
+@section ('before-styles-end')
+    <link rel="stylesheet" href="{{ asset('css/product.css') }}"> 
+@stop
 @section('content')
 <section class="content-header">
     <h1>{{trans('product::product.title_edit')}}</h1>
@@ -35,6 +38,69 @@
                         <div class="form-group">
                             <label>{{ trans('product::product.category') }}</label>
                             {!! Form::select('category_id', $selectedCategories, $product->category_id, ['class'=>'form-control select2']) !!}
+                        </div>
+                        <div class="form-group">
+                            <label>{{ trans('product::product.origin') }}</label>
+                            <input name="location" type="text" class="form-control" value="{{ $product->location }}" placeholder="{{ trans('product::product.enter_origin') }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Trang thái</label>
+                            <select class="form-control" name="has_quantity">
+                                <option value="0" {{ ($product->has_quantity == 0) ? "selected" : "" }}>Hết hàng</option>
+                                <option value="1" {{ ($product->has_quantity == 1) ? "selected" : "" }}>Còn hàng</option>
+                            </select>
+                        </div>
+                        <hr>
+                        <h3>Phân loại sản phẩm</h3>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">S :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[1]) > 0 ? $listSize[1] : '' }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">M :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[2]) > 0 ? $listSize[2] : '' }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">L :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[3]) > 0 ? $listSize[3] : '' }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">XL :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[4]) > 0 ? $listSize[4] : '' }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">XXL :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[5]) > 0 ? $listSize[5] : '' }}">
+                            </div>
+                        </div>
+                        <div class="form-group row no-margin-lr">
+                            <label class="col-sm-2 col-form-label no-padding">XXXL :</label>
+                            <div class="col-sm-10 no-padding">
+                                <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[6]) > 0 ? $listSize[6] : '' }}">
+                            </div>
+                        </div>
+                        <hr>
+                        <h3>Thông tin seo sản phẩm</h3>
+                        <div class="form-group">
+                            <label>{{ trans('product::product.seo_title') }}</label>
+                            <input name="seo_title" type="text" class="form-control" value="{{ $product->seo_title }}{{ old('seo_title') }}">
+                        </div>
+                        <div class="form-group">
+                            <label>{{ trans('product::product.seo_des') }}</label>
+                            <textarea name="seo_description" type="text" class="form-control"> {{ $product->seo_description }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>{{ trans('product::product.seo_key') }}</label>
+                            <textarea name="seo_key" type="text" class="form-control">{{ $product->seo_key }}</textarea>
                         </div>
                     </div>
                     <div class="col-md-6">

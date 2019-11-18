@@ -32,9 +32,9 @@
     cursor: pointer;
     width: 100%;
     position: fixed;
+    right: 15px;
     top: 60px;
     z-index: 1;
-    height: 0;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
@@ -49,19 +49,19 @@
 .flash-container .message {
     display: inline-block;
     padding: 10px 20px;
-    border-radius: 0 0 4px 4px;
+    border-radius: 4px;
+    color: #ffffff;
+    opacity: 0.95;
+    right: 0;
+    position: absolute;
 }
 
 .flash-container .success {
     background-color: #58b858;
-    opacity: 0.8;
-    color: #ffffff;
 }
 
 .flash-container .fail {
     background-color: #ff0000;
-    opacity: 0.8;
-    color: #ffffff;
 }
 .my_sortable>li{
     list-style:none
@@ -182,4 +182,11 @@
 }
 .btn-danger {
     margin-left: 5px;
+}
+.col-form-label {
+    margin-top: 5px;
+}
+.no-margin-lr {
+    margin-left: 0;
+    margin-right: 0;
 }

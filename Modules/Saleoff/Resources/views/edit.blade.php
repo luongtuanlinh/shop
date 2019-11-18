@@ -68,6 +68,35 @@
                                 </label>
                             </div>
                         </div>
+                        <!-- /.card-header -->
+                        <div class="card-body pad">
+                            <div class="mb-3">
+                                <form method="post" enctype="multipart/form-data" novalidate
+                                      action="{{route('admin.saleoff.update',['id' => $sale->id])}}" id="sale-form">
+                                    {{csrf_field()}}
+                                    {{method_field('PUT')}}
+                                    <div class="form-group">
+                                        <label for="event_name">Tên sự kiện</label>
+                                        <input type="text" name="event_name" id="event_name" class="form-control"
+                                               placeholder="Nhập tên sự kiện" value="{{$sale->event_name}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="introduction">Lời giới thiệu ngắn</label>
+                                        <input type="text" name="introduction" id="introduction" class="form-control"
+                                               placeholder="Lời giới thiệu ngắn về sự kiện"
+                                               value="{{$sale->introduction}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Khoảng thời gian diễn ra sự kiện:</label>
+
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control float-right" id="period"
+                                                   name="period">
                         <div class="form-group">
                             <label>
                                 Các sản phẩm giảm giá trong sự kiện
@@ -94,6 +123,52 @@
                                                             <h3 class="card-title">Chọn sản phẩm sẽ giảm giá
                                                                 trong sự kiện này</h3>
 
+                                                                        <div class="card-tools">
+                                                                            <div class="input-group input-group-sm"
+                                                                                 style="width: 150px;">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- /.card-header -->
+                                                                    <div class="card-body table-responsive p-0"
+                                                                         style="height: 300px;">
+                                                                        <table class="table table-head-fixed" id="product-table">
+                                                                            <thead>
+                                                                            <tr>
+                                                                                <th>Thứ tự</th>
+                                                                                <th>Tên sản phẩm</th>
+                                                                                <th>Mã sản phẩm</th>
+                                                                                <th>Giá sản phẩm</th>
+                                                                                <th>Khuyến mại</th>
+                                                                                <th>Phần trăm</th>
+                                                                            </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            <tr v-for="(product,key) in products">
+                                                                                <td>@{{ key+1 }}</td>
+                                                                                <td>@{{ product.name }}</td>
+                                                                                <td>@{{ product.code }}</td>
+                                                                                <td>@{{ product.price }}</td>
+                                                                                <td>
+                                                                                    <input type="checkbox"
+                                                                                           name="productId[]"
+                                                                                           :value="product.id"
+                                                                                           v-model="product.sale">
+                                                                                </td>
+                                                                                <td>
+                                                                                    <input name="discount"
+                                                                                           class="form-control"
+                                                                                           :id="product.id"
+                                                                                           :disabled="!product.sale"
+                                                                                           type="number" max="99"
+                                                                                           v-model="product.percentage"
+                                                                                    >
+                                                                                </td>
+                                                                            </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    <!-- /.card-body -->
                                                             <div class="card-tools">
                                                                 <div class="input-group input-group-sm"
                                                                      style="width: 150px;">
@@ -111,7 +186,7 @@
                                                                     <th>Mã sản phẩm</th>
                                                                     <th>Giá sản phẩm</th>
                                                                     <th>Khuyến mại</th>
-                                                                    <th>Phần trăm</th>
+                                                                    <th>Giá sau giảm</th>
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -133,7 +208,7 @@
                                                                                 :id="product.id"
                                                                                 :disabled="!isSaleArr.includes(product.id)"
                                                                                 :value="discounts[product.id]"
-                                                                                type="number" max="99"
+                                                                                type="number" max="1000000000000000000000000000000"
                                                                         >
                                                                     </td>
                                                                 </tr>
@@ -176,8 +251,6 @@
             el: "#product_list",
             data: {
                 products: {!! json_encode($products) !!},
-                isSaleArr: {!! json_encode($saleProductIds) !!},
-                discounts : {!! json_encode($discounts) !!}
             },
             methods: {},
             mounted: function () {
@@ -186,6 +259,30 @@
                 }, 0);
             },
         });
+        $('#sale-form').submit(function (event) {
+            console.log('gg');
+            event.preventDefault();
+            let saleProductIds = [];
+            let percentageDiscounts = [];
+            for (let i = 0; i < app.products.length; i++) {
+                if (app.products[i].sale === true){
+                    saleProductIds.push(app.products[i].id);
+                    percentageDiscounts.push(parseInt(app.products[i].percentage));
+                }
+            }
+            let params = {
+                event_name: $('#event_name').val(),
+                introduction: $('#introduction').val(),
+                period: $('#period').val(),
+                saleProductIds: saleProductIds,
+                percentageDiscounts: percentageDiscounts,
+            };
+            axios.put("{{route('admin.saleoff.update',['id' => $sale->id])}}",
+                params
+            ).then(function (res) {
+                alert('thanh cong');
+            }).catch(function (err) {
+                alert('loi');
     </script>
     <script type="text/javascript">
         $(document).ready(function(){

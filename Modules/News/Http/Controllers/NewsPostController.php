@@ -51,7 +51,7 @@ class NewsPostController extends Controller
      */
     public function show(Request $request)
     {
-        $data = NewsPost::query();
+        $data = NewsPost::where('post_status' ,'!=' ,NewsPost::STATUS_DELETED);
         return Datatables::of($data)
             ->filter(function ($query) use ($request) {
                 foreach ($request->all() as $key => $value) {
@@ -246,6 +246,7 @@ class NewsPostController extends Controller
             $post['post_status'] = $request->post_status;
             $post['post_famous'] = $request->post_famous;
             $post['published_at'] = Carbon::parse($request->published_at)->toDateTimeString();
+            //dd($request->post_type);
 
             //Image
             $media = NewsPost::uploadMedia();
@@ -282,15 +283,15 @@ class NewsPostController extends Controller
         $obj = NewsPost::where("id", $id)->first();
         if ($obj) {
             $obj->post_status = NewsPost::STATUS_DELETED;
-            $obj->deleted_at = date('Y-m-d H:i:s');
+            //$obj->deleted_at = date('Y-m-d H:i:s');
             $obj->deleted_id = Auth::id();
             $obj->save();
 
-            // Delete new category post
-            DB::table('news_category_posts')->where('post_id', $id)->delete();
-
-            // Delete new tag post
-            DB::table('news_tags_post')->where('post_id', $id)->delete();
+//            // Delete new category post
+//            DB::table('news_category_posts')->where('post_id', $id)->delete();
+//
+//            // Delete new tag post
+//            DB::table('news_tags_post')->where('post_id', $id)->delete();
 
             return redirect(route('news.news_post.index'))->with('messages', trans('news::Controller.post_delete'));
         } else {

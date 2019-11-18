@@ -14,11 +14,11 @@ class ProductColor extends Model
     }
 
     public function product() {
-        return $this->hasOne(Product::class,'id','product_id');
+        return $this->belongsTo(Product::class,'product_id','id');
     }
 
     public function color() {
-        return $this->hasOne(Color::class,'id','color_id');
+        return $this->belongsTo(Color::class,'color_id','id');
     }
 
     public static function genColumnHtml($data){

@@ -19,14 +19,28 @@ use Illuminate\Http\Request;
 
 Route::group(['namespace' => 'Api'], function () {
 
-    Route::group(['prefix' => 'product'], function () {
+    Route::group(['prefix' => 'v1/product'], function () {
 
-        Route::get('/', 'ProductController@getProductForTopic');
+        Route::post('/', 'ProductController@getProductForTopic');
 
-        Route::get('/{id}', 'ProductController@getDetaiProduct');
+        Route::post('/all', 'ProductController@getProduct');
 
-        Route::get('/category/{id}', 'ProductController@getProductByCategory');
+        Route::post('/detail', 'ProductController@getDetaiProduct');
+
+        Route::post('/saleoff', 'ProductController@getProductSaleOff');
         
+    });
+
+    Route::post('v1/size_color', 'ProductController@getSizeColor');
+
+    Route::group(['prefix' => 'v1/category'], function () {
+
+        Route::post('/product', 'ProductController@getProductByCategory');
+
+        Route::post('/', 'ProductController@getCategory');
+
+        Route::post('/get_cate', 'ProductController@getCategoryById');
+
     });
 });
 
