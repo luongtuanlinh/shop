@@ -542,7 +542,7 @@ class ProductController extends Controller
                         'status' => 401,
                         'mess' => 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
                     ]);
-                }              
+                }
             }
         }
     }
@@ -554,7 +554,7 @@ class ProductController extends Controller
             $result->result = KMsg::RESULT_ERROR;
             return \response()->json($result);
         } else {
-            $products = Product::select('id', 'name as text', 'price')->where('category_id', $request->category_id)->get();
+            $products = Product::join('product_sale', 'product_sale.product_id', '=', 'products.id')->select('products.id', 'name as text', 'product_sale.discount as price')->where('category_id', $request->category_id)->get();
             $result->message = $products;
             $result->result = KMsg::RESULT_SUCCESS;
             return \response()->json($result);
