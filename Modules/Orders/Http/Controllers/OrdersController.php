@@ -205,6 +205,7 @@ class OrdersController extends Controller
      */
     public function update(Request $request){
         $params = $request->all();
+        // dd($request);
         $validatorArray = [
             'type' => '',
             'product_id' => '',
@@ -242,6 +243,11 @@ class OrdersController extends Controller
                             $order->deliver_time = Carbon::today()->toDateString();
                         }
                     }
+                    if ($params['order_status'] == \Modules\Orders\Entities\Orders::CANCEL_STATUS) {
+                        if(empty($order->deliver_time)) {
+                            $order->order_status = $params['order_status'];
+                        }
+                    }
                     if ($params['order_status'] == \Modules\Orders\Entities\Orders::SUCCESS_STATUS) {
                         if(empty($order->deliver_time)) {
                             $order->order_status = $params['order_status'];
@@ -255,10 +261,6 @@ class OrdersController extends Controller
                     if ($params['order_status'] == \Modules\Orders\Entities\Orders::SHIPPED_STATUS || $params['order_status'] == \Modules\Orders\Entities\Orders::PROCESSING_STATUS) {
                         $order->order_status = $params['order_status'];
                     }
-                    // if (!empty('subcrible')) {
-                    //     // Sua database
-                    // }
-
                     $order->save();
                 }
             }
@@ -266,6 +268,27 @@ class OrdersController extends Controller
             if (!empty($params['payment_status'])) {
                 $order->payment_status = $params['payment_status'];
                 $order->save();
+            }
+
+            if (!empty($params['edit_customer_name']) || !empty($params['edit_customer_phone']) || !empty($params['edit_deliver_address']) ||
+            !empty($params['edit_shipping_fee'])) {
+                $customer = Customer::whereId($params['customer_id'])->first();
+                if (!empty($params['edit_customer_name'])) {
+                    $customer->customer_name = $params['edit_customer_name'];
+                    $customer->save();
+                }
+                if (!empty($params['edit_customer_phone'])) {
+                    $customer->customer_phone = $params['edit_customer_phone'];
+                    $customer->save();
+                }
+                if (!empty($params['edit_deliver_address'])) {
+                    $order->deliver_address = $params['edit_deliver_address'];
+                    $order->save();
+                }
+                if (!empty($params['edit_shipping_fee'])) {
+                    $order->ship_price = $params['edit_shipping_fee'];
+                    $order->save();
+                }
             }
             DB::commit();
             return redirect()->back()->with('messages','Cập nhật đơn hàng thành công');
