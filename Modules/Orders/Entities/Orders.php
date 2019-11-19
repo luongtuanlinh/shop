@@ -117,14 +117,18 @@ class Orders extends Model
         $order_items = [];
         $index_color = 0;
         foreach ($params["product_id"] as $key => $value){
-            $product = Product::whereId($value)->first();
+            $product = Product::whereId($value)->with('product_sale')->first();
             $item = [];
             $item["order_id"] = $params["order_id"];
             $item["product_id"] = $value;
             $item["size_id"] = $params["size"][$key];
             $item["color"] = $params["color"][$key];
             $item["amount"] = $params["amount"][$key];
-            $item["sell_price"] = $product->price;
+            if( isset($product->product_sale[0]) ) {
+                $item["sell_price"] = $product->product_sale[0]->discount;
+            } else {
+                $item["sell_price"] = $product->price;
+            }
             $item["list_price"] = $product->price; // gia goc
             $item["created_at"] = Carbon::now();
             array_push($order_items, $item);
@@ -139,14 +143,19 @@ class Orders extends Model
         OrderItems::where('order_id', $params['order_id'])->delete();
         $order_items = [];
         foreach ($params["products"] as $product){
-            $product_item = Product::where('id', $product->product_id)->first();
+            $product_item = Product::where('id', $product->product_id)->with('product_sale')->first();
             $item = [];
             $item["order_id"] = $params["order_id"];
             $item["product_id"] = $product->product_id;
             $item["size_id"] = $product->size;
             $item["color"] = $product->color;
             $item["amount"] = $product->amount;
-            $item["sell_price"] = (empty($product_item)) ? 0 : $product_item->price;
+            if( isset($product_item->product_sale[0]) ) {
+                $item["sell_price"] = (empty($product_item)) ? 0 : $product_item->product_sale[0]->discount;
+            } else {
+                $item["sell_price"] = (empty($product_item)) ? 0 : $product_item->price;
+            }
+            
             $item["list_price"] = (empty($product_item)) ? 0 : $product_item->price; // gia goc
             $item["created_at"] = Carbon::now();
             array_push($order_items, $item);

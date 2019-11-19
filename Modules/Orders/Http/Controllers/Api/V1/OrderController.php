@@ -140,6 +140,7 @@ class OrderController extends ApiController
             $order["created_at"] = Carbon::now();
             $params["products"] = json_decode($params["products"]);
             $params['order_id'] = Orders::insertGetId($order);
+            
             //update order item
             Orders::insertOrderitemApi($params);
             DB::commit();

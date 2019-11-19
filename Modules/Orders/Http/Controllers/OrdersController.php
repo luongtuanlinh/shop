@@ -139,9 +139,7 @@ class OrdersController extends Controller
         foreach ($order_items as $item) {
             $item->cate_name = Category::whereId($item->category_id)->first()->cate_name;
             $item->size = Size::where('id', $item->size_id)->first()->size_name;
-            $total += $item->amount * $item->price;
         }
-        $order->total_price = $total;
         $order->save();
         $order->customer_name = $customer->customer_name;
         $order->customer_phone = $customer->customer_phone;
@@ -313,7 +311,7 @@ class OrdersController extends Controller
             return redirect()->back()->withInput()->withErrors($validator->messages());
         }
 
-        DB::beginTransaction();
+        // DB::beginTransaction();
         try{
             //create customer
             if(empty($params["customer_id"])){
@@ -338,6 +336,7 @@ class OrdersController extends Controller
             $order["customer_id"] = $customer_id;
             $order["payment"] = $params['payment'];
             $order["created_at"] = Carbon::now();
+            return $order;
             $params['order_id'] = Orders::insertGetId($order);
             //update order item
             Orders::insertOrderitem($params);
@@ -352,7 +351,7 @@ class OrdersController extends Controller
             
             $order->save();
 
-            DB::commit();
+            // DB::commit();
             return redirect(route('order.index'))->with('messages','Tạo đơn hàng thành công');
         }catch (\Exception $exception){
             DB::rollback();

@@ -184,8 +184,8 @@
                                                     value="{{ $item->color }}"></td>
                                             <td>{{ $item->amount }}<input type="hidden" name="amount[]"
                                                     value="{{ $item->amount }}"></td>
-                                            <td>{{ number_format($item->price) }}</td>
-                                            <td>{{ number_format($item->price * $item->amount) }}</td>
+                                            <td>{{ number_format($item->sell_price) }}</td>
+                                            <td>{{ number_format($item->sell_price * $item->amount) }}</td>
                                             @if($order->order_status <=
                                                 Modules\Orders\Entities\Orders::PROCESSING_STATUS) <td><button
                                                     type="button" class="btn btn-danger btn-xs"

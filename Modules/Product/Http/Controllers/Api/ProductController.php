@@ -276,9 +276,9 @@ class ProductController extends ApiController
             $query = Product::select('id', 'name', 'price', 'cover_path', 'category_id')
                                 ->whereNull('deleted_at')
                                 ->with('product_sale')
-                                ->whereHas('product_sale', function($q) use ($sale_id){
-                                    $q->where('sale_id', $sale_id);
-                                });
+                                ->with(['product_sale' => function ($query) use ($sale_id) {
+                                    $query->where('sale_id', $sale_id);
+                                }]);
 
             $cate_id = isset($params['cate_id']) ? $params['cate_id'] : null;
             if ($cate_id != null) {
