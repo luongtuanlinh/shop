@@ -217,9 +217,9 @@
                                                     value="{{ $item->color }}"></td>
                                             <td>{{ $item->amount }}<input type="hidden" name="amount[]"
                                                     value="{{ $item->amount }}"></td>
-                                            <td>{{ number_format($item->price) }}</td>
-                                            <td>{{ number_format($item->price * $item->amount) }}
-                                            <input type="hidden" value="{{ $item->price * $item->amount }}" />
+                                            <td>{{ number_format($item->sell_price) }}</td>
+                                            <td>{{ number_format($item->sell_price * $item->amount) }}
+                                            <input type="hidden" value="{{ $item->sell_price * $item->amount }}" />
                                             </td>
                                             @if($order->order_status <=
                                                 Modules\Orders\Entities\Orders::PROCESSING_STATUS) <td><button
@@ -405,7 +405,7 @@
                 type: "GET",
                 success: function(data) {
                     if (data.result == 0) {
-                        console.log(data.message);
+                        // console.log(data.message);
                     } else {
                         btn_loading.hide("tbody");
                         // $("#color_" + index).html("");
@@ -452,7 +452,7 @@
                 type: "GET",
                 success: function(data) {
                     if (data.result == 0) {
-                        console.log(data.message);
+                        // console.log(data.message);
                     } else {
                         $("#size_" + index).html("");
                         $("#size_" + index).append(data.message);
@@ -463,7 +463,7 @@
         function filterColor(index) {
             var product = $("#product_id_" + index).select2('data');
             var size = $("#size_" + index).select2('data');
-            console.log(size);
+            // console.log(size);
             $.ajax({
                 data: {
                     product_id: product[0].id,
@@ -473,7 +473,7 @@
                 type: "GET",
                 success: function(data) {
                     if (data.result == 0) {
-                        console.log(data.message);
+                        // console.log(data.message);
                     } else {
                         $("#color_" + index).html("");
                         $("#color_" + index).append(data.message);
@@ -510,7 +510,7 @@
             }
 
             count = count - 1;
-            console.log(count);
+            // console.log(count);
             var i = 1;
             $("#tbody tr").each(function() {
                 $(this).find("td").first().html("#" + i);
