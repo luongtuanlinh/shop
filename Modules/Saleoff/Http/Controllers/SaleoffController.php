@@ -139,7 +139,7 @@ class SaleoffController extends Controller
                 }
             }
         }
-        return view('saleoff::edit', compact('sale', 'products'));
+        return view('saleoff::edit', compact('sale', 'products', 'id'));
     }
 
     /**
