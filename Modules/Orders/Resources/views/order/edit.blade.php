@@ -107,27 +107,28 @@
                                     <tr class="row">
                                         <td class="col-xs-4">Tên khách hàng: </td>
                                         <td class="col-xs-8">
-                                            <input type="text"/>
+                                            <input type="text" id="input_edit_customer_name"/>
                                         </td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-4">Số điện thoại: </td>
                                         <td class="col-xs-8">
-                                            <input type="text"/>
+                                            <input type="text" id="input_edit_customer_phone"/>
                                         </td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-4">Địa chỉ giao hàng: </td>
                                         <td class="col-xs-8" style="overflow:hidden">
-                                            <input type="text"/>
+                                            <input type="text" id="input_edit_deliver_address"/>
                                         </td>
                                     </tr>
                                     <tr class="row">
                                         <td class="col-xs-4">Phí giao hàng: </td>
                                         <td class="col-xs-8" style="overflow:hidden">
-                                            <input type="number"/>
+                                            <input type="number" id="input_edit_shipping_fee"
+                                            value="{{ $order->ship_price }}"/>
                                         </td>
-                                    </tr>                                    
+                                    </tr>
                                 </table>
                             </div>
                             <div class="box-info col-md-1">
@@ -150,7 +151,11 @@
                                     id="order_status">
                                 <input type="hidden" name="payment_status" value="{{ $order->payment_status  }}"
                                     id="payment_status">
-
+                                <input type="hidden" name="edit_customer_name"           id="edit_customer_name">
+                                <input type="hidden" name="edit_customer_phone"  id="edit_customer_phone">
+                                <input type="hidden" name="edit_deliver_address"   id="edit_deliver_address">
+                                <input type="hidden" name="edit_shipping_fee"   id="edit_shipping_fee">
+                                <input type="hidden" name="customer_id"   id="customer_id" value={{ $order->customer_id }}>
 
                                 <!-- done, spin , wait -->
                                 <div class="row" id="process-bar">
@@ -212,8 +217,10 @@
                                                     value="{{ $item->color }}"></td>
                                             <td>{{ $item->amount }}<input type="hidden" name="amount[]"
                                                     value="{{ $item->amount }}"></td>
-                                            <td>{{ number_format($item->sell_price) }}</td>
-                                            <td>{{ number_format($item->sell_price * $item->amount) }}</td>
+                                            <td>{{ number_format($item->price) }}</td>
+                                            <td>{{ number_format($item->price * $item->amount) }}
+                                            <input type="hidden" value="{{ $item->price * $item->amount }}" />
+                                            </td>
                                             @if($order->order_status <=
                                                 Modules\Orders\Entities\Orders::PROCESSING_STATUS) <td><button
                                                     type="button" class="btn btn-danger btn-xs"
@@ -252,13 +259,13 @@
                                         <div style="margin-top:20px;">
                                             <span>Trạng thái thanh toán</span><br>
                                             <select id="select_payment_status" class="form-control">
-                                                <option value="{{ \Modules\Orders\Entities\Orders::NOT_PAY_STATUS }}" 
-                                                @if ($order->payment_status ==
+                                                <option value="{{ \Modules\Orders\Entities\Orders::NOT_PAY_STATUS }}"
+                                                    @if ($order->payment_status ==
                                                     \Modules\Orders\Entities\Orders::NOT_PAY_STATUS)
                                                     selected
                                                     @endif >Chưa thanh toán</option>
                                                 <option value="{{ \Modules\Orders\Entities\Orders::PAID_STATUS }}"
-                                                @if ($order->payment_status ==
+                                                    @if ($order->payment_status ==
                                                     \Modules\Orders\Entities\Orders::PAID_STATUS)
                                                     selected
                                                     @endif >Đã thanh toán</option>
@@ -280,19 +287,19 @@
                                             </tr>
                                             <tr>
                                                 <td>Tổng tiền sản phẩm: </td>
-                                                <td>{{ number_format($order->total_price) }}</td>
-                                            </tr>  
+                                                <td id="sum_price">{{ number_format($order->total_price) }}</td>
+                                            </tr>
                                             <tr>
-                                                <td>Phí ship: </td>
-                                                <td>{{ number_format($order->total_price) }}</td>
-                                            </tr>                                                                                      
+                                                <td>Phí vận chuyển: </td>
+                                                <td id="shipping_fee">{{ number_format($order->ship_price) }}</td>
+                                            </tr>
                                             <tr>
                                                 <td>Tổng tiền: </td>
-                                                <td>{{ number_format($order->total_price) }}</td>
+                                                <td id="total">{{ number_format($order->total_price) }}</td>
                                             </tr>
                                             <tr>
                                                 <td>Hình thức thanh toán: </td>
-                                                <td>{{ $order->payment }}</td>    
+                                                <td>{{ $order->payment }}</td>
                                             </tr>
                                             {{-- <tr>
                                                 <td>Thành tiền: </td>
@@ -529,19 +536,22 @@
         }
 
         function total() {
-            var total = 0;
+            var sum_price = 0;
             $("#tbody tr").each(function() {
                 let value = $(this).find("td").slice(7,8).find("input").val();
                 if (value == '') {
                     value = 0;
                 }
-                total += parseInt(value);
+                sum_price += parseInt(value);
             });
-            $("#sum_price #total").val(total);
-            $("#sum_price span").html("");
-            $("#sum_price span").html(addCommas(total));
-        }
+            let shipping_fee = $("#input_edit_shipping_fee").val();
+            let total = sum_price + parseInt(shipping_fee);
+            $("#total").html(total);
+            $("#sum_price").html("");
+            $("#sum_price").html(addCommas(sum_price));
 
+        }
+        
         function _sum_total(sum_total) {
             $("#sum_total span").html("");
             $("#sum_total_hidden").val("");
@@ -586,6 +596,7 @@
                 $(this).html(arr_status[status - 1]);
                 $(this).addClass(arr_status_class[status - 1]);
             });
+            total();
         });
 
         function changeProgressSubcrible() {
@@ -631,6 +642,34 @@
                 $('#datetimepicker1 ').focus();
             });
         });
+    $(function () {
+        $(document).ready(function () {
+            $("#input_edit_customer_name").change(function() {
+                var name = $("#input_edit_customer_name").val();
+                $("#edit_customer_name").val(name);
+            });
+        });
+        $(document).ready(function () {
+            $("#input_edit_customer_phone").change(function() {
+                var phone = $("#input_edit_customer_phone").val();
+                $("#edit_customer_phone").val(phone);
+            });
+        });
+        $(document).ready(function () {
+            $("#input_edit_deliver_address").change(function() {
+                var address = $("#input_edit_deliver_address").val();
+                $("#edit_deliver_address").val(address);
+            });
+        });
+        $(document).ready(function () {
+            $("#input_edit_shipping_fee").change(function() {
+                var shipping_fee = $("#input_edit_shipping_fee").val();
+                $("#edit_shipping_fee").val(shipping_fee);
+                $("#shipping_fee").html(shipping_fee);
+                total();
+            });
+        });
+    });
 </script>
 
 @endsection
