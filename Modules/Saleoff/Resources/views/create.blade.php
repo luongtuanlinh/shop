@@ -196,7 +196,7 @@
             let params = {
                 event_name: $('#event_name').val(),
                 introduction: $('#introduction').val(),
-                period: $('#period').val(),
+                period: $('#datetimepicker1').val(),
                 saleProductIds: saleProductIds,
                 percentageDiscounts: percentageDiscounts,
             };
@@ -204,6 +204,7 @@
                 params
             ).then(function (res) {
                 alert('thanh cong');
+                window.location.replace("{{route('admin.saleoff.index')}}");
             }).catch(function (err) {
                 alert('loi');
             });
@@ -219,7 +220,7 @@
         $(function () {
             $('#datetimepicker1').daterangepicker({
                 locale: {
-                    format: 'DD-MM-YYYY'
+                    format: 'YYYY-MM-DD'
                 },
             });
         });

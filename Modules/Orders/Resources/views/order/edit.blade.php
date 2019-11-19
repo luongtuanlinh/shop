@@ -72,7 +72,7 @@
                             @endif
                             <div class="box-info col-md-1">
                             </div>
-                            <div class="col-md-8 col-md-offset-1">
+                            <div class="col-md-5">
                                 <h3>Thông tin khách hàng</h3>
                                 <table class="table table-striped">
                                     <tr class="row">
@@ -101,7 +101,35 @@
                                     </tr>
                                 </table>
                             </div>
-
+                            <div class="col-md-5">
+                                <h3>Sửa thông tin</h3>
+                                <table class="table table-striped">
+                                    <tr class="row">
+                                        <td class="col-xs-4">Tên khách hàng: </td>
+                                        <td class="col-xs-8">
+                                            <input type="text"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-4">Số điện thoại: </td>
+                                        <td class="col-xs-8">
+                                            <input type="text"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-4">Địa chỉ giao hàng: </td>
+                                        <td class="col-xs-8" style="overflow:hidden">
+                                            <input type="text"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="row">
+                                        <td class="col-xs-4">Phí giao hàng: </td>
+                                        <td class="col-xs-8" style="overflow:hidden">
+                                            <input type="number"/>
+                                        </td>
+                                    </tr>                                    
+                                </table>
+                            </div>
                             <div class="box-info col-md-1">
                             </div>
                             <div style="clear: both;"></div>
@@ -250,6 +278,14 @@
                                                 <td>Ngày nhận hàng: </td>
                                                 <td>{{ $order->deliver_time }}</td>
                                             </tr>
+                                            <tr>
+                                                <td>Tổng tiền sản phẩm: </td>
+                                                <td>{{ number_format($order->total_price) }}</td>
+                                            </tr>  
+                                            <tr>
+                                                <td>Phí ship: </td>
+                                                <td>{{ number_format($order->total_price) }}</td>
+                                            </tr>                                                                                      
                                             <tr>
                                                 <td>Tổng tiền: </td>
                                                 <td>{{ number_format($order->total_price) }}</td>
