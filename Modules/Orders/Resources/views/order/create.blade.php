@@ -181,7 +181,7 @@
                                         required onchange="return changeAmount('1')">
                                 </td>
                                 <td id="sell_price_1">
-                                    <input type="hidden" id="price_hidden_1">
+                                    <input type="hidden" id="price_hidden_1" name="sell_price[]">
                                     <span>0</span>
                                 </td>
                                 <td id="tt_1">
