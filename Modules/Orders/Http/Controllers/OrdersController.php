@@ -101,7 +101,7 @@ class OrdersController extends Controller
                 return $html;
             })
             ->editColumn('total', function ($order) {
-                return number_format($order->count_price);
+                return number_format($order->total_price);
             })
             ->editColumn('deliver_time', function ($order) {
                 if (!empty($order->deliver_time)) {
@@ -186,11 +186,11 @@ class OrdersController extends Controller
             return $html;
         })
         ->addColumn('sell_price', function($item) {
-            return $item->price;
+            return $item->sell_price;
         })
         ->addColumn('total_price', function($item) {
             // $order_price += $item->amount * $item->sell_price;
-            return $item->amount * $item->price;
+            return $item->amount * $item->sell_price;
         })
         ->addColumn('action', function($item) {
             $html = '<button type="button" class="btn btn-danger btn-xs" onclick="deleteRow($(this))"><i class="fa fa-minus">Xoá</i></button>';
@@ -223,16 +223,11 @@ class OrdersController extends Controller
         try {
             if (!empty($params['product_id']) && !empty($params['size']) && !empty($params['color']) && !empty($params['amount'])) {
                 Orders::insertOrderitem($params);
-                $order_items = OrderItems::join('products', 'products.id', '=', 'order_product.product_id')->where('order_product.order_id', $order->id)->get();
-                $total = 0;
-                foreach ($order_items as $item) {
-                    $total += $item->amount * $item->price;
-                }
-                $order->total_price = $total;
-
+            }
+            if (!empty($params['edit_total_price'])) {
+                $order->total_price = $params['edit_total_price'];
                 $order->save();
             }
-
             if (!empty($params['order_status'])) {
                 if($params['order_status'] < $order->order_status) {
                     return redirect()->back()->withErrors('Cập nhật trạng thái đơn hàng không thành công!');
@@ -359,7 +354,6 @@ class OrdersController extends Controller
             $order["customer_id"] = $customer_id;
             $order["payment"] = $params['payment'];
             $order["created_at"] = Carbon::now();
-            return $order;
             $params['order_id'] = Orders::insertGetId($order);
             //update order item
             Orders::insertOrderitem($params);
