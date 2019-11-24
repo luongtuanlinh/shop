@@ -155,6 +155,7 @@
                                 <input type="hidden" name="edit_customer_phone"  id="edit_customer_phone">
                                 <input type="hidden" name="edit_deliver_address"   id="edit_deliver_address">
                                 <input type="hidden" name="edit_shipping_fee"   id="edit_shipping_fee">
+                                <input type="hidden" name="edit_total_price" id="edit_total_price">
                                 <input type="hidden" name="customer_id"   id="customer_id" value={{ $order->customer_id }}>
 
                                 <!-- done, spin , wait -->
@@ -548,6 +549,7 @@
             let total = sum_price + parseInt(shipping_fee);
             $("#total").html(total);
             $("#sum_price").html("");
+            $("#edit_total_price").val(total);
             $("#sum_price").html(addCommas(sum_price));
 
         }
@@ -668,7 +670,7 @@
                 $("#shipping_fee").html(shipping_fee);
                 total();
             });
-        });
+        });    
     });
 </script>
 
