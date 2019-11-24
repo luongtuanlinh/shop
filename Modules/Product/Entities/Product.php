@@ -85,7 +85,8 @@ class Product extends Model
     }
 
     public function getProductFirst(){
-        return $this->with('category')
+        return $this->select('id', 'name', 'price', 'cover_path', 'category_id', 'count')
+                    ->with('category')
                     ->with(['sales' => function ($query) {
                         $dayNow = new DateTime();
                         $query->where('end_time', '>=', $dayNow);
@@ -96,7 +97,8 @@ class Product extends Model
     }
 
     public function getProductHome($cate_id){
-        return $this->with('category')
+        return $this->select('id', 'name', 'price', 'cover_path', 'category_id', 'count')
+                    ->with('category')
                     ->with(['sales' => function ($query) {
                         $dayNow = new DateTime();
                         $query->where('end_time', '>=', $dayNow);

@@ -77,6 +77,7 @@ class ProductController extends Controller
         $created_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
         $listSize = $request->size;
+        $listAmount = $request->amount;
 
         $validatorArray = [
             'name' => 'required',
@@ -97,6 +98,16 @@ class ProductController extends Controller
 
         if (count($request->cover_path) > 5) {
             return redirect()->back()->withFlashWarning(@trans('product::notify.max_upload'));
+        }
+        
+        $countProduct = 0;
+        foreach($listAmount as $key => $value) {
+            if ($value !== null ) {
+                $arr_item = explode(',',$value);
+                foreach($arr_item as $item) {
+                    $countProduct += (int)$item;
+                }
+            }
         }
 
         $list_img = array();
@@ -130,6 +141,7 @@ class ProductController extends Controller
         $product->seo_description = $seo_description;
         $product->seo_key = $seo_key;
         $product->location = $origin;
+        $product->count = $countProduct;
         $product->save();
 
         $product_id = $product->id;
@@ -138,10 +150,12 @@ class ProductController extends Controller
             foreach ($listSize as $key => $value) {
                 if ($value !== null ) {
                     $size_id = $key + 1;
+                    //cộng số lượng rồi cập nhật vào bảng product
                     $arr = [
                         'product_id' => $product_id,
                         'size_id' => $size_id,
                         'color' => $value,
+                        'amount' => $listAmount[$key],
                         'created_at' => $created_at
                     ];
                     $insertSize = ProductSize::insert($arr);
@@ -175,9 +189,11 @@ class ProductController extends Controller
         $product = $this->product->getProductById($id);
 
         $listSize = [];
+        $listAmount = [];
         if (count($product->product_size) ) {
             foreach ($product->product_size as $key => $value) {
                 $listSize[$value->size_id] = $value->color;
+                $listAmount[$value->size_id] = $value->amount;
             }
         }
        
@@ -188,7 +204,7 @@ class ProductController extends Controller
         foreach ($categories as $category) {
             $selectedCategories[$category->id] = $category->cate_name;
         }
-        return view('product::products/edit', compact('selectedCategories', 'product', 'listSize'));
+        return view('product::products/edit', compact('selectedCategories', 'product', 'listSize', 'listAmount'));
     }
 
     /**
@@ -212,6 +228,7 @@ class ProductController extends Controller
         $updated_at = date('Y-m-d H:i:s');
         $admin_id = Auth::user()->id;
         $listSize = $request->size;
+        $listAmount = $request->amount;
 
         $validatorArray = [
             'name' => 'required',
@@ -224,6 +241,16 @@ class ProductController extends Controller
         if ($validator->fails()) {
             $message = $validator->errors();
             return Redirect::back()->withInput()->withErrors([$message->first()])->with(['modal_error' => $message->first()]);
+        }
+
+        $countProduct = 0;
+        foreach($listAmount as $key => $value) {
+            if ($value !== null ) {
+                $arr_item = explode(',',$value);
+                foreach($arr_item as $item) {
+                    $countProduct += (int)$item;
+                }
+            }
         }
 
         $old_list_image = Product::select('cover_path')->where('id', $id)->get();
@@ -264,6 +291,7 @@ class ProductController extends Controller
             'seo_description' => $seo_description,
             'seo_key' => $seo_key,
             'location' => $location,
+            'count' => $countProduct,
             'has_quantity' => $has_quantity
         ];
 
@@ -272,6 +300,7 @@ class ProductController extends Controller
             $size_id = $key + 1;
             $arr = [
                 'color' => $value,
+                'amount' => $listAmount[$key],
                 'updated_at' => $updated_at
             ];
             if (ProductSize::where('product_id', '=', $id)->where('size_id', $size_id)->exists()) {
@@ -282,6 +311,7 @@ class ProductController extends Controller
                         'product_id' => $id,
                         'size_id' => $size_id,
                         'color' => $value,
+                        'amount' => $listAmount[$key],
                         'created_at' => $updated_at
                     ];
                     $insertSize = ProductSize::insert($arr_new);

@@ -52,42 +52,42 @@
                         <label class="col-sm-2 col-form-label no-padding">S :</label>
                         <div class="col-sm-10 no-padding">
                             <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
-                            <input type="text" class="form-control" style="margin-top: 5px" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
+                            <input type="text" class="form-control product-amount" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
                         </div>
                     </div>
                     <div class="form-group row no-margin-lr">
                         <label class="col-sm-2 col-form-label no-padding">M :</label>
                         <div class="col-sm-10 no-padding">
                             <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
-                            <input type="text" class="form-control" style="margin-top: 5px" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
+                            <input type="text" class="form-control product-amount" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
                         </div>
                     </div>
                     <div class="form-group row no-margin-lr">
                         <label class="col-sm-2 col-form-label no-padding">L :</label>
                         <div class="col-sm-10 no-padding">
                             <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
-                            <input type="text" class="form-control" style="margin-top: 5px" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
+                            <input type="text" class="form-control product-amount"  placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
                         </div>
                     </div>
                     <div class="form-group row no-margin-lr">
                         <label class="col-sm-2 col-form-label no-padding">XL :</label>
                         <div class="col-sm-10 no-padding">
                             <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
-                            <input type="text" class="form-control" style="margin-top: 5px" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
+                            <input type="text" class="form-control product-amount" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
                         </div>
                     </div>
                     <div class="form-group row no-margin-lr">
                         <label class="col-sm-2 col-form-label no-padding">XXL :</label>
                         <div class="col-sm-10 no-padding">
                             <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
-                            <input type="text" class="form-control" style="margin-top: 5px" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
+                            <input type="text" class="form-control product-amount" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
                         </div>
                     </div>
                     <div class="form-group row no-margin-lr">
                         <label class="col-sm-2 col-form-label no-padding">XXXL :</label>
                         <div class="col-sm-10 no-padding">
                             <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="">
-                            <input type="text" class="form-control" style="margin-top: 5px" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
+                            <input type="text" class="form-control product-amount" placeholder="Số lượng. VD: 1,2,3,4,5" name="amount[]" value="">
                         </div>
                     </div>
                     <hr>
