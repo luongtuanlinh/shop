@@ -57,7 +57,8 @@
                                     {{method_field('PUT')}}
                                     <div class="form-group">
                                         <label for="event_name">Tên sự kiện</label>
-                                        <input type="text" name="event_name" id="event_name" class="form-control" required
+                                        <input type="text" name="event_name" id="event_name" class="form-control"
+                                               required
                                                placeholder="Nhập tên sự kiện" value="{{$sale->event_name}}">
                                     </div>
                                     <div class="form-group">
@@ -104,7 +105,10 @@
                                                                             <div class="card-header">
                                                                                 <h3 class="card-title">Chọn sản phẩm sẽ
                                                                                     giảm giá
-                                                                                    trong sự kiện này</h3>
+                                                                                    trong sự kiện này
+                                                                                    <input type="checkbox"
+                                                                                           v-model="checkAll">
+                                                                                </h3>
 
                                                                                 <div class="card-tools">
                                                                                     <div class="input-group input-group-sm"
@@ -202,12 +206,34 @@
             el: "#product_list",
             data: {
                 products: {!! json_encode($products) !!},
+                checkAll: false,
             },
             methods: {},
             mounted: function () {
                 setTimeout(() => {
                     $('#product-table').DataTable();
                 }, 0);
+            },
+            watch: {
+                checkAll: function () {
+                    for (let i = 0; i < this.products.length; i++) {
+                        this.products[i].sale = this.checkAll;
+                    }
+                },
+                haveSaleProducts: function () {
+                    if (this.haveSaleProducts === false) this.checkAll = false;
+                }
+            },
+            computed: {
+                haveSaleProducts: function () {
+                    let arr = this.products.map(function (el) {
+                        return el.sale;
+                    });
+                    for (let i = 0; i < arr.length; i++) {
+                        if (arr[i] === true) return true;
+                    }
+                    return false;
+                }
             },
         });
         $('#submit-button').click(function (event) {
@@ -229,12 +255,12 @@
             };
             axios.put("{{route('admin.saleoff.update',['id' => $sale->id])}}",
                 params
-            ).then(function(res){
+            ).then(function (res) {
                 alert(res.data.messenger);
-                
+
                 window.location.replace("{{route('admin.saleoff.index')}}");
-            }).catch(function(err){
-               console.log(err.data);
+            }).catch(function (err) {
+                console.log(err.data);
             });
         })
     </script>
