@@ -56,42 +56,42 @@
                             <label class="col-sm-2 col-form-label no-padding">S :</label>
                             <div class="col-sm-10 no-padding">
                                 <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[1]) > 0 ? $listSize[1] : '' }}">
-                                <input type="text" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[1]) > 0 ? $listAmount[1] : '' }}">
+                                <input type="text" placeholder="Số lượng. VD: 1,2,3,4,5" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[1]) > 0 ? $listAmount[1] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">M :</label>
                             <div class="col-sm-10 no-padding">
                                 <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[2]) > 0 ? $listSize[2] : '' }}">
-                                <input type="text" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[2]) > 0 ? $listAmount[2] : '' }}">
+                                <input type="text" placeholder="Số lượng. VD: 1,2,3,4,5" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[2]) > 0 ? $listAmount[2] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">L :</label>
                             <div class="col-sm-10 no-padding">
                                 <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[3]) > 0 ? $listSize[3] : '' }}">
-                                <input type="text" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[3]) > 0 ? $listAmount[3] : '' }}">
+                                <input type="text" placeholder="Số lượng. VD: 1,2,3,4,5" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[3]) > 0 ? $listAmount[3] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">XL :</label>
                             <div class="col-sm-10 no-padding">
                                 <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[4]) > 0 ? $listSize[4] : '' }}">
-                                <input type="text" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[4]) > 0 ? $listAmount[4] : '' }}">
+                                <input type="text" placeholder="Số lượng. VD: 1,2,3,4,5" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[4]) > 0 ? $listAmount[4] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">XXL :</label>
                             <div class="col-sm-10 no-padding">
                                 <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[5]) > 0 ? $listSize[5] : '' }}">
-                                <input type="text" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[5]) > 0 ? $listAmount[5] : '' }}">
+                                <input type="text" placeholder="Số lượng. VD: 1,2,3,4,5" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[5]) > 0 ? $listAmount[5] : '' }}">
                             </div>
                         </div>
                         <div class="form-group row no-margin-lr">
                             <label class="col-sm-2 col-form-label no-padding">XXXL :</label>
                             <div class="col-sm-10 no-padding">
                                 <input type="text" data-role="tagsinput" class="form-control" name="size[]" value="{{ isset($listSize[6]) > 0 ? $listSize[6] : '' }}">
-                                <input type="text" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[6]) > 0 ? $listAmount[6] : '' }}">
+                                <input type="text" placeholder="Số lượng. VD: 1,2,3,4,5" class="form-control product-amount" name="amount[]" value="{{ isset($listAmount[6]) > 0 ? $listAmount[6] : '' }}">
                             </div>
                         </div>
                         <hr>

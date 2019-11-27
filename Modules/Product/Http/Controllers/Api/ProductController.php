@@ -124,25 +124,6 @@ class ProductController extends ApiController
         }
     }
 
-    // public function getProductByCategory(Request $request) {
-    //         $cate_id = $request->id;
-    //         if (!$cate_id) {
-    //             return response()->json(['success' => 500, 'Invalid category id']);
-    //         }
-    //         $product = $this->product->getProductByCategory($cate_id);
-    //         $listCate = Category::where('parent_id', $cate_id)
-    //                             ->whereNull('deleted_at')
-    //                             ->get();
-           
-    //         if ($product) {
-    //             $product = $this->convertImageHome($product);
-    //             return $this->successResponse(['result' => $product, 'listCate' => $listCate], 'Response Successfully');
-    //         } else {
-    //             return $this->errorResponse([], 'None data!');
-    //         }
-        
-    // }
-
     public function getCategory() {
         $categories = $this->category->getCategoryList();
         if ($categories) {
@@ -194,11 +175,8 @@ class ProductController extends ApiController
             //sort by price
 
             $result = array();
-            $query = Product::with(['sales' => function ($sale) {
-                                $dayNow = new DateTime();
-                                $sale->where('end_time', '>=', $dayNow);
-                            }])
-                            ->with('category')
+            $query = Product::select('id', 'name', 'price', 'cover_path', 'count')
+                            ->with('product_sale')
                             ->whereNull('deleted_at');
             $cate_id = isset($params['cate_id']) ? $params['cate_id'] : null;
             if ($cate_id != null) {

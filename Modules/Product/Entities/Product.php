@@ -51,11 +51,18 @@ class Product extends Model
     public function product_size()
     {
         return $this->hasMany(ProductSize::class,'product_id','id');
+                    
     }
 
     public function product_sale()
     {
-        return $this->hasMany(ProductSale::class,'product_id','id');
+        $dayNow = new DateTime();
+        return $this->hasMany(ProductSale::class,'product_id','id')
+                    ->whereHas('sale', function($query) use ($dayNow) {
+                        $query->where('end_time', '>=', $dayNow)
+                              ->orderby('created_at', 'DESC');
+                    });
+                    
     }
 
     public function orders()
@@ -76,33 +83,22 @@ class Product extends Model
     }
 
     public function getProductById($id){
-        return $this->with(['sales' => function ($query) {
-                        $dayNow = new DateTime();
-                        $query->where('end_time', '>=', $dayNow);
-                    }])
+        return $this->with('product_sale')
                     ->with('product_size')
                     ->where("id", $id)->first();
     }
 
     public function getProductFirst(){
-        return $this->select('id', 'name', 'price', 'cover_path', 'category_id', 'count')
-                    ->with('category')
-                    ->with(['sales' => function ($query) {
-                        $dayNow = new DateTime();
-                        $query->where('end_time', '>=', $dayNow);
-                    }])
+        return $this->select('id', 'name', 'price', 'cover_path', 'count')
+                    ->with('product_sale')
                     ->whereNull('deleted_at')
                     ->where('status', 2)
                     ->get();
     }
 
     public function getProductHome($cate_id){
-        return $this->select('id', 'name', 'price', 'cover_path', 'category_id', 'count')
-                    ->with('category')
-                    ->with(['sales' => function ($query) {
-                        $dayNow = new DateTime();
-                        $query->where('end_time', '>=', $dayNow);
-                    }])
+        return $this->select('id', 'name', 'price', 'cover_path', 'count')
+                    ->with('product_sale')
                     ->whereNull('deleted_at')
                     ->where('status', 1)
                     ->whereHas('category', function($q) use ($cate_id){
@@ -113,11 +109,8 @@ class Product extends Model
     }
 
     public function getProductByCategory($cate_id) {
-        return Product::with('category')
-                    ->with(['sales' => function ($query) {
-                        $dayNow = new DateTime();
-                        $query->where('end_time', '>=', $dayNow);
-                    }])
+        return Product::select('id', 'name', 'price', 'cover_path', 'category_id', 'count')
+                    ->with('product_sale')
                     ->whereNull('deleted_at')
                     ->where('status', '!=' , -1)
                     ->whereHas('category', function($q) use ($cate_id){
@@ -133,14 +126,6 @@ class Product extends Model
         if(!empty($data)){
             $collum .= '<a href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';
             $collum .= '<a href="'. route('product.product.delete', $data->id) .'" onclick="return confirm('.$message.')" class="btn btn-sm btn-danger">Xóa</a>';
-            // $collum .= '<a href="' .route('product.color.get', $data->id) .'" class="btn btn-default btn-sm">Quản lý size, màu</a>';
-
-            // if(Session::get('edit')) {
-            //     $collum .= '<a type="button" href="' .route('product.product.edit', $data->id) .'" class="btn btn-primary btn-sm">Sửa</a>';
-            // }
-            // if(Session::get('destroy')){
-            //     $collum .= '<a href="'. route('product.product.delete', $data->id) .'" onclick="return confirm('.$message.')" class="btn btn-xs btn-danger"><i class="fa fa-trash">Xoá</i></a>';
-            // }
         }
         return $collum;
     }
