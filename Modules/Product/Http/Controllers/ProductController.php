@@ -17,6 +17,7 @@ use Auth;
 use Modules\Product\Entities\Color;
 use Validator;
 use stdClass;
+use Carbon\Carbon;
 use DB;
 
 class ProductController extends Controller
@@ -584,7 +585,7 @@ class ProductController extends Controller
             $result->result = KMsg::RESULT_ERROR;
             return \response()->json($result);
         } else {
-            $products = Product::join('product_sale', 'product_sale.product_id', '=', 'products.id')->select('products.id', 'name as text', 'product_sale.discount as price')->where('category_id', $request->category_id)->get();
+            $products = Product::join('product_sale', 'product_sale.product_id', '=', 'products.id')->join('sales', 'sales.id', '=', 'product_sale.sale_id')->select('products.id', 'name as text', 'product_sale.discount as price')->where('category_id', $request->category_id)->where('sales.end_time', '>', Carbon::now())->where('sales.start_time', '<', Carbon::now())->get();
             $result->message = $products;
             $result->result = KMsg::RESULT_SUCCESS;
             return \response()->json($result);
