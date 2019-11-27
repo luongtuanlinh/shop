@@ -90,8 +90,10 @@
                                                 <div class="col-12">
                                                     <div class="card">
                                                         <div class="card-header">
-                                                            <h3 class="card-title">Chọn sản phẩm sẽ giảm giá
-                                                                trong sự kiện này</h3>
+                                                            <h3 class="card-title">
+                                                                Chọn sản phẩm sẽ giảm giá trong sự kiện này
+                                                                <input type="checkbox" v-model="checkAll">
+                                                            </h3>
 
                                                             <div class="card-tools">
                                                                 <div class="input-group input-group-sm"
@@ -111,7 +113,7 @@
                                                                     <th>Mã sản phẩm</th>
                                                                     <th>Giá sản phẩm</th>
                                                                     <th>Khuyến mại</th>
-                                                                    <th>Phần trăm</th>
+                                                                    <th>Giá sau khi giảm</th>
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -131,7 +133,7 @@
                                                                                class="form-control"
                                                                                :id="product.id"
                                                                                :disabled="!product.sale"
-                                                                               type="number" max="99"
+                                                                               type="number"
                                                                                v-model="product.percentage"
                                                                         >
                                                                     </td>
@@ -172,10 +174,30 @@
             el: "#product_list",
             data: {
                 products: {!! json_encode($products) !!},
+                checkAll : false,
             },
             methods: {
                 createSale: function () {
                 },
+            },
+            watch:{
+                checkAll: function() {
+                    for (let i=0;i<this.products.length;i++){
+                        this.products[i].sale = this.checkAll;
+                    }
+                },
+                haveSaleProducts: function(){
+                    if (this.haveSaleProducts === false) this.checkAll = false;
+                }
+            },
+            computed: {
+              haveSaleProducts :function () {
+                  let arr = this.products.map(function (el) { return el.sale;});
+                  for (let i=0;i<arr.length;i++){
+                      if (arr[i] === true) return true;
+                  }
+                  return false;
+              }
             },
             mounted: function () {
                 setTimeout(() => {
