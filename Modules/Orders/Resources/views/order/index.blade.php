@@ -59,8 +59,7 @@
                         <div class="pull-right">
                         @if(Session::get('create'))
                                 <a class="btn btn-success btn-sm" href="{{ route('order.create') }}">Tạo đơn hàng</a>
-                                {{-- <a class="btn btn-success btn-sm" href="{{ route('order.excel') }}">Excel</a> --}}
-
+                                 <a class="btn btn-info btn-sm" href="{{ route('order.excel') }}"><i class="fa fa-download"></i> Excel</a>
                         @endif
                         </div>
                     </div>

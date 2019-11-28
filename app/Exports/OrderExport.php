@@ -10,8 +10,11 @@ class OrderExport implements FromView
 {
     public function view(): View
     {
+        $orders = Orders::select("orders.*", "customers.name as customer_name")
+            ->join("customers", "customers.id", "orders.customer_id")
+            ->get();
         return view('orders::order.excel', [
-            'orders' => Orders::all()
+            'orders' => $orders
         ]);
     }
 }
