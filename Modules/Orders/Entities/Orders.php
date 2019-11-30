@@ -6,9 +6,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use League\Fractal\Resource\Item;
 use Modules\Product\Entities\ColorCode;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductPrice;
+use Modules\Product\Entities\ProductSize;
 
 
 class Orders extends Model
@@ -159,6 +161,39 @@ class Orders extends Model
             $item["list_price"] = (empty($product_item)) ? 0 : $product_item->price; // gia goc
             $item["created_at"] = Carbon::now();
             array_push($order_items, $item);
+
+            $sizeColor = ProductSize::where("product_id", $product->product_id)
+                                        ->where("size_id", $product->size)
+                                        ->first();
+            $newAmount = '';
+            
+            if($sizeColor) {
+                $color = explode(",", $sizeColor->color);
+                $amount = explode(",", $sizeColor->amount);
+
+                foreach($color as $key => $item) {
+                    if (trim($item) == trim($product->color)) {
+                        $amount[$key] = (string)((int)$amount[$key] -(int)$product->amount);
+                    }
+                }
+
+                foreach($amount as $key2 => $value ) {
+                    if($key2 == 0) {
+                        $newAmount .= (string)$value;
+                    } else {
+                        $newAmount .= ",".(string)$value;
+                    }
+                }
+
+            }
+            //update amount of size
+            ProductSize::where("id", $sizeColor->id)
+                        ->update(["amount" => $newAmount]);
+
+            //update amount of product
+            $newCount = (int)$product_item->count - (int)$product->amount;
+            Product::where("id", $product->product_id)
+                    ->update([ "count" => $newCount ]);
         }
 
         OrderItems::insert($order_items);

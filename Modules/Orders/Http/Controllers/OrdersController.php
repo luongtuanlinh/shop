@@ -241,6 +241,7 @@ class OrdersController extends Controller
                     if ($params['order_status'] == \Modules\Orders\Entities\Orders::CANCEL_STATUS) {
                         if(empty($order->deliver_time)) {
                             $order->order_status = $params['order_status'];
+                            OrderItems::returnProduct($order->id);
                         }
                     }
                     if ($params['order_status'] == \Modules\Orders\Entities\Orders::SUCCESS_STATUS) {

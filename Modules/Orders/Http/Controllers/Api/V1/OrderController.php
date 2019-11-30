@@ -143,6 +143,7 @@ class OrderController extends ApiController
             
             //update order item
             Orders::insertOrderitemApi($params);
+            
             DB::commit();
             return $this->successResponse(["success" => 1], 'Response Successfully');
 
